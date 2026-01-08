@@ -42,3 +42,159 @@ Monitoring      : Prometheus, OpenTelemetry
 
 
 
+🗺️ Learning Roadmap
+✅ Level 0: Web & Backend Fundamentals
+
+Client–Server Architecture
+
+HTTP & HTTPS
+
+REST APIs
+
+Status Codes & JSON
+
+API design principles
+
+✅ Level 1: Go Language Fundamentals
+
+Go syntax & types
+
+Structs & interfaces
+
+Error handling
+
+Pointers & memory basics
+
+Context & testing basics
+
+✅ Level 2: Building APIs with Go
+
+net/http
+
+Gin framework
+
+Routing & middleware
+
+Request validation
+
+Proper API responses
+
+✅ Level 3: Database Integration
+
+PostgreSQL fundamentals
+
+SQL queries & indexing
+
+GORM / SQLC
+
+Migrations
+
+Transactions
+
+✅ Level 4: Authentication & Security
+
+Password hashing (bcrypt)
+
+JWT (access & refresh tokens)
+
+Auth middleware
+
+Role-based access control (RBAC)
+
+Security best practices
+
+✅ Level 5: Go Concurrency (Superpower ⚡)
+
+Goroutines
+
+Channels
+
+Worker pools
+
+Mutex & WaitGroups
+
+Background jobs
+
+✅ Level 6: Advanced Backend Engineering
+
+Clean Architecture
+
+Dependency Injection
+
+Repository & service layers
+
+Logging & configuration
+
+Graceful shutdowns
+
+✅ Level 7: Microservices & Communication
+
+Monolith vs Microservices
+
+REST vs gRPC
+
+API gateways
+
+Async communication
+
+Event-driven systems
+
+✅ Level 8: Performance & Scaling
+
+Redis caching
+
+Rate limiting
+
+Load balancing
+
+Database optimization
+
+Horizontal scaling
+
+✅ Level 9: Testing & Reliability
+
+Unit testing
+
+Integration testing
+
+Mocking
+
+Testcontainers
+
+API testing
+
+✅ Level 10: DevOps & Deployment
+
+Docker & Docker Compose
+
+CI/CD pipelines
+
+Environment configs
+
+Cloud deployment (AWS / Fly.io)
+
+Reverse proxy (Nginx)
+
+✅ Level 11: Observability & Monitoring
+
+Structured logging
+
+Metrics
+
+Tracing
+
+Health checks
+
+Production debugging
+
+✅ Level 12: System Design (Hero Level 🧠)
+
+Scalability patterns
+
+CAP theorem
+
+Distributed systems basics
+
+Designing real-world systems (URL shortener, chat app, etc.)
+
+
