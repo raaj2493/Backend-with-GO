@@ -27,3 +27,18 @@ Create real-world backend projects
 Develop an engineer mindset, not just API syntax
 
 Track progress consistently and publicly
+
+
+🛠️ Tech Stack
+
+Language        : Go (Golang)
+Framework       : Gin
+Database        : PostgreSQL
+Authentication  : JWT
+Caching         : Redis
+Messaging       : Kafka / RabbitMQ
+Deployment      : Docker, CI/CD
+Monitoring      : Prometheus, OpenTelemetry
+
+
+
