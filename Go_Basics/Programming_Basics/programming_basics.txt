@@ -1,0 +1,321 @@
+📘 Programming & Go Language Notes (Zero → Core)
+
+These notes are written assuming no prior programming knowledge and gradually build up to how Go works internally.
+
+1️⃣ What is Programming?
+
+Programming is the process of giving instructions to a computer to perform a task.
+A computer itself is just hardware. It needs:
+Instructions (code)
+
+A way to understand those instructions
+
+That’s where programming languages come in.
+
+2️⃣ How Computers Actually Work
+Computers Understand ONLY
+
+Electric signals → ON / OFF
+
+Represented as 1 and 0
+
+This system is called Binary.
+
+Example:
+
+1 = ON
+0 = OFF
+
+Everything in a computer:
+
+Numbers
+
+Text
+
+Images
+
+Videos
+
+is finally converted into binary.
+
+3️⃣ Machine Code (Lowest Level)
+What is Machine Code?
+
+Machine code is binary instructions that the CPU can execute directly.
+
+Example (conceptual):
+
+10101010 00010101
+
+Each CPU has its own machine code format.
+
+Problems with Machine Code
+
+Impossible for humans to read/write
+
+Very error-prone
+
+Hardware dependent
+
+➡️ So humans created programming languages.
+
+4️⃣ Low-Level vs High-Level Languages
+🟥 Low-Level Languages
+
+Close to hardware
+
+Examples:
+
+Machine Code
+
+Assembly Language
+
+Characteristics:
+
+Very fast
+
+Very hard to write
+
+Hardware dependent
+
+🟦 High-Level Languages
+
+Close to humans
+
+Examples:
+
+C, C++, Go
+
+Java
+
+Python, JavaScript
+
+Characteristics:
+
+Easy to write
+
+Portable
+
+Need translation to machine code
+
+5️⃣ Translators (Very Important)
+
+High-level code cannot run directly on CPU.
+
+It must be converted using a translator:
+
+Types of Translators
+
+Compiler
+
+Interpreter
+
+Virtual Machine (VM)
+
+6️⃣ Compiled Languages
+What is Compilation?
+
+Compilation converts entire source code into machine code before execution.
+
+Flow: Source Code → Compiler → Machine Code → CPU
+
+Source Code → Compiler → Machine Code → CPU
+Examples
+
+C
+
+C++
+
+Go
+
+Rust
+
+Pros
+
+Very fast execution
+
+Errors found early
+
+Cons
+
+Platform specific
+
+7️⃣ Interpreted Languages
+What is Interpretation?
+
+Code is executed line by line at runtime.
+
+Flow:  Source Code → Interpreter → CPU
+
+Source Code → Interpreter → CPU
+Examples
+
+Python
+
+JavaScript
+
+Pros
+
+Easy debugging
+
+Platform independent
+
+Cons
+
+Slower execution
+
+8️⃣ Hybrid Languages (Compiled + Interpreted)
+Java (Best Example)
+
+Flow: Java Code → Bytecode → JVM → Machine Code → CPU
+
+Java Code → Bytecode → JVM → Machine Code → CPU
+
+Java uses:
+
+Compiler (to bytecode)
+
+JVM + JIT (runtime optimization)
+
+9️⃣ What is Bytecode?
+
+Bytecode is:
+
+Not machine code
+
+Not human-readable
+
+Designed for a virtual machine
+
+Used by:
+
+Java (JVM)
+
+Python (PVM)
+
+🔟 How Python Works (CPython)
+
+Flow:  .py → Bytecode (.pyc) → Python VM → CPU
+
+.py → Bytecode (.pyc) → Python VM → CPU
+
+Key points:
+
+Dynamic typing
+
+Runtime checks
+
+No JIT in CPython
+
+Result:
+
+Easy to write
+
+Slower execution
+
+1️⃣1️⃣ How Java Works
+
+Flow:
+
+.java → Bytecode → JVM → JIT → CPU
+
+Key points:
+
+Platform independent
+
+JIT improves performance
+
+Heavy runtime
+
+1️⃣2️⃣ How Go Language Works (Very Important)
+Go is a Compiled Language
+
+Flow:
+
+.go → Go Compiler → Native Binary → CPU
+What Go Does at Compile Time
+
+Type checking
+
+Memory layout planning
+
+Escape analysis
+
+Garbage collection preparation
+
+Go Runtime (Small but Powerful)
+
+Go binary includes:
+
+Garbage Collector
+
+Goroutine scheduler
+
+Channel handling
+
+(No VM, no JIT)
+
+1️⃣3️⃣ Why Go is Fast
+
+Ahead-of-time compilation
+
+No virtual machine
+
+Static typing
+
+Simple language design
+
+1️⃣4️⃣ Concurrency in Go (Special Feature)
+
+Go uses:
+
+Goroutines (lightweight threads)
+
+Channels (communication)
+
+Handled by:
+
+Go scheduler (inside runtime)
+
+1️⃣5️⃣ Go vs Other Languages (Execution Model)
+Language	Execution Style
+Go	Compiled → Native
+Java	Bytecode → JVM + JIT
+Python	Bytecode → VM
+1️⃣6️⃣ Why Go is Used in Industry
+
+Backend services
+
+Cloud systems
+
+Microservices
+
+DevOps tools
+
+Examples:
+
+Docker
+
+Kubernetes
+
+1️⃣7️⃣ Mental Model (Final)
+
+All languages end in binary.
+
+Difference is:
+
+WHEN translation happens
+
+HOW MUCH work happens at runtime
+
+✅ Final Summary
+
+Binary → language of hardware
+
+Machine code → CPU instructions
+
+Low-level → fast but hard
+
+High-level → easy but needs translation
+
+Go → compiled, fast, simple runtime
