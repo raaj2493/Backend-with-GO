@@ -28,7 +28,7 @@ var globalMessage = "Hello from global scope"
 
 const globalConst = "I am constant"
 
-func main() {
+func demonstratevariables() {
 
 	/*
 	--------------------------------------------------------

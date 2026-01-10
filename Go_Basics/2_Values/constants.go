@@ -41,7 +41,7 @@ const (
 	enableLogging = true
 )
 
-func main() {
+func demonstrateConstants() {
 
 	/*
 	--------------------------------------------------------
@@ -96,4 +96,8 @@ func main() {
 	End of constants demo
 	--------------------------------------------------------
 	*/
+}
+
+func main() {
+	demonstrateConstants()
 }
