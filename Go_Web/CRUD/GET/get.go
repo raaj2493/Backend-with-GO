@@ -1,15 +1,16 @@
 package main
-import {
+import (
+	"encoding/json"
 	"fmt"
 	"net/http"
-}
+)
 
 
 type Todo struct {
 	UserID int `json:"userid"`
 	Id int `json:"id"`
 	Title string `json:"title"`
-	Completed `json:"completed"`
+	Completed bool `json:"completed"`
 }
 
 func main(){
@@ -25,7 +26,7 @@ func main(){
 	fmt.Println("Response status", response.Status)
 
 	var todo Todo
-	error = json.NewDecoder(response.body).Decode(&Todo)
+	error = json.NewDecoder(response.Body).Decode(&todo)
 	if error != nil {
 		fmt.Println("error while getting the data " , error)
 	}
