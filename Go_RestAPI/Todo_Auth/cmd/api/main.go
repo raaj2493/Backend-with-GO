@@ -1,9 +1,17 @@
 package api
 
-import "fmt"
+import (
+	"github.com/gin-gonic/gin"
+)
 
 func main() {
-	fmt.Println("TODO API Server")
-	fmt.Println("Project setup completed")
-	fmt.Println("Folder structure created")
+	var router * gin.Engine = gin.Default()
+
+	router.GET("/", func (c *gin.Context)  {
+		c.JSON(200, gin.H{
+			"message" : "TODO API is Running",
+			"Status": "Success",
+		})
+	})
+	router.Run(":3000")
 }
