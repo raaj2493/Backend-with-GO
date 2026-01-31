@@ -1,17 +1,36 @@
 package main
 
 import (
+	"todo_api/internal/config"
+	"todo_api/internal/database"
+
 	"github.com/gin-gonic/gin"
+	"github.com/jackc/pgx/v5/pgxpool"
 )
 
 func main() {
-	var router * gin.Engine = gin.Default()
+
+	var config *config.Config
+	var err error
+	config, err = config.Load()
+	if err != nil {
+		panic(err)
+	}
+
+	var pool *pgxpool.Pool
+	pool, err = database.Connect(config.DATABASEURL)
+	if err != nil {
+		panic(err)
+	}
+	defer pool.Close()
+
+	var router *gin.Engine = gin.Default()
 	router.SetTrustedProxies(nil)
 
-	router.GET("/", func (c *gin.Context)  {
+	router.GET("/", func(c *gin.Context) {
 		c.JSON(200, gin.H{
-			"message" : "TODO API is Running",
-			"Status": "Success",
+			"message": "TODO API is Running",
+			"Status":  "Success",
 		})
 	})
 	router.Run(":3000")
