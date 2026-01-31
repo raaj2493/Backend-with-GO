@@ -24,13 +24,13 @@ func main() {
 	}
 	defer pool.Close()
 
-	var router *gin.Engine = gin.Default()
+	var router * gin.Engine = gin.Default()
 	router.SetTrustedProxies(nil)
 
-	router.GET("/", func(c *gin.Context) {
+	router.GET("/", func (c *gin.Context)  {
 		c.JSON(200, gin.H{
-			"message": "TODO API is Running",
-			"Status":  "Success",
+			"message" : "TODO API is Running",
+			"Status": "Success",
 		})
 	})
 	router.Run(":3000")
