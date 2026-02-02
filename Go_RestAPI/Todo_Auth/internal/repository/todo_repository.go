@@ -29,7 +29,7 @@ func CreateTodo(pool *pgxpool.Pool, title string, completed bool) (*models.Todo,
 		&todo.Id,
 		&todo.Title,
 		&todo.Completed,
-		&todo.
+		&todo.CreatedAt
 		&todo.
 	)
 }
