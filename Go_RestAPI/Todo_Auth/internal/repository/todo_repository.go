@@ -17,7 +17,9 @@ func CreateTodo(pool *pgxpool.Pool, title string, completed bool) (*models.Todo,
 
 	var Query string = `
 	
-	        INSERT INTO Todo
+	        INSERT INTO Todo (title , completed)
+			VALUES(&1, &2)
+			RETURING id,title,completed,created_at,updated_at
 	 
 
 	`
