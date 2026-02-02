@@ -28,7 +28,7 @@ func CreateTodo(pool *pgxpool.Pool, title string, completed bool) (*models.Todo,
 	pool.QueryRow(ctx,Query , title , completed).Scan(
 		&todo.Id,
 		&todo.Title,
-		&todo.Completed
+		&todo.Completed,
 		&todo.
 		&todo.
 	)
