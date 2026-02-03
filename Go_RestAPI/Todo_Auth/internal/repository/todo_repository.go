@@ -32,4 +32,6 @@ func CreateTodo(pool *pgxpool.Pool, title string, completed bool) (*models.Todo,
 		&todo.CreatedAt,
 		&todo.UpdatedAt,
 	)
+
+	return &todo , nil
 }
