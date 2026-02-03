@@ -42,4 +42,6 @@ func getMoviesbyId (c *gin.Context){
 
 }
 
+func postMovies (c *gin.Context) {
 
+}
