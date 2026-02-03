@@ -24,7 +24,7 @@ func main() {
     moviesapi := gin.Default()
 
     moviesapi.GET("/movies", getMovies)
-	moviesapi.GET("/movies/:id" , getMovies)
+	moviesapi.GET("/movies/:id" , getMoviesbyId)
 	moviesapi.POST("/movies" , postMovies)
 	moviesapi.PUT("/movies/:id" , updateMovies)
 	moviesapi.DELETE("/movies/:id", deleteMovies)
@@ -36,6 +36,10 @@ func getMovies (c *gin.Context){
 	    "count" : len(movies),
 		"movies" : movies,
    })
+}
+
+func getMoviesbyId (c *gin.Context){
+
 }
 
 
