@@ -37,3 +37,5 @@ func getMovies (c *gin.Context){
 		"movies" : movies,
    })
 }
+
+
