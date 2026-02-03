@@ -28,7 +28,12 @@ func main() {
 	moviesapi.POST("/movies" , postMovies)
 	moviesapi.PUT("/movies/:id" , updateMovies)
 	moviesapi.DELETE("/movies/:id", deleteMovies)
-    
-	
 
+}
+
+func getMovies (c *gin.Context){
+   c.JSON(http.StatusOK , gin.H{
+	    "count" : len(movies),
+		"movies" : movies,
+   })
 }
