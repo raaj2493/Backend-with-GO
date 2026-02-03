@@ -39,7 +39,25 @@ func getMovies (c *gin.Context){
 }
 
 func getMoviesbyId (c *gin.Context){
+     id := c.Param("id")
 
+	 if id == "" {
+		c.JSON(http.StatusBadRequest , gin.H{
+			"error" : "Movie id is required",
+		})
+		return
+
+	 }
+
+	 for _, movie := range movies {
+		 if movie.ID == id {
+			c.JSON(http.StatusOK, movie)
+		 }
+	 }
+
+	 c.JSON(http.StatusNotFound, gin.H{
+		"error": "movie not found",
+	})
 }
 
 func postMovies (c *gin.Context) {
