@@ -1,37 +1,37 @@
-// package repository
+package repository
 
-// import (
-// 	"context"
-// 	"time"
+import (
+	"context"
+	"time"
 
-// 	"github.com/jackc/pgx/v5/pgxpool"
-// 	"github.com/raajgiri/todo-auth/internal/models"
-// )
+	"github.com/jackc/pgx/v5/pgxpool"
+	"github.com/raajgiri/todo-auth/internal/models"
+)
 
-// func CreateTodo(pool *pgxpool.Pool, title string, completed bool) (*models.Todo, error) {
+func CreateTodo(pool *pgxpool.Pool, title string, completed bool) (*models.Todo, error) {
 
-// 	var ctx context.Context
-// 	var cancel context.CancelFunc
-// 	ctx, cancel = context.WithTimeout(context.Background(), 5*time.Second)
-// 	defer cancel()
+	var ctx context.Context
+	var cancel context.CancelFunc
+	ctx, cancel = context.WithTimeout(context.Background(), 5*time.Second)
+	defer cancel()
 
-// 	var Query string = `
+	var Query string = `
 	
-// 	        INSERT INTO Todo (title , completed)
-// 			VALUES(&1, &2)
-// 			RETURING id,title,completed,created_at,updated_at
+			INSERT INTO Todo (title , completed)
+			VALUES($1, $2)
+			RETURNING id,title,completed,created_at,updated_at
 	 
 
-// 	`
-// 	var todo models.Todo
+	`
+	var todo models.Todo
 
-// 	pool.QueryRow(ctx, Query, title, completed).Scan(
-// 		&todo.Id,
-// 		&todo.Title,
-// 		&todo.Completed,
-// 		&todo.CreatedAt,
-// 		&todo.UpdatedAt,
-// 	)
+	pool.QueryRow(ctx, Query, title, completed).Scan(
+		&todo.Id,
+		&todo.Title,
+		&todo.Completed,
+		&todo.CreatedAt,
+		&todo.UpdatedAt,
+	)
 
-// 	return &todo, nil
-// }
+	return &todo, nil
+}
