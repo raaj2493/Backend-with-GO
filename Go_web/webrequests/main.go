@@ -18,7 +18,7 @@ func webrequest() {
 		fmt.Println("Error while getting response", err)
 	}
 	defer response.Body.Close()
-	fmt.Println("Type of response %T\n" , response)
+	//fmt.Println("Type of response %T\n" , response)
 
 	// Read the response body 
    data , err := ioutil.ReadAll(response.Body)
