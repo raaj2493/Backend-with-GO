@@ -1,18 +1,18 @@
 package repository
 
 import (
-	"Todo_Auth/internal/models"
 	"context"
 	"time"
 
 	"github.com/jackc/pgx/v5/pgxpool"
+	"github.com/raajgiri/todo-auth/internal/models"
 )
 
-func CreateTodo(pool *pgxpool.Pool, title string, completed bool) (*models.Todo, error){
+func CreateTodo(pool *pgxpool.Pool, title string, completed bool) (*models.Todo, error) {
 
 	var ctx context.Context
 	var cancel context.CancelFunc
-	ctx , cancel = context.WithTimeout(context.Background(), 5*time.Second)
+	ctx, cancel = context.WithTimeout(context.Background(), 5*time.Second)
 	defer cancel()
 
 	var Query string = `
@@ -25,7 +25,7 @@ func CreateTodo(pool *pgxpool.Pool, title string, completed bool) (*models.Todo,
 	`
 	var todo models.Todo
 
-	pool.QueryRow(ctx,Query , title , completed).Scan(
+	pool.QueryRow(ctx, Query, title, completed).Scan(
 		&todo.Id,
 		&todo.Title,
 		&todo.Completed,
@@ -33,5 +33,5 @@ func CreateTodo(pool *pgxpool.Pool, title string, completed bool) (*models.Todo,
 		&todo.UpdatedAt,
 	)
 
-	return &todo , nil
+	return &todo, nil
 }
