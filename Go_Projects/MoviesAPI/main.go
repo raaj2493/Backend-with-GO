@@ -1,4 +1,4 @@
-package moviesapi
+package main
 
 import (
 	"net/http"
@@ -23,5 +23,5 @@ var movies[] Movies
 func main() {
     router := gin.Default()
 
-	
+
 }
