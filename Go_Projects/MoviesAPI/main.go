@@ -45,3 +45,11 @@ func getMoviesbyId (c *gin.Context){
 func postMovies (c *gin.Context) {
 
 }
+
+func updateMovies (c *gin.Context)  {
+	
+}
+
+func deleteMovies (c *gin.Context)  {
+	
+}
