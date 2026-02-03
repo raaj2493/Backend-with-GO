@@ -21,7 +21,14 @@ type Director struct {
 var movies[] Movies
 
 func main() {
-    router := gin.Default()
+    moviesapi := gin.Default()
 
+    moviesapi.GET("/movies", getMovies)
+	moviesapi.GET("/movies/:id" , getMovies)
+	moviesapi.POST("/movies" , postMovies)
+	moviesapi.PUT("/movies/:id" , updateMovies)
+	moviesapi.DELETE("/movies/:id", deleteMovies)
+    
+	
 
 }
