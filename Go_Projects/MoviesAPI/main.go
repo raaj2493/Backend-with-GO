@@ -68,7 +68,28 @@ func postMovies (c *gin.Context) {
 		c.JSON(http.StatusBadRequest , gin.H{
 			"message" : "invalid request body",
 		})
+		return
 	 }
+
+	 if input.Title == "" || input.Isbn == "" || input.Director == nil {
+		c.JSON(http.StatusBadRequest, gin.H{
+			"error": "title, isbn and director are required",
+		})
+		return
+	}
+
+	newmovie := Movies{
+		ID:    strconv.Itoa(rand.Intn(1000000)),
+		Title: input.Title,
+		Year: input.Year,
+		Rating: input.Rating,
+		Director: &Director{
+			Name: input.Director.name,
+		},
+	}
+
+	movies = append(movies, newmovie)
+	c.JSON(http.StatusCreated, newmovie)
 
 
 }
