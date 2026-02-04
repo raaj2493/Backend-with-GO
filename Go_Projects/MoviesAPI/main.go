@@ -4,6 +4,7 @@ import (
 	"net/http"
 
 	"github.com/gin-gonic/gin"
+	"github.com/gin-gonic/gin/binding"
 )
 
 type Movies struct {
@@ -63,7 +64,13 @@ func getMoviesbyId (c *gin.Context){
 func postMovies (c *gin.Context) {
      var input movie 
 
-	 
+	 if err := c.ShouldBindJSON(&input); err != nil {
+		c.JSON(http.StatusBadRequest , gin.H{
+			"message" : "invalid request body",
+		})
+	 }
+
+
 }
 
 func updateMovies (c *gin.Context)  {
