@@ -61,7 +61,9 @@ func getMoviesbyId (c *gin.Context){
 }
 
 func postMovies (c *gin.Context) {
+     var input movie 
 
+	 
 }
 
 func updateMovies (c *gin.Context)  {
