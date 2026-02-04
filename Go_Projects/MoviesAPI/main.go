@@ -1,11 +1,12 @@
 package main
 
 import (
+	"math/rand"
 	"net/http"
 	"strconv"
+	"time"
 
 	"github.com/gin-gonic/gin"
-	"github.com/gin-gonic/gin/binding"
 )
 
 type Movies struct {
@@ -20,98 +21,47 @@ type Director struct {
 	Name string `json:"name"`
 }
 
-var movies[] Movies
+var movies []Movies
 
 func main() {
-    moviesapi := gin.Default()
+	rand.Seed(time.Now().UnixNano())
 
-    moviesapi.GET("/movies", getMovies)
-	moviesapi.GET("/movies/:id" , getMoviesbyId)
-	moviesapi.POST("/movies" , postMovies)
-	moviesapi.PUT("/movies/:id" , updateMovies)
-	moviesapi.DELETE("/movies/:id", deleteMovies)
+	r := gin.Default()
 
+	r.GET("/movies", getMovies)
+	r.GET("/movies/:id", getMovieByID)
+	r.POST("/movies", createMovie)
+	r.PUT("/movies/:id", updateMovie)
+	r.DELETE("/movies/:id", deleteMovie)
+
+	r.Run(":8080")
 }
 
-func getMovies (c *gin.Context){
-   c.JSON(http.StatusOK , gin.H{
-	    "count" : len(movies),
-		"movies" : movies,
-   })
-}
+/* ================= GET ALL MOVIES ================= */
 
-func getMoviesbyId (c *gin.Context){
-     id := c.Param("id")
-
-	 if id == "" {
-		c.JSON(http.StatusBadRequest , gin.H{
-			"error" : "Movie id is required",
-		})
-		return
-
-	 }
-
-	 for _, movie := range movies {
-		 if movie.ID == id {
-			c.JSON(http.StatusOK, movie)
-		 }
-	 }
-
-	 c.JSON(http.StatusNotFound, gin.H{
-		"error": "movie not found",
+func getMovies(c *gin.Context) {
+	c.JSON(http.StatusOK, gin.H{
+		"count":  len(movies),
+		"movies": movies,
 	})
 }
 
-func postMovies (c *gin.Context) {
-     var input movie 
+/* ================= GET MOVIE BY ID ================= */
 
-	 if err := c.ShouldBindJSON(&input); err != nil {
-		c.JSON(http.StatusBadRequest , gin.H{
-			"message" : "invalid request body",
-		})
-		return
-	 }
+func getMovieByID(c *gin.Context) {
+	idParam := c.Param("id")
 
-	 if input.Title == "" || input.Isbn == "" || input.Director == nil {
+	id, err := strconv.Atoi(idParam)
+	if err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{
-			"error": "title, isbn and director are required",
+			"error": "invalid movie id",
 		})
 		return
 	}
 
-	newmovie := Movies{
-		ID:    strconv.Itoa(rand.Intn(1000000)),
-		Title: input.Title,
-		Year: input.Year,
-		Rating: input.Rating,
-		Director: &Director{
-			Name: input.Director.name,
-		},
-	}
-
-	movies = append(movies, newmovie)
-	c.JSON(http.StatusCreated, newmovie)
-
-
-}
-
-func updateMovies (c *gin.Context)  {
-	id := c.Param("id")
-	var input Movies
-
-	if err := c.ShouldBindJSON(&input); err != nil {
-		c.JSON(http.StatusBadRequest , gin.H{
-			"message" : "invalid request body",
-		})
-		return
-	}
-
-	for i , movie := range movies {
+	for _, movie := range movies {
 		if movie.ID == id {
-			movies[i] = input
-			c.JSON(http.StatusOK , gin.H{
-				"message": "movie updated successfully",
-			})
+			c.JSON(http.StatusOK, movie)
 			return
 		}
 	}
@@ -121,21 +71,103 @@ func updateMovies (c *gin.Context)  {
 	})
 }
 
-func deleteMovies (c *gin.Context)  {
-	id = c.Param("id")
+/* ================= CREATE MOVIE ================= */
 
-	for i , movies := range movies {
-         if movies.ID == id {
-			movies = append(movies[:i] , movies[i+1]...)
+func createMovie(c *gin.Context) {
+	var input Movies
 
-			c.JSON(http.StatusOK , gin.H{
+	if err := c.ShouldBindJSON(&input); err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{
+			"error": "invalid request body",
+		})
+		return
+	}
+
+	if input.Title == "" || input.Year == 0 || input.Director == nil {
+		c.JSON(http.StatusBadRequest, gin.H{
+			"error": "title, year and director are required",
+		})
+		return
+	}
+
+	newMovie := Movies{
+		ID:     rand.Intn(1000000),
+		Title:  input.Title,
+		Year:   input.Year,
+		Rating: input.Rating,
+		Director: &Director{
+			Name: input.Director.Name,
+		},
+	}
+
+	movies = append(movies, newMovie)
+
+	c.JSON(http.StatusCreated, newMovie)
+}
+
+/* ================= UPDATE MOVIE ================= */
+
+func updateMovie(c *gin.Context) {
+	idParam := c.Param("id")
+
+	id, err := strconv.Atoi(idParam)
+	if err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{
+			"error": "invalid movie id",
+		})
+		return
+	}
+
+	var input Movies
+	if err := c.ShouldBindJSON(&input); err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{
+			"error": "invalid request body",
+		})
+		return
+	}
+
+	for i, movie := range movies {
+		if movie.ID == id {
+			movies[i].Title = input.Title
+			movies[i].Year = input.Year
+			movies[i].Rating = input.Rating
+			movies[i].Director = input.Director
+
+			c.JSON(http.StatusOK, movies[i])
+			return
+		}
+	}
+
+	c.JSON(http.StatusNotFound, gin.H{
+		"error": "movie not found",
+	})
+}
+
+/* ================= DELETE MOVIE ================= */
+
+func deleteMovie(c *gin.Context) {
+	idParam := c.Param("id")
+
+	id, err := strconv.Atoi(idParam)
+	if err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{
+			"error": "invalid movie id",
+		})
+		return
+	}
+
+	for i, movie := range movies {
+		if movie.ID == id {
+			movies = append(movies[:i], movies[i+1:]...)
+
+			c.JSON(http.StatusOK, gin.H{
 				"message": "movie deleted successfully",
 			})
 			return
-		 }
+		}
+	}
 
-		 c.JSON(http.StatusNotFound, gin.H{
+	c.JSON(http.StatusNotFound, gin.H{
 		"error": "movie not found",
 	})
-	}
 }
