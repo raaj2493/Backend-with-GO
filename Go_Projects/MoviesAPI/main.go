@@ -69,5 +69,20 @@ func updateMovies (c *gin.Context)  {
 }
 
 func deleteMovies (c *gin.Context)  {
-	
+	id = c.Param("id")
+
+	for i , movies := range movies {
+         if movies.ID == id {
+			movies = append(movies[:i] , movies[i+1]...)
+
+			c.JSON(http.StatusOK , gin.H{
+				"message": "movie deleted successfully",
+			})
+			return
+		 }
+
+		 c.JSON(http.StatusNotFound, gin.H{
+		"error": "movie not found",
+	})
+	}
 }
