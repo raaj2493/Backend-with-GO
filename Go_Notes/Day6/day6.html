@@ -1,0 +1,769 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>JWT Authentication Mastery - Secure Backend Systems</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Caveat:wght@400;600;700&family=Patrick+Hand&family=Indie+Flower&family=Fira+Code:wght@400;500&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        body {
+            font-family: 'Patrick Hand', cursive;
+            background-color: #f4f1ea;
+            background-image: 
+                linear-gradient(#e1e1e1 1px, transparent 1px),
+                linear-gradient(90deg, #e1e1e1 1px, transparent 1px);
+            background-size: 20px 20px;
+        }
+        
+        .handwritten { font-family: 'Caveat', cursive; }
+        .code-font { font-family: 'Fira Code', monospace; }
+        
+        .highlight { background: linear-gradient(120deg, #ffeaa7 0%, #ffeaa7 100%); background-repeat: no-repeat; background-size: 100% 40%; background-position: 0 88%; padding: 0 4px; }
+        .highlight-blue { background: linear-gradient(120deg, #74b9ff 0%, #74b9ff 100%); background-repeat: no-repeat; background-size: 100% 40%; background-position: 0 88%; padding: 0 4px; }
+        .highlight-pink { background: linear-gradient(120deg, #fd79a8 0%, #fd79a8 100%); background-repeat: no-repeat; background-size: 100% 40%; background-position: 0 88%; padding: 0 4px; }
+        .highlight-green { background: linear-gradient(120deg, #55efc4 0%, #55efc4 100%); background-repeat: no-repeat; background-size: 100% 40%; background-position: 0 88%; padding: 0 4px; }
+        
+        .sticky-note { background: #fff740; box-shadow: 2px 2px 10px rgba(0,0,0,0.1); transform: rotate(-2deg); }
+        .sticky-note-blue { background: #7ee8fa; transform: rotate(2deg); }
+        .sticky-note-pink { background: #ff9999; transform: rotate(-1deg); }
+        .sticky-note-green { background: #98fb98; transform: rotate(1deg); }
+        
+        .code-block {
+            font-family: 'Fira Code', monospace;
+            background: #2d3436;
+            color: #dfe6e9;
+            position: relative;
+            font-size: 0.85rem;
+            line-height: 1.5;
+        }
+        
+        .code-block::before {
+            content: '';
+            position: absolute;
+            top: -5px; left: -5px; right: -5px; bottom: -5px;
+            background: #fff;
+            z-index: -1;
+            transform: rotate(1deg);
+            box-shadow: 3px 3px 10px rgba(0,0,0,0.1);
+        }
+        
+        .paper-shadow {
+            box-shadow: 
+                0 1px 1px rgba(0,0,0,0.15), 
+                0 10px 0 -5px #eee, 
+                0 10px 1px -4px rgba(0,0,0,0.15), 
+                0 20px 0 -10px #eee, 
+                0 20px 1px -9px rgba(0,0,0,0.15);
+        }
+        
+        .step-badge {
+            background: linear-gradient(135deg, #6c5ce7 0%, #a29bfe 100%);
+            color: white;
+            width: 60px;
+            height: 60px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            font-size: 1.5rem;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+        }
+        
+        .flow-arrow {
+            font-size: 2rem;
+            color: #e17055;
+            animation: bounce 1s infinite;
+        }
+        
+        @keyframes bounce {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-10px); }
+        }
+        
+        .jwt-visual {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border-radius: 20px;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .token-card {
+            background: rgba(255,255,255,0.1);
+            backdrop-filter: blur(10px);
+            border: 2px solid rgba(255,255,255,0.3);
+            border-radius: 15px;
+            font-family: 'Fira Code', monospace;
+            word-break: break-all;
+        }
+        
+        .auth-flow-box {
+            background: white;
+            border: 3px solid #2d3436;
+            border-radius: 15px;
+            position: relative;
+        }
+        
+        .auth-flow-box::before {
+            content: '';
+            position: absolute;
+            top: 5px; left: 5px; right: -5px; bottom: -5px;
+            border: 2px solid #b2bec3;
+            border-radius: 15px;
+            z-index: -1;
+        }
+        
+        .security-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            background: linear-gradient(135deg, #ff7675 0%, #d63031 100%);
+            color: white;
+            padding: 8px 16px;
+            border-radius: 20px;
+            font-weight: bold;
+        }
+        
+        .method-badge {
+            display: inline-block;
+            padding: 6px 14px;
+            border-radius: 20px;
+            font-weight: bold;
+            font-size: 0.85rem;
+        }
+        
+        .method-post { background: #00b894; color: white; }
+        .method-get { background: #0984e3; color: white; }
+        
+        .concept-card {
+            transition: all 0.3s;
+            border-left: 5px solid;
+        }
+        
+        .concept-card:hover {
+            transform: translateX(10px);
+        }
+        
+        .concept-auth { border-color: #6c5ce7; background: #f3f0ff; }
+        .concept-author { border-color: #00b894; background: #e8f8f5; }
+        
+        @media print {
+            body { background: white; }
+            .no-print { display: none; }
+            .page-break { page-break-before: always; }
+        }
+    </style>
+</head>
+<body class="p-4 md:p-8 max-w-4xl mx-auto">
+
+    <!-- Title -->
+    <div class="relative mb-12 text-center">
+        <div class="absolute top-0 left-1/2 transform -translate-x-1/2 -translate-y-1/2 bg-red-600 text-white px-6 py-2 rounded-full font-bold shadow-lg z-10">
+            PART 6: SECURITY
+        </div>
+        <h1 class="text-5xl md:text-6xl font-bold text-gray-800 mb-4 handwritten mt-4">
+            JWT Authentication Mastery
+        </h1>
+        <div class="text-2xl text-gray-600 handwritten">Building Secure Backend Systems</div>
+        <div class="mt-4 text-6xl animate-bounce">🔐</div>
+    </div>
+
+    <!-- What is Authentication -->
+    <div class="bg-white p-8 rounded-lg paper-shadow mb-8">
+        <h2 class="text-3xl font-bold mb-6 text-center text-gray-800">🧠 First: What Is Authentication? (Like You're 5)</h2>
+        
+        <div class="sticky-note p-6 mb-6 text-center transform -rotate-1">
+            <p class="text-2xl">Authentication means: <span class="highlight font-bold">"Who are you? Prove it."</span></p>
+        </div>
+
+        <div class="bg-blue-50 p-6 rounded-lg border-2 border-blue-300 mb-6">
+            <h3 class="text-xl font-bold mb-4 text-blue-800">Example: Gmail Login</h3>
+            <div class="space-y-3">
+                <div class="flex items-center gap-3">
+                    <span class="bg-blue-500 text-white w-8 h-8 rounded-full flex items-center justify-center font-bold">1</span>
+                    <span>You open Gmail</span>
+                </div>
+                <div class="flex items-center gap-3">
+                    <span class="bg-blue-500 text-white w-8 h-8 rounded-full flex items-center justify-center font-bold">2</span>
+                    <span>It asks for email + password</span>
+                </div>
+                <div class="flex items-center gap-3">
+                    <span class="bg-blue-500 text-white w-8 h-8 rounded-full flex items-center justify-center font-bold">3</span>
+                    <span>You enter them</span>
+                </div>
+                <div class="flex items-center gap-3">
+                    <span class="bg-blue-500 text-white w-8 h-8 rounded-full flex items-center justify-center font-bold">4</span>
+                    <span>Google checks</span>
+                </div>
+                <div class="flex items-center gap-3">
+                    <span class="bg-green-500 text-white w-8 h-8 rounded-full flex items-center justify-center font-bold">✓</span>
+                    <span class="font-bold text-green-700">If correct → you are allowed in</span>
+                </div>
+            </div>
+        </div>
+        
+        <div class="text-center text-xl">
+            <p>That process is <span class="highlight-pink font-bold">authentication</span>. 🎯</p>
+        </div>
+    </div>
+
+    <!-- Why Auth Needed -->
+    <div class="page-break"></div>
+    
+    <div class="grid md:grid-cols-2 gap-6 mb-8">
+        <div class="bg-red-50 p-6 rounded-lg border-3 border-red-300">
+            <h3 class="text-2xl font-bold mb-4 text-red-600">🔓 Without Auth:</h3>
+            <ul class="space-y-3 text-lg">
+                <li class="flex items-center gap-3">
+                    <span class="text-red-500">✗</span>
+                    <span>Anyone can access anything</span>
+                </li>
+                <li class="flex items-center gap-3">
+                    <span class="text-red-500">✗</span>
+                    <span>Anyone can delete data</span>
+                </li>
+                <li class="flex items-center gap-3">
+                    <span class="text-red-500">✗</span>
+                    <span>No security</span>
+                </li>
+            </ul>
+        </div>
+        
+        <div class="bg-green-50 p-6 rounded-lg border-3 border-green-300">
+            <h3 class="text-2xl font-bold mb-4 text-green-600">🔐 With Auth:</h3>
+            <ul class="space-y-3 text-lg">
+                <li class="flex items-center gap-3">
+                    <span class="text-green-500">✓</span>
+                    <span>Only logged-in users access data</span>
+                </li>
+                <li class="flex items-center gap-3">
+                    <span class="text-green-500">✓</span>
+                    <span>Permissions can be controlled</span>
+                </li>
+                <li class="flex items-center gap-3">
+                    <span class="text-green-500">✓</span>
+                    <span>Secure system</span>
+                </li>
+            </ul>
+        </div>
+    </div>
+
+    <!-- Auth vs Authorization -->
+    <div class="bg-white p-6 rounded-lg paper-shadow mb-8">
+        <h2 class="text-3xl font-bold mb-6 text-center text-gray-800">🧠 Authentication vs Authorization (VERY IMPORTANT)</h2>
+        
+        <div class="grid md:grid-cols-2 gap-6">
+            <div class="concept-card concept-auth p-6 rounded-lg">
+                <div class="text-4xl mb-3">🙋‍♂️</div>
+                <h3 class="text-2xl font-bold mb-2 text-purple-800">Authentication</h3>
+                <p class="text-xl mb-3 font-bold">"Who are you?"</p>
+                <div class="bg-white bg-opacity-50 p-3 rounded">
+                    <p class="text-sm">Example: Login with email/password</p>
+                </div>
+            </div>
+            
+            <div class="concept-card concept-author p-6 rounded-lg">
+                <div class="text-4xl mb-3">✅</div>
+                <h3 class="text-2xl font-bold mb-2 text-green-800">Authorization</h3>
+                <p class="text-xl mb-3 font-bold">"What are you allowed to do?"</p>
+                <div class="bg-white bg-opacity-50 p-3 rounded">
+                    <p class="text-sm">Example: Admin can delete users</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- JWT Explanation -->
+    <div class="jwt-visual p-8 mb-8 text-center">
+        <h2 class="text-3xl font-bold mb-4">🔐 What Is JWT?</h2>
+        <p class="text-xl mb-6">JWT = <span class="font-bold">JSON Web Token</span> = Digital ID Card</p>
+        
+        <div class="text-6xl mb-6">🪪</div>
+        
+        <p class="text-lg mb-6">Think of JWT like a <span class="font-bold">secure entry pass</span></p>
+        
+        <div class="token-card p-4 mb-6 text-sm">
+            eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4gRG9lIiwiaWF0IjoxNTE2MjM5MDIyfQ.SflKxwRJSMeKKF2QT4fwpMe...
+        </div>
+        
+        <div class="sticky-note-green p-4 inline-block transform rotate-1">
+            <p class="font-bold">Don't panic! 😄</p>
+            <p class="text-sm mt-2">This is just a long secure string</p>
+            <p class="text-sm">You don't need to understand its internal structure yet</p>
+        </div>
+        
+        <div class="mt-6 text-xl font-bold">
+            JWT = secure string proving you are logged in
+        </div>
+    </div>
+
+    <!-- Big Picture Flow -->
+    <div class="page-break"></div>
+    
+    <div class="bg-white p-6 rounded-lg paper-shadow mb-8">
+        <h2 class="text-3xl font-bold mb-6 text-center text-gray-800">🧩 Big Picture Flow (Understand This First)</h2>
+        
+        <div class="space-y-6">
+            <div class="auth-flow-box p-4 bg-green-50">
+                <div class="flex items-center gap-4">
+                    <span class="text-3xl">📝</span>
+                    <div>
+                        <p class="font-bold text-green-800">Signup</p>
+                        <p class="text-sm">Store user + hashed password → OK</p>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="text-center text-2xl text-gray-400">↓</div>
+            
+            <div class="auth-flow-box p-4 bg-blue-50">
+                <div class="flex items-center gap-4">
+                    <span class="text-3xl">🔑</span>
+                    <div>
+                        <p class="font-bold text-blue-800">Login</p>
+                        <p class="text-sm">Verify password → Generate JWT → Send token</p>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="text-center text-2xl text-gray-400">↓</div>
+            
+            <div class="auth-flow-box p-4 bg-purple-50">
+                <div class="flex items-center gap-4">
+                    <span class="text-3xl">🛡️</span>
+                    <div>
+                        <p class="font-bold text-purple-800">Client</p>
+                        <p class="text-sm">Sends JWT in headers → Server verifies → Allows access</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- What We'll Build -->
+    <div class="sticky-note-blue p-6 mb-8 text-center">
+        <h2 class="text-3xl font-bold mb-4 text-gray-800">🧱 What We'll Build (Complete Auth System)</h2>
+        
+        <div class="bg-white bg-opacity-50 p-6 rounded-lg max-w-2xl mx-auto">
+            <table class="w-full text-left">
+                <thead>
+                    <tr class="border-b-2 border-gray-300">
+                        <th class="pb-3">Feature</th>
+                        <th class="pb-3">Endpoint</th>
+                    </tr>
+                </thead>
+                <tbody class="text-lg">
+                    <tr class="border-b border-gray-200">
+                        <td class="py-3">Signup</td>
+                        <td class="py-3"><span class="method-badge method-post">POST</span> /auth/register</td>
+                    </tr>
+                    <tr class="border-b border-gray-200">
+                        <td class="py-3">Login</td>
+                        <td class="py-3"><span class="method-badge method-post">POST</span> /auth/login</td>
+                    </tr>
+                    <tr>
+                        <td class="py-3">Protected Route</td>
+                        <td class="py-3"><span class="method-badge method-get">GET</span> /profile</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+        
+        <div class="mt-4 flex flex-wrap justify-center gap-2">
+            <span class="security-badge"><i class="fas fa-lock"></i> Password hashing</span>
+            <span class="security-badge"><i class="fas fa-key"></i> JWT generation</span>
+            <span class="security-badge"><i class="fas fa-shield-alt"></i> Middleware protection</span>
+        </div>
+    </div>
+
+    <!-- Step 1: Install -->
+    <div class="page-break"></div>
+    
+    <div class="bg-white p-6 rounded-lg paper-shadow mb-8">
+        <div class="flex items-center gap-4 mb-6">
+            <div class="step-badge">1</div>
+            <div>
+                <h2 class="text-3xl font-bold text-gray-800">Install Required Packages</h2>
+            </div>
+        </div>
+
+        <div class="code-block p-4 rounded-lg overflow-x-auto text-sm mb-6">
+            <span style="color:#74b9ff">go get</span> github.com/golang-jwt/jwt/v5<br>
+            <span style="color:#74b9ff">go get</span> golang.org/x/crypto/bcrypt
+        </div>
+
+        <div class="grid md:grid-cols-2 gap-4">
+            <div class="bg-blue-50 p-4 rounded-lg border-l-4 border-blue-500">
+                <p class="font-bold text-blue-800 mb-2">bcrypt</p>
+                <p>→ Password hashing</p>
+            </div>
+            <div class="bg-purple-50 p-4 rounded-lg border-l-4 border-purple-500">
+                <p class="font-bold text-purple-800 mb-2">jwt</p>
+                <p>→ Token creation & verification</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Why Hash Password -->
+    <div class="sticky-note-pink p-6 mb-8 transform -rotate-1">
+        <h3 class="text-2xl font-bold mb-4 text-center">🧠 Why Hash Password?</h3>
+        
+        <div class="grid md:grid-cols-2 gap-4 mb-4">
+            <div class="bg-red-100 p-4 rounded-lg">
+                <p class="font-bold text-red-600 mb-2">❌ Never store:</p>
+                <code class="block bg-gray-800 text-white p-2 rounded text-sm">password = "raj123"</code>
+            </div>
+            <div class="bg-green-100 p-4 rounded-lg">
+                <p class="font-bold text-green-600 mb-2">✅ Instead store:</p>
+                <code class="block bg-gray-800 text-white p-2 rounded text-sm break-all">$2a$14$nfj3n8rfn3...</code>
+            </div>
+        </div>
+        
+        <p class="text-center font-bold">So even if database leaks → passwords remain secure! 🔒</p>
+    </div>
+
+    <!-- Step 2: User Model -->
+    <div class="page-break"></div>
+    
+    <div class="bg-white p-6 rounded-lg paper-shadow mb-8">
+        <div class="flex items-center gap-4 mb-6">
+            <div class="step-badge">2</div>
+            <div>
+                <h2 class="text-3xl font-bold text-gray-800">User Model With Password</h2>
+            </div>
+        </div>
+
+        <div class="bg-gray-100 p-3 rounded-lg mb-4 flex items-center gap-2">
+            <span class="text-2xl">📁</span>
+            <span class="font-mono text-lg">models/user.go</span>
+        </div>
+
+        <div class="code-block p-4 rounded-lg overflow-x-auto text-sm mb-6">
+<pre><span style="color:#fd79a8">package</span> models
+
+<span style="color:#fd79a8">import</span> <span style="color:#ffeaa7">"gorm.io/gorm"</span>
+
+<span style="color:#fd79a8">type</span> User <span style="color:#fd79a8">struct</span> {
+    gorm.Model
+    Name     <span style="color:#55efc4">string</span> <span style="color:#ffeaa7">`json:"name"`</span>
+    Email    <span style="color:#55efc4">string</span> <span style="color:#ffeaa7">`json:"email" gorm:"unique"`</span>
+    Password <span style="color:#55efc4">string</span> <span style="color:#ffeaa7">`json:"password"`</span>
+}</pre>
+        </div>
+
+        <!-- Line by Line -->
+        <h3 class="text-2xl font-bold mb-4 text-gray-800">🔍 Line-by-Line Explanation</h3>
+        
+        <div class="space-y-4">
+            <div class="bg-blue-50 p-4 rounded-lg border-l-4 border-blue-500">
+                <code class="bg-gray-800 text-white px-3 py-1 rounded text-sm">package models</code>
+                <p class="mt-2">This file belongs to <span class="highlight-blue font-bold">models</span> package. Stores data structures for database tables.</p>
+            </div>
+            
+            <div class="bg-purple-50 p-4 rounded-lg border-l-4 border-purple-500">
+                <code class="bg-gray-800 text-white px-3 py-1 rounded text-sm">import "gorm.io/gorm"</code>
+                <p class="mt-2">Imports <span class="highlight-pink font-bold">GORM</span> (Object Relational Mapper). Converts Go code to SQL automatically.</p>
+            </div>
+            
+            <div class="bg-green-50 p-4 rounded-lg border-l-4 border-green-500">
+                <code class="bg-gray-800 text-white px-3 py-1 rounded text-sm">type User struct</code>
+                <p class="mt-2">Defines <span class="highlight-green font-bold">structure</span> of what a user looks like in our system.</p>
+            </div>
+            
+            <div class="bg-yellow-50 p-4 rounded-lg border-l-4 border-yellow-500">
+                <code class="bg-gray-800 text-white px-3 py-1 rounded text-sm">gorm.Model</code>
+                <p class="mt-2">Adds default fields: <span class="font-bold">ID, CreatedAt, UpdatedAt, DeletedAt</span>. Auto-managed!</p>
+            </div>
+            
+            <div class="bg-pink-50 p-4 rounded-lg border-l-4 border-pink-500">
+                <code class="bg-gray-800 text-white px-3 py-1 rounded text-sm">Email string `json:"email" gorm:"unique"`</code>
+                <p class="mt-2"><span class="highlight font-bold">json:"email"</span> → JSON mapping. <span class="highlight font-bold">gorm:"unique"</span> → No duplicate emails allowed!</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Step 3: Auth Controller -->
+    <div class="page-break"></div>
+    
+    <div class="bg-white p-6 rounded-lg paper-shadow mb-8 transform rotate-1">
+        <div class="flex items-center gap-4 mb-6">
+            <div class="step-badge">3</div>
+            <div>
+                <h2 class="text-3xl font-bold text-gray-800">Auth Controller</h2>
+                <p class="text-gray-600">Register + Login</p>
+            </div>
+        </div>
+
+        <div class="bg-gray-100 p-3 rounded-lg mb-4 flex items-center gap-2">
+            <span class="text-2xl">📁</span>
+            <span class="font-mono text-lg">controllers/auth.go</span>
+        </div>
+
+        <div class="code-block p-4 rounded-lg overflow-x-auto text-sm mb-6">
+<pre><span style="color:#fd79a8">package</span> controllers
+
+<span style="color:#fd79a8">import</span> (
+    <span style="color:#ffeaa7">"net/http"</span>
+    <span style="color:#ffeaa7">"time"</span>
+    <span style="color:#ffeaa7">"github.com/gin-gonic/gin"</span>
+    <span style="color:#ffeaa7">"github.com/golang-jwt/jwt/v5"</span>
+    <span style="color:#ffeaa7">"golang.org/x/crypto/bcrypt"</span>
+    <span style="color:#ffeaa7">"go-backend/config"</span>
+    <span style="color:#ffeaa7">"go-backend/models"</span>
+)
+
+<span style="color:#fd79a8">var</span> jwtKey = []<span style="color:#55efc4">byte</span>(<span style="color:#ffeaa7">"secret_key"</span>)</pre>
+        </div>
+
+        <!-- JWT Secret Explanation -->
+        <div class="sticky-note p-4 mb-6 transform -rotate-1">
+            <h4 class="font-bold mb-2">🔐 JWT Secret Key</h4>
+            <code class="block bg-gray-800 text-white p-2 rounded text-sm mb-2">var jwtKey = []byte("secret_key")</code>
+            <ul class="text-sm space-y-1">
+                <li>• This is a <span class="highlight font-bold">secret signing key</span></li>
+                <li>• Used to <span class="font-bold">sign tokens</span> and <span class="font-bold">verify tokens</span></li>
+                <li>• <span class="text-red-600 font-bold">Only server knows this</span></li>
+                <li>• If someone gets this → security broken!</li>
+            </ul>
+        </div>
+
+        <!-- Register Function -->
+        <h3 class="text-2xl font-bold mb-4 text-gray-800">🧩 REGISTER FUNCTION</h3>
+        
+        <div class="code-block p-4 rounded-lg overflow-x-auto text-sm mb-4">
+<pre><span style="color:#fd79a8">func</span> <span style="color:#74b9ff">Register</span>(c *gin.Context) {
+    <span style="color:#fd79a8">var</span> user models.User
+    
+    <span style="color:#fd79a8">if</span> err := c.<span style="color:#74b9ff">ShouldBindJSON</span>(&user); err != <span style="color:#fd79a8">nil</span> {
+        c.<span style="color:#74b9ff">JSON</span>(http.StatusBadRequest, gin.<span style="color:#74b9ff">H</span>{<span style="color:#ffeaa7">"error"</span>: err.Error()})
+        <span style="color:#fd79a8">return</span>
+    }
+    
+    hashedPassword, _ := bcrypt.<span style="color:#74b9ff">GenerateFromPassword</span>(
+        []<span style="color:#55efc4">byte</span>(user.Password), <span style="color:#55efc4">14</span>)
+    user.Password = <span style="color:#55efc4">string</span>(hashedPassword)
+    
+    config.DB.<span style="color:#74b9ff">Create</span>(&user)
+    
+    c.<span style="color:#74b9ff">JSON</span>(http.StatusCreated, gin.<span style="color:#74b9ff">H</span>{
+        <span style="color:#ffeaa7">"message"</span>: <span style="color:#ffeaa7">"User registered successfully"</span>,
+    })
+}</pre>
+        </div>
+
+        <!-- Register Breakdown -->
+        <div class="space-y-3 mb-6">
+            <div class="bg-blue-50 p-3 rounded-lg">
+                <p class="font-bold text-sm">ShouldBindJSON(&user)</p>
+                <p class="text-sm">Reads JSON body → stores in user struct</p>
+            </div>
+            <div class="bg-green-50 p-3 rounded-lg">
+                <p class="font-bold text-sm">bcrypt.GenerateFromPassword(..., 14)</p>
+                <p class="text-sm">Hashes password. <span class="font-bold">14</span> = cost factor (higher = more secure but slower)</p>
+            </div>
+            <div class="bg-purple-50 p-3 rounded-lg">
+                <p class="font-bold text-sm">config.DB.Create(&user)</p>
+                <p class="text-sm">Saves user to database with <span class="font-bold">hashed password</span></p>
+            </div>
+        </div>
+
+        <!-- Login Function -->
+        <h3 class="text-2xl font-bold mb-4 text-gray-800">🧩 LOGIN FUNCTION</h3>
+        
+        <div class="code-block p-4 rounded-lg overflow-x-auto text-sm mb-4">
+<pre><span style="color:#fd79a8">func</span> <span style="color:#74b9ff">Login</span>(c *gin.Context) {
+    <span style="color:#fd79a8">var</span> input models.User
+    <span style="color:#fd79a8">var</span> user models.User
+    
+    c.<span style="color:#74b9ff">ShouldBindJSON</span>(&input)
+    
+    <span style="color:#fd79a8">if</span> err := config.DB.<span style="color:#74b9ff">Where</span>(<span style="color:#ffeaa7">"email = ?"</span>, input.Email).
+        <span style="color:#74b9ff">First</span>(&user).Error; err != <span style="color:#fd79a8">nil</span> {
+        c.<span style="color:#74b9ff">JSON</span>(http.StatusUnauthorized, gin.<span style="color:#74b9ff">H</span>{<span style="color:#ffeaa7">"error"</span>: <span style="color:#ffeaa7">"Invalid email"</span>})
+        <span style="color:#fd79a8">return</span>
+    }
+    
+    <span style="color:#fd79a8">if</span> err := bcrypt.<span style="color:#74b9ff">CompareHashAndPassword</span>(
+        []<span style="color:#55efc4">byte</span>(user.Password), 
+        []<span style="color:#55efc4">byte</span>(input.Password)); err != <span style="color:#fd79a8">nil</span> {
+        c.<span style="color:#74b9ff">JSON</span>(http.StatusUnauthorized, gin.<span style="color:#74b9ff">H</span>{<span style="color:#ffeaa7">"error"</span>: <span style="color:#ffeaa7">"Invalid password"</span>})
+        <span style="color:#fd79a8">return</span>
+    }
+    
+    token := jwt.<span style="color:#74b9ff">NewWithClaims</span>(jwt.SigningMethodHS256, jwt.MapClaims{
+        <span style="color:#ffeaa7">"user_id"</span>: user.ID,
+        <span style="color:#ffeaa7">"exp"</span>:     time.<span style="color:#74b9ff">Now</span>().<span style="color:#74b9ff">Add</span>(time.Hour * <span style="color:#55efc4">24</span>).<span style="color:#74b9ff">Unix</span>(),
+    })
+    
+    tokenString, _ := token.<span style="color:#74b9ff">SignedString</span>(jwtKey)
+    
+    c.<span style="color:#74b9ff">JSON</span>(http.StatusOK, gin.<span style="color:#74b9ff">H</span>{<span style="color:#ffeaa7">"token"</span>: tokenString})
+}</pre>
+        </div>
+
+        <!-- Login Breakdown -->
+        <div class="space-y-3">
+            <div class="bg-blue-50 p-3 rounded-lg">
+                <p class="font-bold text-sm">DB.Where("email = ?", input.Email).First(&user)</p>
+                <p class="text-sm">SQL: <code>SELECT * FROM users WHERE email = ? LIMIT 1</code></p>
+            </div>
+            <div class="bg-green-50 p-3 rounded-lg">
+                <p class="font-bold text-sm">bcrypt.CompareHashAndPassword(...)</p>
+                <p class="text-sm">Compares stored hash with entered password. <span class="font-bold">Auto-handles hashing!</span></p>
+            </div>
+            <div class="bg-purple-50 p-3 rounded-lg">
+                <p class="font-bold text-sm">jwt.NewWithClaims(...)</p>
+                <p class="text-sm">Creates token with <span class="font-bold">user_id</span> and <span class="font-bold">expiry (24 hours)</span></p>
+            </div>
+            <div class="bg-yellow-50 p-3 rounded-lg">
+                <p class="font-bold text-sm">token.SignedString(jwtKey)</p>
+                <p class="text-sm">Signs token with secret → generates final token string</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Middleware -->
+    <div class="page-break"></div>
+    
+    <div class="bg-white p-6 rounded-lg paper-shadow mb-8">
+        <div class="flex items-center gap-4 mb-6">
+            <div class="step-badge">4</div>
+            <div>
+                <h2 class="text-3xl font-bold text-gray-800">AuthMiddleware</h2>
+                <p class="text-gray-600">Protecting Routes</p>
+            </div>
+        </div>
+
+        <div class="code-block p-4 rounded-lg overflow-x-auto text-sm mb-6">
+<pre><span style="color:#fd79a8">func</span> <span style="color:#74b9ff">AuthMiddleware</span>() gin.HandlerFunc {
+    <span style="color:#fd79a8">return</span> <span style="color:#fd79a8">func</span>(c *gin.Context) {
+        authHeader := c.<span style="color:#74b9ff">GetHeader</span>(<span style="color:#ffeaa7">"Authorization"</span>)
+        
+        <span style="color:#fd79a8">if</span> authHeader == <span style="color:#ffeaa7">""</span> {
+            c.<span style="color:#74b9ff">JSON</span>(http.StatusUnauthorized, gin.<span style="color:#74b9ff">H</span>{<span style="color:#ffeaa7">"error"</span>: <span style="color:#ffeaa7">"Authorization header required"</span>})
+            c.<span style="color:#74b9ff">Abort</span>()
+            <span style="color:#fd79a8">return</span>
+        }
+        
+        tokenString := strings.<span style="color:#74b9ff">Split</span>(authHeader, <span style="color:#ffeaa7">" "</span>)[<span style="color:#55efc4">1</span>]
+        
+        token, err := jwt.<span style="color:#74b9ff">Parse</span>(tokenString, <span style="color:#fd79a8">func</span>(t *jwt.Token) (<span style="color:#fd79a8">interface</span>{}, <span style="color:#55efc4">error</span>) {
+            <span style="color:#fd79a8">return</span> jwtKey, <span style="color:#fd79a8">nil</span>
+        })
+        
+        <span style="color:#fd79a8">if</span> err != <span style="color:#fd79a8">nil</span> || !token.Valid {
+            c.<span style="color:#74b9ff">JSON</span>(http.StatusUnauthorized, gin.<span style="color:#74b9ff">H</span>{<span style="color:#ffeaa7">"error"</span>: <span style="color:#ffeaa7">"Invalid token"</span>})
+            c.<span style="color:#74b9ff">Abort</span>()
+            <span style="color:#fd79a8">return</span>
+        }
+        
+        c.<span style="color:#74b9ff">Next</span>()
+    }
+}</pre>
+        </div>
+
+        <!-- Middleware Breakdown -->
+        <div class="sticky-note-green p-6 transform rotate-1">
+            <h4 class="font-bold mb-3">🛡️ How Middleware Works:</h4>
+            <div class="space-y-2 text-sm">
+                <div class="flex items-start gap-2">
+                    <span class="bg-green-500 text-white w-5 h-5 rounded-full flex items-center justify-center text-xs flex-shrink-0">1</span>
+                    <span>Reads <code>Authorization: Bearer &lt;token&gt;</code> header</span>
+                </div>
+                <div class="flex items-start gap-2">
+                    <span class="bg-green-500 text-white w-5 h-5 rounded-full flex items-center justify-center text-xs flex-shrink-0">2</span>
+                    <span>Extracts token from "Bearer token"</span>
+                </div>
+                <div class="flex items-start gap-2">
+                    <span class="bg-green-500 text-white w-5 h-5 rounded-full flex items-center justify-center text-xs flex-shrink-0">3</span>
+                    <span>Verifies token using secret key</span>
+                </div>
+                <div class="flex items-start gap-2">
+                    <span class="bg-green-500 text-white w-5 h-5 rounded-full flex items-center justify-center text-xs flex-shrink-0">4</span>
+                    <span>If valid → <code>c.Next()</code> allows request to continue</span>
+                </div>
+                <div class="flex items-start gap-2">
+                    <span class="bg-red-500 text-white w-5 h-5 rounded-full flex items-center justify-center text-xs flex-shrink-0">✗</span>
+                    <span>If invalid → <code>c.Abort()</code> blocks request</span>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Protected Route -->
+    <div class="bg-white p-6 rounded-lg paper-shadow mb-8 transform -rotate-1">
+        <div class="flex items-center gap-4 mb-6">
+            <div class="step-badge">5</div>
+            <div>
+                <h2 class="text-3xl font-bold text-gray-800">Protected Route</h2>
+            </div>
+        </div>
+
+        <div class="code-block p-4 rounded-lg overflow-x-auto text-sm mb-4">
+<pre><span style="color:#fd79a8">func</span> <span style="color:#74b9ff">Profile</span>(c *gin.Context) {
+    c.<span style="color:#74b9ff">JSON</span>(<span style="color:#55efc4">200</span>, gin.<span style="color:#74b9ff">H</span>{<span style="color:#ffeaa7">"message"</span>: <span style="color:#ffeaa7">"Welcome to your profile"</span>})
+}</pre>
+        </div>
+
+        <div class="bg-purple-50 p-4 rounded-lg border-l-4 border-purple-500">
+            <p class="font-bold">Usage in routes:</p>
+            <code class="block bg-gray-800 text-white p-3 rounded mt-2 text-sm">
+                r.GET("/profile", AuthMiddleware(), Profile)
+            </code>
+        </div>
+    </div>
+
+    <!-- Final Flow -->
+    <div class="page-break"></div>
+    
+    <div class="bg-gray-800 text-white p-8 rounded-lg paper-shadow mb-8">
+        <h2 class="text-3xl font-bold mb-8 text-center text-yellow-300">🧠 Final Flow (Complete Auth System)</h2>
+        
+        <div class="flex flex-col items-center gap-3">
+            <div class="bg-blue-600 p-4 rounded-lg text-center w-full max-w-md font-bold text-xl">Login</div>
+            <div class="text-3xl text-yellow-400">↓</div>
+            <div class="bg-green-600 p-4 rounded-lg text-center w-full max-w-md font-bold text-xl">Token Generated</div>
+            <div class="text-3xl text-yellow-400">↓</div>
+            <div class="bg-purple-600 p-4 rounded-lg text-center w-full max-w-md">
+                <div class="font-bold text-xl">Client stores token</div>
+                <div class="text-sm text-purple-200 mt-1">(LocalStorage/Cookie)</div>
+            </div>
+            <div class="text-3xl text-yellow-400">↓</div>
+            <div class="bg-orange-600 p-4 rounded-lg text-center w-full max-w-md">
+                <div class="font-bold text-xl">Client sends token in headers</div>
+                <div class="text-xs text-orange-200 mt-1 font-mono">Authorization: Bearer eyJhbG...</div>
+            </div>
+            <div class="text-3xl text-yellow-400">↓</div>
+            <div class="bg-pink-600 p-4 rounded-lg text-center w-full max-w-md font-bold text-xl">Backend verifies token</div>
+            <div class="text-3xl text-yellow-400">↓</div>
+            <div class="bg-green-600 p-4 rounded-lg text-center w-full max-w-md font-bold text-xl">Access allowed ✅</div>
+        </div>
+    </div>
+
+    <!-- Achievement -->
+    <div class="sticky-note p-8 text-center mb-8 transform rotate-1">
+        <div class="text-5xl mb-4">🎉</div>
+        <h2 class="text-3xl font-bold mb-4 text-gray-800">If You Understand This Completely...</h2>
+        <p class="text-2xl font-bold text-purple-600 mb-4">You already think like a real backend engineer!</p>
+        <p class="text-lg text-gray-600">You've mastered:</p>
+        <div class="flex flex-wrap justify-center gap-2 mt-4">
+            <span class="bg-purple-100 text-purple-800 px-4 py-2 rounded-full font-bold">Password Hashing</span>
+            <span class="bg-blue-100 text-blue-800 px-4 py-2 rounded-full font-bold">JWT Tokens</span>
+            <span class="bg-green-100 text-green-800 px-4 py-2 rounded-full font-bold">Middleware</span>
+            <span class="bg-orange-100 text-orange-800 px-4 py-2 rounded-full font-bold">Route Protection</span>
+        </div>
+    </div>
+
+    <!-- Print Button -->
+    <div class="text-center no-print mb-8">
+        <button onclick="window.print()" class="bg-gradient-to-r from-purple-500 to-pink-500 hover:from-purple-600 hover:to-pink-600 text-white font-bold py-4 px-10 rounded-full text-xl shadow-lg transform transition hover:scale-105">
+            🖨️ Save as PDF / Print
+        </button>
+        <p class="mt-2 text-gray-600 text-sm">Use Ctrl+P (or Cmd+P) → Save as PDF</p>
+    </div>
+
+</body>
+</html>
