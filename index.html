@@ -1,0 +1,624 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Backend Mastery with Go - Complete Learning Path</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Caveat:wght@400;600;700&family=Patrick+Hand&family=Indie+Flower&family=Fira+Code:wght@400;500&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        body {
+            font-family: 'Patrick Hand', cursive;
+            background-color: #f4f1ea;
+            background-image: 
+                linear-gradient(#e1e1e1 1px, transparent 1px),
+                linear-gradient(90deg, #e1e1e1 1px, transparent 1px);
+            background-size: 20px 20px;
+        }
+        
+        .handwritten { font-family: 'Caveat', cursive; }
+        .code-font { font-family: 'Fira Code', monospace; }
+        
+        .hero-pattern {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .hero-pattern::before {
+            content: '';
+            position: absolute;
+            top: 0; left: 0; right: 0; bottom: 0;
+            background-image: 
+                radial-gradient(circle at 20% 50%, rgba(255,255,255,0.1) 0%, transparent 50%),
+                radial-gradient(circle at 80% 80%, rgba(255,255,255,0.1) 0%, transparent 50%),
+                radial-gradient(circle at 40% 20%, rgba(255,255,255,0.1) 0%, transparent 50%);
+        }
+        
+        .day-card {
+            background: white;
+            border-radius: 20px;
+            border: 3px solid #2d3436;
+            position: relative;
+            transition: all 0.3s ease;
+            cursor: pointer;
+        }
+        
+        .day-card::before {
+            content: '';
+            position: absolute;
+            top: 8px; left: 8px; right: -8px; bottom: -8px;
+            background: #2d3436;
+            border-radius: 20px;
+            z-index: -1;
+            opacity: 0.1;
+            transition: all 0.3s ease;
+        }
+        
+        .day-card:hover {
+            transform: translateY(-10px) rotate(1deg);
+        }
+        
+        .day-card:hover::before {
+            top: 12px; left: 12px;
+            opacity: 0.2;
+        }
+        
+        .day-number {
+            background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+            color: white;
+            width: 60px;
+            height: 60px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.5rem;
+            font-weight: bold;
+            box-shadow: 0 4px 15px rgba(240, 147, 251, 0.4);
+        }
+        
+        .progress-bar {
+            background: #e0e0e0;
+            border-radius: 10px;
+            height: 10px;
+            overflow: hidden;
+        }
+        
+        .progress-fill {
+            background: linear-gradient(90deg, #00b894 0%, #00cec9 100%);
+            height: 100%;
+            border-radius: 10px;
+            transition: width 1s ease;
+        }
+        
+        .sticky-note {
+            background: #fff740;
+            box-shadow: 2px 2px 10px rgba(0,0,0,0.1);
+            transform: rotate(-2deg);
+        }
+        
+        .tape {
+            position: absolute;
+            top: -15px;
+            left: 50%;
+            transform: translateX(-50%) rotate(-2deg);
+            width: 100px;
+            height: 30px;
+            background: rgba(255,255,255,0.4);
+            box-shadow: 0 1px 3px rgba(0,0,0,0.2);
+        }
+        
+        .floating-icon {
+            animation: float 3s ease-in-out infinite;
+        }
+        
+        @keyframes float {
+            0%, 100% { transform: translateY(0px) rotate(0deg); }
+            50% { transform: translateY(-20px) rotate(5deg); }
+        }
+        
+        .tech-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            background: rgba(255,255,255,0.2);
+            padding: 8px 16px;
+            border-radius: 20px;
+            font-size: 0.9rem;
+            backdrop-filter: blur(10px);
+        }
+        
+        .checklist-item {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 12px;
+            background: #f8f9fa;
+            border-radius: 12px;
+            margin-bottom: 8px;
+            border-left: 4px solid #00b894;
+        }
+        
+        .checklist-item i {
+            color: #00b894;
+            font-size: 1.2rem;
+        }
+        
+        .github-btn {
+            background: #24292e;
+            color: white;
+            padding: 12px 24px;
+            border-radius: 30px;
+            display: inline-flex;
+            align-items: center;
+            gap: 10px;
+            font-weight: bold;
+            transition: all 0.3s;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+        }
+        
+        .github-btn:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 6px 20px rgba(0,0,0,0.3);
+        }
+        
+        .pulse-dot {
+            width: 12px;
+            height: 12px;
+            background: #00b894;
+            border-radius: 50%;
+            display: inline-block;
+            animation: pulse 2s infinite;
+        }
+        
+        @keyframes pulse {
+            0%, 100% { opacity: 1; transform: scale(1); }
+            50% { opacity: 0.5; transform: scale(1.2); }
+        }
+        
+        /* About Me Section Styles */
+        .about-me-container {
+            max-height: 0;
+            overflow: hidden;
+            transition: max-height 0.5s ease-out;
+        }
+        
+        .about-me-container.open {
+            max-height: 1000px;
+        }
+        
+        .about-me-content {
+            opacity: 0;
+            transform: translateY(-20px);
+            transition: all 0.4s ease-out;
+        }
+        
+        .about-me-container.open .about-me-content {
+            opacity: 1;
+            transform: translateY(0);
+        }
+        
+        .know-more-btn {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 10px 24px;
+            border-radius: 25px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            border: none;
+            font-family: 'Patrick Hand', cursive;
+            font-size: 1.1rem;
+        }
+        
+        .know-more-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(102, 126, 234, 0.4);
+        }
+        
+        .know-more-btn i {
+            transition: transform 0.3s;
+        }
+        
+        .know-more-btn.active i {
+            transform: rotate(180deg);
+        }
+        
+        .skill-tag {
+            display: inline-block;
+            background: rgba(102, 126, 234, 0.1);
+            color: #667eea;
+            padding: 6px 14px;
+            border-radius: 20px;
+            font-size: 0.9rem;
+            margin: 4px;
+            border: 2px solid rgba(102, 126, 234, 0.2);
+        }
+        
+        .social-icon {
+            width: 45px;
+            height: 45px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.3rem;
+            transition: all 0.3s;
+            color: white;
+        }
+        
+        .social-linkedin { background: #0077b5; }
+        .social-github { background: #333; }
+        .social-twitter { background: #1da1f2; }
+        .social-email { background: #ea4335; }
+        
+        .social-icon:hover {
+            transform: translateY(-5px) scale(1.1);
+            box-shadow: 0 10px 20px rgba(0,0,0,0.2);
+        }
+    </style>
+</head>
+<body class="min-h-screen">
+
+    <!-- Hero Section -->
+    <section class="hero-pattern text-white py-20 px-4 relative">
+        <div class="max-w-6xl mx-auto text-center relative z-10">
+            <div class="floating-icon text-6xl mb-6">🚀</div>
+            <h1 class="text-5xl md:text-7xl font-bold mb-6 handwritten">
+                Backend Mastery with Go
+            </h1>
+            <p class="text-xl md:text-2xl mb-8 opacity-90">
+                From Zero to Production-Ready Backend Developer
+            </p>
+            
+            <div class="flex flex-wrap justify-center gap-4 mb-10">
+                <span class="tech-badge">
+                    <i class="fab fa-golang text-2xl"></i> Go
+                </span>
+                <span class="tech-badge">
+                    <i class="fas fa-server"></i> Gin
+                </span>
+                <span class="tech-badge">
+                    <i class="fas fa-database"></i> MySQL
+                </span>
+                <span class="tech-badge">
+                    <i class="fas fa-code"></i> GORM
+                </span>
+                <span class="tech-badge">
+                    <i class="fas fa-lock"></i> JWT
+                </span>
+            </div>
+
+            <div class="bg-white bg-opacity-10 backdrop-blur-md rounded-2xl p-6 max-w-2xl mx-auto mb-8">
+                <div class="flex justify-between items-center mb-3">
+                    <span class="font-bold">Your Progress</span>
+                    <span class="text-2xl font-bold">5/6 Days</span>
+                </div>
+                <div class="progress-bar">
+                    <div class="progress-fill" style="width: 83%"></div>
+                </div>
+                <p class="mt-3 text-sm opacity-80">83% Complete - Almost there! 💪</p>
+            </div>
+
+            <a href="https://github.com/raaj2493/Backend-with-GO" target="_blank" class="github-btn">
+                <i class="fab fa-github text-xl"></i>
+                View on GitHub
+            </a>
+        </div>
+    </section>
+
+    <!-- Quick Stats -->
+    <section class="py-10 px-4 bg-white shadow-lg relative z-20">
+        <div class="max-w-6xl mx-auto grid grid-cols-2 md:grid-cols-4 gap-6 text-center">
+            <div>
+                <div class="text-3xl font-bold text-purple-600">6</div>
+                <div class="text-gray-600">Modules</div>
+            </div>
+            <div>
+                <div class="text-3xl font-bold text-blue-600">25+</div>
+                <div class="text-gray-600">Code Examples</div>
+            </div>
+            <div>
+                <div class="text-3xl font-bold text-green-600">5</div>
+                <div class="text-gray-600">CRUD Operations</div>
+            </div>
+            <div>
+                <div class="text-3xl font-bold text-pink-600">100%</div>
+                <div class="text-gray-600">Free & Open Source</div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Learning Path -->
+    <section class="py-16 px-4">
+        <div class="max-w-6xl mx-auto">
+            <div class="text-center mb-12">
+                <h2 class="text-4xl font-bold text-gray-800 mb-4 handwritten">📚 Learning Path</h2>
+                <p class="text-xl text-gray-600">Click any day to start learning</p>
+            </div>
+
+            <div class="grid md:grid-cols-2 lg:grid-cols-3 gap-8 relative">
+                
+                <!-- Day 1 -->
+                <a href="Go_Notes/Day1/day1.html" class="day-card p-6 block">
+                    <div class="flex items-start justify-between mb-4">
+                        <div class="day-number">1</div>
+                        <span class="bg-green-100 text-green-800 px-3 py-1 rounded-full text-sm font-bold">✓ Done</span>
+                    </div>
+                    <h3 class="text-2xl font-bold text-gray-800 mb-2">Backend Basics</h3>
+                    <p class="text-gray-600 mb-4">Understanding HTTP, Servers, Request-Response cycle</p>
+                    <div class="flex flex-wrap gap-2">
+                        <span class="bg-blue-100 text-blue-800 px-2 py-1 rounded text-xs">HTTP</span>
+                        <span class="bg-purple-100 text-purple-800 px-2 py-1 rounded text-xs">Server</span>
+                        <span class="bg-pink-100 text-pink-800 px-2 py-1 rounded text-xs">JSON</span>
+                    </div>
+                </a>
+
+                <!-- Day 2 -->
+                <a href="Go_Notes/Day2/day2.html" class="day-card p-6 block">
+                    <div class="flex items-start justify-between mb-4">
+                        <div class="day-number" style="background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);">2</div>
+                        <span class="bg-green-100 text-green-800 px-3 py-1 rounded-full text-sm font-bold">✓ Done</span>
+                    </div>
+                    <h3 class="text-2xl font-bold text-gray-800 mb-2">Gin Framework</h3>
+                    <p class="text-gray-600 mb-4">Router, Context, Handlers, Controllers</p>
+                    <div class="flex flex-wrap gap-2">
+                        <span class="bg-blue-100 text-blue-800 px-2 py-1 rounded text-xs">Gin</span>
+                        <span class="bg-purple-100 text-purple-800 px-2 py-1 rounded text-xs">Routing</span>
+                        <span class="bg-pink-100 text-pink-800 px-2 py-1 rounded text-xs">Middleware</span>
+                    </div>
+                </a>
+
+                <!-- Day 3 -->
+                <a href="Go_Notes/Day3/day3.html" class="day-card p-6 block">
+                    <div class="flex items-start justify-between mb-4">
+                        <div class="day-number" style="background: linear-gradient(135deg, #43e97b 0%, #38f9d7 100%);">3</div>
+                        <span class="bg-green-100 text-green-800 px-3 py-1 rounded-full text-sm font-bold">✓ Done</span>
+                    </div>
+                    <h3 class="text-2xl font-bold text-gray-800 mb-2">JSON API Mastery</h3>
+                    <p class="text-gray-600 mb-4">Request parsing, Struct binding, Responses</p>
+                    <div class="flex flex-wrap gap-2">
+                        <span class="bg-blue-100 text-blue-800 px-2 py-1 rounded text-xs">JSON</span>
+                        <span class="bg-purple-100 text-purple-800 px-2 py-1 rounded text-xs">Struct</span>
+                        <span class="bg-pink-100 text-pink-800 px-2 py-1 rounded text-xs">Binding</span>
+                    </div>
+                </a>
+
+                <!-- Day 4 -->
+                <a href="Go_Notes/Day4/day4.html" class="day-card p-6 block">
+                    <div class="flex items-start justify-between mb-4">
+                        <div class="day-number" style="background: linear-gradient(135deg, #fa709a 0%, #fee140 100%);">4</div>
+                        <span class="bg-green-100 text-green-800 px-3 py-1 rounded-full text-sm font-bold">✓ Done</span>
+                    </div>
+                    <h3 class="text-2xl font-bold text-gray-800 mb-2">FULL CRUD</h3>
+                    <p class="text-gray-600 mb-4">Create, Read, Update, Delete - Complete API</p>
+                    <div class="flex flex-wrap gap-2">
+                        <span class="bg-blue-100 text-blue-800 px-2 py-1 rounded text-xs">POST</span>
+                        <span class="bg-purple-100 text-purple-800 px-2 py-1 rounded text-xs">GET</span>
+                        <span class="bg-pink-100 text-pink-800 px-2 py-1 rounded text-xs">PUT</span>
+                        <span class="bg-red-100 text-red-800 px-2 py-1 rounded text-xs">DELETE</span>
+                    </div>
+                </a>
+
+                <!-- Day 5 -->
+                <a href="Go_Notes/Day5/day5.html" class="day-card p-6 block">
+                    <div class="flex items-start justify-between mb-4">
+                        <div class="day-number" style="background: linear-gradient(135deg, #a8edea 0%, #fed6e3 100%); color: #333;">5</div>
+                        <span class="bg-green-100 text-green-800 px-3 py-1 rounded-full text-sm font-bold">✓ Done</span>
+                    </div>
+                    <h3 class="text-2xl font-bold text-gray-800 mb-2">Database & ORM</h3>
+                    <p class="text-gray-600 mb-4">MySQL, GORM, Models, Migrations</p>
+                    <div class="flex flex-wrap gap-2">
+                        <span class="bg-blue-100 text-blue-800 px-2 py-1 rounded text-xs">MySQL</span>
+                        <span class="bg-purple-100 text-purple-800 px-2 py-1 rounded text-xs">GORM</span>
+                        <span class="bg-pink-100 text-pink-800 px-2 py-1 rounded text-xs">ORM</span>
+                    </div>
+                </a>
+
+                <!-- Day 6 - Coming Soon -->
+                <div class="day-card p-6 opacity-75">
+                    <div class="flex items-start justify-between mb-4">
+                        <div class="day-number" style="background: linear-gradient(135deg, #ffecd2 0%, #fcb69f 100%); color: #333;">6</div>
+                        <span class="bg-yellow-100 text-yellow-800 px-3 py-1 rounded-full text-sm font-bold">
+                            <span class="pulse-dot mr-2"></span>Coming
+                        </span>
+                    </div>
+                    <h3 class="text-2xl font-bold text-gray-800 mb-2">Authentication</h3>
+                    <p class="text-gray-600 mb-4">JWT, Login, Signup, Middleware, Security</p>
+                    <div class="flex flex-wrap gap-2">
+                        <span class="bg-blue-100 text-blue-800 px-2 py-1 rounded text-xs">JWT</span>
+                        <span class="bg-purple-100 text-purple-800 px-2 py-1 rounded text-xs">Auth</span>
+                        <span class="bg-pink-100 text-pink-800 px-2 py-1 rounded text-xs">Security</span>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </section>
+
+    <!-- What You'll Learn -->
+    <section class="py-16 px-4 bg-white">
+        <div class="max-w-4xl mx-auto">
+            <div class="text-center mb-12">
+                <h2 class="text-4xl font-bold text-gray-800 mb-4 handwritten">✨ What You'll Master</h2>
+            </div>
+
+            <div class="grid md:grid-cols-2 gap-6">
+                <div class="checklist-item">
+                    <i class="fas fa-check-circle"></i>
+                    <span>Build REST APIs from scratch</span>
+                </div>
+                <div class="checklist-item">
+                    <i class="fas fa-check-circle"></i>
+                    <span>Connect to MySQL databases</span>
+                </div>
+                <div class="checklist-item">
+                    <i class="fas fa-check-circle"></i>
+                    <span>Use ORM (GORM) effectively</span>
+                </div>
+                <div class="checklist-item">
+                    <i class="fas fa-check-circle"></i>
+                    <span>Implement CRUD operations</span>
+                </div>
+                <div class="checklist-item">
+                    <i class="fas fa-check-circle"></i>
+                    <span>Handle JSON requests/responses</span>
+                </div>
+                <div class="checklist-item">
+                    <i class="fas fa-check-circle"></i>
+                    <span>Structure backend projects</span>
+                </div>
+                <div class="checklist-item">
+                    <i class="fas fa-check-circle"></i>
+                    <span>Authentication with JWT</span>
+                </div>
+                <div class="checklist-item">
+                    <i class="fas fa-check-circle"></i>
+                    <span>Production-ready code patterns</span>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="bg-gray-900 text-white py-12 px-4">
+        <div class="max-w-4xl mx-auto text-center">
+            
+            <!-- Creator Credits - Short & Crisp -->
+            <div class="mb-8">
+                <div class="text-5xl mb-4">👨‍💻</div>
+                <h3 class="text-2xl font-bold mb-2 handwritten">Crafted by Raaj Giri</h3>
+                <p class="text-gray-400 mb-4">Full Stack Developer | Flutter & Go Enthusiast</p>
+                
+                <!-- Social Links -->
+                <div class="flex justify-center gap-4 mb-6">
+                    <a href="https://www.linkedin.com/in/rajgiri2493/" target="_blank" class="social-icon social-linkedin" title="LinkedIn">
+                        <i class="fab fa-linkedin-in"></i>
+                    </a>
+                    <a href="https://github.com/raaj2493" target="_blank" class="social-icon social-github" title="GitHub">
+                        <i class="fab fa-github"></i>
+                    </a>
+                    <a href="https://x.com/raj_ash2493" target="_blank" class="social-icon social-twitter" title="Twitter/X">
+                        <i class="fab fa-x-twitter"></i>
+                    </a>
+                    <a href="mailto:raj.ash2493@gmail.com" class="social-icon social-email" title="Email">
+                        <i class="fas fa-envelope"></i>
+                    </a>
+                </div>
+                
+                <!-- Know More Button -->
+                <button class="know-more-btn" onclick="toggleAboutMe()">
+                    <span>Know More About Me</span>
+                    <i class="fas fa-chevron-down"></i>
+                </button>
+            </div>
+
+            <!-- Expandable About Me Section -->
+            <div id="aboutMeSection" class="about-me-container">
+                <div class="about-me-content bg-gray-800 rounded-2xl p-8 text-left">
+                    <div class="flex flex-col md:flex-row gap-8 items-start">
+                        
+                        <!-- Left: Intro -->
+                        <div class="md:w-1/3 text-center md:text-left">
+                            <div class="w-24 h-24 bg-gradient-to-br from-purple-500 to-pink-500 rounded-full mx-auto md:mx-0 mb-4 flex items-center justify-center text-4xl">
+                                🚀
+                            </div>
+                            <h4 class="text-xl font-bold mb-2">Raaj Giri</h4>
+                            <p class="text-purple-400 font-semibold mb-4">Full Stack App Developer</p>
+                            <p class="text-gray-400 text-sm leading-relaxed">
+                                Passionate about building modern, scalable, backend-driven applications that solve real-world problems.
+                            </p>
+                        </div>
+
+                        <!-- Right: Skills & Details -->
+                        <div class="md:w-2/3">
+                            <h5 class="text-lg font-bold mb-4 text-purple-400">Tech Stack</h5>
+                            <div class="mb-6">
+                                <span class="skill-tag"><i class="fab fa-flutter mr-2"></i>Flutter</span>
+                                <span class="skill-tag"><i class="fab fa-golang mr-2"></i>Go</span>
+                                <span class="skill-tag">Gin</span>
+                                <span class="skill-tag">REST APIs</span>
+                                <span class="skill-tag">Firebase</span>
+                                <span class="skill-tag">PostgreSQL</span>
+                                <span class="skill-tag">MongoDB</span>
+                                <span class="skill-tag">Docker</span>
+                                <span class="skill-tag">AWS/GCP</span>
+                            </div>
+
+                            <h5 class="text-lg font-bold mb-4 text-purple-400">What I Do</h5>
+                            <ul class="space-y-2 text-gray-300 text-sm">
+                                <li class="flex items-start gap-3">
+                                    <i class="fas fa-mobile-alt text-purple-500 mt-1"></i>
+                                    <span>Build cross-platform mobile apps with Flutter</span>
+                                </li>
+                                <li class="flex items-start gap-3">
+                                    <i class="fas fa-server text-purple-500 mt-1"></i>
+                                    <span>Develop high-performance backends with Go & Gin</span>
+                                </li>
+                                <li class="flex items-start gap-3">
+                                    <i class="fas fa-database text-purple-500 mt-1"></i>
+                                    <span>Design scalable SQL/NoSQL database architectures</span>
+                                </li>
+                                <li class="flex items-start gap-3">
+                                    <i class="fas fa-cloud text-purple-500 mt-1"></i>
+                                    <span>Deploy cloud-native solutions on AWS, GCP, Firebase</span>
+                                </li>
+                                <li class="flex items-start gap-3">
+                                    <i class="fas fa-code text-purple-500 mt-1"></i>
+                                    <span>Follow clean architecture & production-ready patterns</span>
+                                </li>
+                            </ul>
+
+                            <div class="mt-6 pt-6 border-t border-gray-700">
+                                <p class="text-gray-400 text-sm italic">
+                                    "I enjoy turning real-world problems into efficient, scalable, and production-ready applications."
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="mt-8 pt-8 border-t border-gray-800 text-sm text-gray-500">
+                <p>© 2025 Backend Mastery with Go. Made with ❤️ by Raaj Giri</p>
+                <p class="mt-2">Open source under MIT License</p>
+            </div>
+        </div>
+    </footer>
+
+    <script>
+        // Animate progress bar on load
+        window.addEventListener('load', () => {
+            const progressFill = document.querySelector('.progress-fill');
+            setTimeout(() => {
+                progressFill.style.width = '83%';
+            }, 500);
+        });
+
+        // Toggle About Me Section
+        function toggleAboutMe() {
+            const section = document.getElementById('aboutMeSection');
+            const btn = document.querySelector('.know-more-btn');
+            
+            section.classList.toggle('open');
+            btn.classList.toggle('active');
+            
+            if (section.classList.contains('open')) {
+                btn.querySelector('span').textContent = 'Show Less';
+                // Smooth scroll to section
+                setTimeout(() => {
+                    section.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+                }, 100);
+            } else {
+                btn.querySelector('span').textContent = 'Know More About Me';
+            }
+        }
+    </script>
+
+</body>
+</html>
