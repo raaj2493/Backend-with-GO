@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Project: User Management with Auth - Backend Mastery</title>
+    <title>Projects Hub - Backend Mastery with Go</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://fonts.googleapis.com/css2?family=Caveat:wght@400;600;700&family=Patrick+Hand&family=Fira+Code:wght@400;500&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
@@ -18,370 +18,385 @@
         }
         
         .handwritten { font-family: 'Caveat', cursive; }
-        .code-font { font-family: 'Fira Code', monospace; }
         
-        .step-badge {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            color: white;
-            width: 50px;
-            height: 50px;
-            border-radius: 50%;
+        .project-card {
+            background: white;
+            border-radius: 20px;
+            border: 3px solid #2d3436;
+            position: relative;
+            transition: all 0.3s ease;
+            overflow: hidden;
+        }
+        
+        .project-card::before {
+            content: '';
+            position: absolute;
+            top: 8px; left: 8px; right: -8px; bottom: -8px;
+            background: #2d3436;
+            border-radius: 20px;
+            z-index: -1;
+            opacity: 0.1;
+            transition: all 0.3s ease;
+        }
+        
+        .project-card:hover {
+            transform: translateY(-10px) rotate(1deg);
+        }
+        
+        .project-card:hover::before {
+            top: 12px; left: 12px;
+            opacity: 0.2;
+        }
+        
+        .difficulty-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            padding: 6px 14px;
+            border-radius: 20px;
+            font-size: 0.85rem;
+            font-weight: bold;
+        }
+        
+        .difficulty-beginner { background: #d4edda; color: #155724; }
+        .difficulty-intermediate { background: #fff3cd; color: #856404; }
+        .difficulty-advanced { background: #f8d7da; color: #721c24; }
+        
+        .feature-tag {
+            display: inline-block;
+            background: rgba(102, 126, 234, 0.1);
+            color: #667eea;
+            padding: 4px 12px;
+            border-radius: 15px;
+            font-size: 0.8rem;
+            margin: 2px;
+            border: 2px solid rgba(102, 126, 234, 0.2);
+        }
+        
+        .tech-stack-icon {
+            width: 40px;
+            height: 40px;
+            border-radius: 10px;
             display: flex;
             align-items: center;
             justify-content: center;
-            font-weight: bold;
-            font-size: 1.3rem;
+            font-size: 1.2rem;
+            color: white;
         }
         
-        .code-block {
-            font-family: 'Fira Code', monospace;
-            background: #2d3436;
-            color: #dfe6e9;
-            font-size: 0.85rem;
-            line-height: 1.5;
-        }
-        
-        .check-item {
-            display: flex;
+        .back-btn {
+            display: inline-flex;
             align-items: center;
-            gap: 10px;
-            padding: 10px;
-            background: #e8f5e9;
-            border-radius: 10px;
-            margin-bottom: 8px;
-            border-left: 4px solid #4caf50;
+            gap: 8px;
+            background: #2d3436;
+            color: white;
+            padding: 12px 24px;
+            border-radius: 30px;
+            font-weight: bold;
+            transition: all 0.3s;
+            text-decoration: none;
         }
         
-        .check-item i {
-            color: #4caf50;
+        .back-btn:hover {
+            transform: translateX(-5px);
+            background: #636e72;
         }
         
-        .tip-box {
-            background: linear-gradient(135deg, #fff9c4 0%, #fff59d 100%);
-            border-left: 5px solid #fbc02d;
-            padding: 15px;
-            border-radius: 0 10px 10px 0;
+        .status-badge {
+            position: absolute;
+            top: 15px;
+            right: 15px;
+            padding: 6px 14px;
+            border-radius: 20px;
+            font-size: 0.75rem;
+            font-weight: bold;
         }
+        
+        .status-completed { background: #d4edda; color: #155724; }
+        .status-inprogress { background: #fff3cd; color: #856404; }
+        .status-planned { background: #e2e3e5; color: #383d41; }
     </style>
 </head>
-<body class="p-4 md:p-8 max-w-4xl mx-auto">
+<body class="p-4 md:p-8 max-w-6xl mx-auto">
 
-    <!-- Navigation -->
-    <div class="flex items-center justify-between mb-8">
-        <a href="../../projects.html" class="inline-flex items-center gap-2 bg-gray-800 text-white px-5 py-2 rounded-full font-bold hover:bg-gray-700 transition">
-            <i class="fas fa-arrow-left"></i> Back to Projects
+    <!-- Back Button -->
+    <div class="mb-8">
+        <a href="index.html" class="back-btn">
+            <i class="fas fa-arrow-left"></i>
+            Back to Home
         </a>
-        <span class="bg-green-100 text-green-800 px-4 py-2 rounded-full font-bold text-sm">
-            <i class="fas fa-check-circle mr-1"></i> Available Now
-        </span>
     </div>
 
     <!-- Header -->
-    <div class="text-center mb-10">
-        <div class="w-20 h-20 mx-auto rounded-2xl bg-gradient-to-br from-blue-500 to-purple-600 flex items-center justify-center text-white text-3xl mb-4">
-            <i class="fas fa-users-cog"></i>
-        </div>
-        <h1 class="text-5xl font-bold text-gray-800 mb-3 handwritten">User Management with Auth</h1>
-        <p class="text-xl text-gray-600">Build a complete authentication system from scratch</p>
-    </div>
-
-    <!-- Project Overview -->
-    <div class="bg-white p-6 rounded-2xl shadow-lg mb-8">
-        <h2 class="text-3xl font-bold text-gray-800 mb-4">🎯 Project Overview</h2>
-        <p class="text-lg text-gray-700 mb-4">
-            In this project, you'll build a production-ready user management system with complete authentication 
-            flow. This combines everything you learned in Days 1-6 into a real-world application.
+    <div class="text-center mb-12">
+        <div class="text-6xl mb-4">🚀</div>
+        <h1 class="text-5xl md:text-6xl font-bold text-gray-800 mb-4 handwritten">
+            Projects Hub
+        </h1>
+        <p class="text-xl text-gray-600 max-w-2xl mx-auto">
+            Hands-on production-ready backend projects. Build real-world applications with Go, Gin, and MySQL.
         </p>
-        
-        <div class="grid md:grid-cols-3 gap-4 mt-6">
-            <div class="bg-blue-50 p-4 rounded-xl text-center">
-                <i class="fas fa-shield-alt text-3xl text-blue-600 mb-2"></i>
-                <p class="font-bold">Secure</p>
-                <p class="text-sm text-gray-600">Password hashing + JWT</p>
-            </div>
-            <div class="bg-purple-50 p-4 rounded-xl text-center">
-                <i class="fas fa-database text-3xl text-purple-600 mb-2"></i>
-                <p class="font-bold">Persistent</p>
-                <p class="text-sm text-gray-600">MySQL + GORM</p>
-            </div>
-            <div class="bg-green-50 p-4 rounded-xl text-center">
-                <i class="fas fa-code text-3xl text-green-600 mb-2"></i>
-                <p class="font-bold">RESTful</p>
-                <p class="text-sm text-gray-600">Clean API design</p>
-            </div>
-        </div>
     </div>
 
-    <!-- What You'll Build -->
-    <div class="bg-white p-6 rounded-2xl shadow-lg mb-8">
-        <h2 class="text-3xl font-bold text-gray-800 mb-4">✨ Features You'll Implement</h2>
-        
-        <div class="grid md:grid-cols-2 gap-4">
-            <div class="check-item">
-                <i class="fas fa-check-circle"></i>
-                <span>User registration with validation</span>
-            </div>
-            <div class="check-item">
-                <i class="fas fa-check-circle"></i>
-                <span>Secure login with JWT tokens</span>
-            </div>
-            <div class="check-item">
-                <i class="fas fa-check-circle"></i>
-                <span>Password hashing with bcrypt</span>
-            </div>
-            <div class="check-item">
-                <i class="fas fa-check-circle"></i>
-                <span>Protected route middleware</span>
-            </div>
-            <div class="check-item">
-                <i class="fas fa-check-circle"></i>
-                <span>User profile management</span>
-            </div>
-            <div class="check-item">
-                <i class="fas fa-check-circle"></i>
-                <span>Role-based access (Admin/User)</span>
-            </div>
-            <div class="check-item">
-                <i class="fas fa-check-circle"></i>
-                <span>Token refresh mechanism</span>
-            </div>
-            <div class="check-item">
-                <i class="fas fa-check-circle"></i>
-                <span>Logout functionality</span>
-            </div>
-        </div>
-    </div>
+    <!-- Projects Grid -->
+    <div class="grid md:grid-cols-2 gap-8 mb-12">
 
-    <!-- API Endpoints -->
-    <div class="bg-white p-6 rounded-2xl shadow-lg mb-8">
-        <h2 class="text-3xl font-bold text-gray-800 mb-4">🌐 API Endpoints</h2>
-        
-        <div class="overflow-x-auto">
-            <table class="w-full text-left">
-                <thead class="bg-gray-100">
-                    <tr>
-                        <th class="p-3 rounded-tl-lg">Method</th>
-                        <th class="p-3">Endpoint</th>
-                        <th class="p-3">Description</th>
-                        <th class="p-3 rounded-tr-lg">Auth</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    <tr class="border-b">
-                        <td class="p-3"><span class="bg-green-500 text-white px-2 py-1 rounded text-sm">POST</span></td>
-                        <td class="p-3 font-mono">/api/register</td>
-                        <td class="p-3">Register new user</td>
-                        <td class="p-3"><span class="text-gray-400">No</span></td>
-                    </tr>
-                    <tr class="border-b">
-                        <td class="p-3"><span class="bg-green-500 text-white px-2 py-1 rounded text-sm">POST</span></td>
-                        <td class="p-3 font-mono">/api/login</td>
-                        <td class="p-3">Login user</td>
-                        <td class="p-3"><span class="text-gray-400">No</span></td>
-                    </tr>
-                    <tr class="border-b">
-                        <td class="p-3"><span class="bg-blue-500 text-white px-2 py-1 rounded text-sm">GET</span></td>
-                        <td class="p-3 font-mono">/api/profile</td>
-                        <td class="p-3">Get user profile</td>
-                        <td class="p-3"><span class="text-green-600 font-bold">Yes</span></td>
-                    </tr>
-                    <tr class="border-b">
-                        <td class="p-3"><span class="bg-yellow-500 text-white px-2 py-1 rounded text-sm">PUT</span></td>
-                        <td class="p-3 font-mono">/api/profile</td>
-                        <td class="p-3">Update profile</td>
-                        <td class="p-3"><span class="text-green-600 font-bold">Yes</span></td>
-                    </tr>
-                    <tr class="border-b">
-                        <td class="p-3"><span class="bg-blue-500 text-white px-2 py-1 rounded text-sm">GET</span></td>
-                        <td class="p-3 font-mono">/api/users</td>
-                        <td class="p-3">List all users (Admin)</td>
-                        <td class="p-3"><span class="text-purple-600 font-bold">Admin</span></td>
-                    </tr>
-                    <tr>
-                        <td class="p-3"><span class="bg-red-500 text-white px-2 py-1 rounded text-sm">DELETE</span></td>
-                        <td class="p-3 font-mono">/api/users/:id</td>
-                        <td class="p-3">Delete user (Admin)</td>
-                        <td class="p-3"><span class="text-purple-600 font-bold">Admin</span></td>
-                    </tr>
-                </tbody>
-            </table>
-        </div>
-    </div>
-
-    <!-- Project Structure -->
-    <div class="bg-white p-6 rounded-2xl shadow-lg mb-8">
-        <h2 class="text-3xl font-bold text-gray-800 mb-4">📁 Project Structure</h2>
-        
-        <div class="code-block p-4 rounded-lg text-sm">
-user-management-auth/
-├── config/
-│   └── db.go              # Database connection
-├── controllers/
-│   ├── auth_controller.go # Login/Register
-│   └── user_controller.go # User CRUD
-├── middleware/
-│   └── auth_middleware.go # JWT protection
-├── models/
-│   └── user.go            # User struct
-├── routes/
-│   └── routes.go          # API routes
-├── utils/
-│   └── jwt.go             # JWT helpers
-├── .env                   # Environment variables
-├── go.mod
-└── main.go                # Entry point
-        </div>
-    </div>
-
-    <!-- Step by Step -->
-    <div class="bg-white p-6 rounded-2xl shadow-lg mb-8">
-        <h2 class="text-3xl font-bold text-gray-800 mb-6">🚀 Step-by-Step Implementation</h2>
-        
-        <!-- Step 1 -->
-        <div class="mb-8">
-            <div class="flex items-center gap-4 mb-4">
-                <div class="step-badge">1</div>
-                <h3 class="text-2xl font-bold">Setup Project</h3>
-            </div>
-            <div class="ml-16">
-                <div class="code-block p-4 rounded-lg mb-3">
-mkdir user-management-auth
-cd user-management-auth
-go mod init user-management-auth
-go get -u github.com/gin-gonic/gin
-go get -u gorm.io/gorm
-go get -u gorm.io/driver/mysql
-go get github.com/golang-jwt/jwt/v5
-go get golang.org/x/crypto/bcrypt
-go get github.com/joho/godotenv
-                </div>
-            </div>
-        </div>
-
-        <!-- Step 2 -->
-        <div class="mb-8">
-            <div class="flex items-center gap-4 mb-4">
-                <div class="step-badge">2</div>
-                <h3 class="text-2xl font-bold">Environment Variables</h3>
-            </div>
-            <div class="ml-16">
-                <p class="mb-2">Create <code>.env</code> file:</p>
-                <div class="code-block p-4 rounded-lg mb-3">
-DB_HOST=localhost
-DB_USER=root
-DB_PASSWORD=yourpassword
-DB_NAME=user_management
-DB_PORT=3306
-
-JWT_SECRET=your-super-secret-key-change-this
-JWT_EXPIRATION=24
-                </div>
-                <div class="tip-box">
-                    <i class="fas fa-lightbulb text-yellow-600 mr-2"></i>
-                    <strong>Tip:</strong> Never commit .env to Git! Add it to .gitignore
-                </div>
-            </div>
-        </div>
-
-        <!-- Step 3 -->
-        <div class="mb-8">
-            <div class="flex items-center gap-4 mb-4">
-                <div class="step-badge">3</div>
-                <h3 class="text-2xl font-bold">Database Setup</h3>
-            </div>
-            <div class="ml-16">
-                <p class="mb-2">Create MySQL database:</p>
-                <div class="code-block p-4 rounded-lg">
-CREATE DATABASE user_management;
-                </div>
-            </div>
-        </div>
-
-        <!-- Continue steps... -->
-        <div class="text-center mt-8">
-            <p class="text-gray-600 mb-4">Full implementation code available in the repository</p>
-            <a href="https://github.com/raaj2493/Backend-with-GO/tree/main/Go_Projects/UserManagementAuth" target="_blank" class="inline-flex items-center gap-2 bg-gray-800 text-white px-6 py-3 rounded-full font-bold hover:bg-gray-700 transition">
-                <i class="fab fa-github"></i>
-                View Full Code on GitHub
-            </a>
-        </div>
-    </div>
-
-    <!-- Testing Guide -->
-    <div class="bg-white p-6 rounded-2xl shadow-lg mb-8">
-        <h2 class="text-3xl font-bold text-gray-800 mb-4">🧪 Testing with Postman</h2>
-        
-        <div class="space-y-4">
-            <div class="bg-gray-50 p-4 rounded-lg">
-                <p class="font-bold mb-2">1. Register User</p>
-                <code class="text-sm bg-gray-200 px-2 py-1 rounded">POST http://localhost:8080/api/register</code>
-                <pre class="bg-gray-800 text-green-400 p-3 rounded mt-2 text-sm">
-{
-  "name": "Raj Giri",
-  "email": "raj@example.com",
-  "password": "securepassword123"
-}</pre>
-            </div>
+        <!-- Project 1: User CRUD API (COMPLETED) -->
+        <a href="Go_Notes/Day6/index.html" class="project-card p-6 block relative">
+            <span class="status-badge status-completed">
+                <i class="fas fa-check-circle mr-1"></i> Available
+            </span>
             
-            <div class="bg-gray-50 p-4 rounded-lg">
-                <p class="font-bold mb-2">2. Login</p>
-                <code class="text-sm bg-gray-200 px-2 py-1 rounded">POST http://localhost:8080/api/login</code>
-                <p class="text-sm text-gray-600 mt-2">Response: <code>{"token": "eyJhbG..."}</code></p>
+            <div class="flex items-center gap-4 mb-4 mt-4">
+                <div class="w-16 h-16 bg-gradient-to-br from-blue-500 to-purple-600 rounded-2xl flex items-center justify-center text-white text-3xl">
+                    <i class="fas fa-users"></i>
+                </div>
+                <div>
+                    <h3 class="text-2xl font-bold text-gray-800">User Management API</h3>
+                    <span class="difficulty-badge difficulty-beginner">
+                        <i class="fas fa-seedling"></i> Beginner
+                    </span>
+                </div>
             </div>
+
+            <p class="text-gray-600 mb-4">
+                Complete CRUD API with MySQL database. Learn professional folder structure, GORM ORM, and REST API design patterns.
+            </p>
+
+            <div class="mb-4">
+                <p class="text-sm font-bold text-gray-700 mb-2">Features:</p>
+                <div class="flex flex-wrap">
+                    <span class="feature-tag">Create User</span>
+                    <span class="feature-tag">Read All</span>
+                    <span class="feature-tag">Update</span>
+                    <span class="feature-tag">Delete</span>
+                    <span class="feature-tag">Auto Migration</span>
+                </div>
+            </div>
+
+            <div class="flex items-center gap-3 mb-4">
+                <div class="tech-stack-icon bg-blue-500" title="Go">
+                    <i class="fab fa-golang"></i>
+                </div>
+                <div class="tech-stack-icon bg-green-500" title="Gin">
+                    <i class="fas fa-bolt"></i>
+                </div>
+                <div class="tech-stack-icon bg-orange-500" title="MySQL">
+                    <i class="fas fa-database"></i>
+                </div>
+                <div class="tech-stack-icon bg-purple-500" title="GORM">
+                    <i class="fas fa-sync"></i>
+                </div>
+            </div>
+
+            <div class="flex items-center justify-between pt-4 border-t border-gray-200">
+                <span class="text-sm text-gray-500">6 Steps • 30 min</span>
+                <span class="text-blue-600 font-bold">Start Project <i class="fas fa-arrow-right ml-1"></i></span>
+            </div>
+        </a>
+
+        <!-- Project 2: JWT Auth System (AVAILABLE) -->
+        <a href="Go_Notes/Day7/index.html" class="project-card p-6 block relative">
+            <span class="status-badge status-completed">
+                <i class="fas fa-check-circle mr-1"></i> Available
+            </span>
             
-            <div class="bg-gray-50 p-4 rounded-lg">
-                <p class="font-bold mb-2">3. Access Protected Route</p>
-                <code class="text-sm bg-gray-200 px-2 py-1 rounded">GET http://localhost:8080/api/profile</code>
-                <p class="text-sm text-gray-600 mt-2">Header: <code>Authorization: Bearer eyJhbG...</code></p>
+            <div class="flex items-center gap-4 mb-4 mt-4">
+                <div class="w-16 h-16 bg-gradient-to-br from-red-500 to-pink-600 rounded-2xl flex items-center justify-center text-white text-3xl">
+                    <i class="fas fa-shield-alt"></i>
+                </div>
+                <div>
+                    <h3 class="text-2xl font-bold text-gray-800">JWT Auth System</h3>
+                    <span class="difficulty-badge difficulty-intermediate">
+                        <i class="fas fa-layer-group"></i> Intermediate
+                    </span>
+                </div>
+            </div>
+
+            <p class="text-gray-600 mb-4">
+                Secure authentication with JWT tokens. Build login/signup system with password hashing and protected routes.
+            </p>
+
+            <div class="mb-4">
+                <p class="text-sm font-bold text-gray-700 mb-2">Features:</p>
+                <div class="flex flex-wrap">
+                    <span class="feature-tag">Register</span>
+                    <span class="feature-tag">Login</span>
+                    <span class="feature-tag">JWT Tokens</span>
+                    <span class="feature-tag">Middleware</span>
+                    <span class="feature-tag">bcrypt</span>
+                </div>
+            </div>
+
+            <div class="flex items-center gap-3 mb-4">
+                <div class="tech-stack-icon bg-blue-500" title="Go">
+                    <i class="fab fa-golang"></i>
+                </div>
+                <div class="tech-stack-icon bg-red-500" title="JWT">
+                    <i class="fas fa-key"></i>
+                </div>
+                <div class="tech-stack-icon bg-green-500" title="bcrypt">
+                    <i class="fas fa-lock"></i>
+                </div>
+            </div>
+
+            <div class="flex items-center justify-between pt-4 border-t border-gray-200">
+                <span class="text-sm text-gray-500">8 Steps • 45 min</span>
+                <span class="text-blue-600 font-bold">Start Project <i class="fas fa-arrow-right ml-1"></i></span>
+            </div>
+        </a>
+
+        <!-- Project 3: E-Commerce API (AVAILABLE) -->
+        <a href="Go_Projects/ecommerce-api/index.html" class="project-card p-6 block relative">
+            <span class="status-badge status-completed">
+                <i class="fas fa-check-circle mr-1"></i> Available
+            </span>
+            
+            <div class="flex items-center gap-4 mb-4 mt-4">
+                <div class="w-16 h-16 bg-gradient-to-br from-green-500 to-teal-600 rounded-2xl flex items-center justify-center text-white text-3xl">
+                    <i class="fas fa-shopping-cart"></i>
+                </div>
+                <div>
+                    <h3 class="text-2xl font-bold text-gray-800">E-Commerce API</h3>
+                    <span class="difficulty-badge difficulty-advanced">
+                        <i class="fas fa-rocket"></i> Advanced
+                    </span>
+                </div>
+            </div>
+
+            <p class="text-gray-600 mb-4">
+                Full-featured e-commerce backend with products, orders, cart, and payment integration. Real-world complexity!
+            </p>
+
+            <div class="mb-4">
+                <p class="text-sm font-bold text-gray-700 mb-2">Features:</p>
+                <div class="flex flex-wrap">
+                    <span class="feature-tag">Products</span>
+                    <span class="feature-tag">Orders</span>
+                    <span class="feature-tag">Cart</span>
+                    <span class="feature-tag">Categories</span>
+                    <span class="feature-tag">Search</span>
+                </div>
+            </div>
+
+            <div class="flex items-center gap-3 mb-4">
+                <div class="tech-stack-icon bg-blue-500" title="Go">
+                    <i class="fab fa-golang"></i>
+                </div>
+                <div class="tech-stack-icon bg-green-500" title="Gin">
+                    <i class="fas fa-bolt"></i>
+                </div>
+                <div class="tech-stack-icon bg-orange-500" title="MySQL">
+                    <i class="fas fa-database"></i>
+                </div>
+                <div class="tech-stack-icon bg-red-500" title="Redis">
+                    <i class="fas fa-bolt"></i>
+                </div>
+            </div>
+
+            <div class="flex items-center justify-between pt-4 border-t border-gray-200">
+                <span class="text-sm text-gray-500">12 Steps • 2 hours</span>
+                <span class="text-blue-600 font-bold">Start Project <i class="fas fa-arrow-right ml-1"></i></span>
+            </div>
+        </a>
+
+        <!-- Project 4: Real-Time Chat (AVAILABLE) -->
+        <a href="Go_Projects/chat-app/index.html" class="project-card p-6 block relative">
+            <span class="status-badge status-completed">
+                <i class="fas fa-check-circle mr-1"></i> Available
+            </span>
+            
+            <div class="flex items-center gap-4 mb-4 mt-4">
+                <div class="w-16 h-16 bg-gradient-to-br from-purple-500 to-indigo-600 rounded-2xl flex items-center justify-center text-white text-3xl">
+                    <i class="fas fa-comments"></i>
+                </div>
+                <div>
+                    <h3 class="text-2xl font-bold text-gray-800">Real-Time Chat</h3>
+                    <span class="difficulty-badge difficulty-advanced">
+                        <i class="fas fa-rocket"></i> Advanced
+                    </span>
+                </div>
+            </div>
+
+            <p class="text-gray-600 mb-4">
+                WebSocket-based real-time messaging system with rooms, typing indicators, and message history.
+            </p>
+
+            <div class="mb-4">
+                <p class="text-sm font-bold text-gray-700 mb-2">Features:</p>
+                <div class="flex flex-wrap">
+                    <span class="feature-tag">WebSockets</span>
+                    <span class="feature-tag">Rooms</span>
+                    <span class="feature-tag">Typing</span>
+                    <span class="feature-tag">History</span>
+                    <span class="feature-tag">Online Status</span>
+                </div>
+            </div>
+
+            <div class="flex items-center gap-3 mb-4">
+                <div class="tech-stack-icon bg-blue-500" title="Go">
+                    <i class="fab fa-golang"></i>
+                </div>
+                <div class="tech-stack-icon bg-green-500" title="WebSocket">
+                    <i class="fas fa-plug"></i>
+                </div>
+                <div class="tech-stack-icon bg-red-500" title="Redis">
+                    <i class="fas fa-server"></i>
+                </div>
+                <div class="tech-stack-icon bg-purple-500" title="Gorilla">
+                    <i class="fas fa-robot"></i>
+                </div>
+            </div>
+
+            <div class="flex items-center justify-between pt-4 border-t border-gray-200">
+                <span class="text-sm text-gray-500">10 Steps • 1.5 hours</span>
+                <span class="text-blue-600 font-bold">Start Project <i class="fas fa-arrow-right ml-1"></i></span>
+            </div>
+        </a>
+
+    </div>
+
+    <!-- Stats Section -->
+    <div class="bg-white p-8 rounded-2xl shadow-lg mb-12">
+        <div class="grid grid-cols-2 md:grid-cols-4 gap-6 text-center">
+            <div>
+                <div class="text-4xl font-bold text-blue-600">4</div>
+                <div class="text-gray-600">Projects</div>
+            </div>
+            <div>
+                <div class="text-4xl font-bold text-green-600">36+</div>
+                <div class="text-gray-600">Steps Total</div>
+            </div>
+            <div>
+                <div class="text-4xl font-bold text-purple-600">5h</div>
+                <div class="text-gray-600">Learning Time</div>
+            </div>
+            <div>
+                <div class="text-4xl font-bold text-orange-600">100%</div>
+                <div class="text-gray-600">Free</div>
             </div>
         </div>
     </div>
 
-    <!-- What You Learned -->
-    <div class="bg-gradient-to-r from-purple-500 to-pink-500 text-white p-8 rounded-2xl mb-8">
-        <h2 class="text-3xl font-bold mb-4">🎓 What You Learned</h2>
-        <div class="grid md:grid-cols-2 gap-4">
-            <div class="flex items-center gap-3">
-                <i class="fas fa-check-circle text-2xl"></i>
-                <span>Complete authentication flow</span>
-            </div>
-            <div class="flex items-center gap-3">
-                <i class="fas fa-check-circle text-2xl"></i>
-                <span>Password security with bcrypt</span>
-            </div>
-            <div class="flex items-center gap-3">
-                <i class="fas fa-check-circle text-2xl"></i>
-                <span>JWT token generation & validation</span>
-            </div>
-            <div class="flex items-center gap-3">
-                <i class="fas fa-check-circle text-2xl"></i>
-                <span>Middleware for route protection</span>
-            </div>
-            <div class="flex items-center gap-3">
-                <i class="fas fa-check-circle text-2xl"></i>
-                <span>Role-based access control</span>
-            </div>
-            <div class="flex items-center gap-3">
-                <i class="fas fa-check-circle text-2xl"></i>
-                <span>Project structure & organization</span>
-            </div>
-        </div>
+    <!-- Learning Path Recommendation -->
+    <div class="bg-gradient-to-r from-purple-600 to-pink-600 text-white p-8 rounded-2xl text-center">
+        <h2 class="text-3xl font-bold mb-4 handwritten">New to Backend?</h2>
+        <p class="text-xl mb-6">Start with the 6-day learning path before jumping into projects!</p>
+        <a href="index.html" class="inline-block bg-white text-purple-600 px-8 py-4 rounded-full font-bold text-lg hover:transform hover:scale-105 transition">
+            <i class="fas fa-graduation-cap mr-2"></i>
+            Start Learning Path
+        </a>
     </div>
 
-    <!-- Next Steps -->
-    <div class="text-center">
-        <h3 class="text-2xl font-bold text-gray-800 mb-4">Ready for more?</h3>
-        <div class="flex flex-wrap justify-center gap-4">
-            <a href="../../projects.html" class="inline-flex items-center gap-2 bg-purple-600 text-white px-6 py-3 rounded-full font-bold hover:bg-purple-700 transition">
-                <i class="fas fa-rocket"></i>
-                More Projects
-            </a>
-            <a href="https://github.com/raaj2493/Backend-with-GO" target="_blank" class="inline-flex items-center gap-2 bg-gray-800 text-white px-6 py-3 rounded-full font-bold hover:bg-gray-700 transition">
+    <!-- Footer -->
+    <footer class="mt-12 text-center text-gray-600">
+        <p>Keep building! More projects added regularly. ⭐ Star the repo for updates.</p>
+        <div class="flex justify-center gap-4 mt-4">
+            <a href="https://github.com/raaj2493/Backend-with-GO" target="_blank" class="text-2xl hover:text-gray-900 transition">
                 <i class="fab fa-github"></i>
-                Star on GitHub
             </a>
         </div>
-    </div>
+    </footer>
 
 </body>
 </html>
