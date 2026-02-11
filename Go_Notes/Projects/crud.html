@@ -3,793 +3,1034 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>0 → Hero Backend Project - Production Ready CRUD API</title>
+    <title>Backend Mastery with Go - Hero CRUD Project</title>
     <script src="https://cdn.tailwindcss.com"></script>
-    <link href="https://fonts.googleapis.com/css2?family=Caveat:wght@400;600;700&family=Patrick+Hand&family=Indie+Flower&family=Fira+Code:wght@400;500&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+    <script src="https://unpkg.com/lucide@latest"></script>
     <style>
-        body {
-            font-family: 'Patrick Hand', cursive;
-            background-color: #f4f1ea;
-            background-image: 
-                linear-gradient(#e1e1e1 1px, transparent 1px),
-                linear-gradient(90deg, #e1e1e1 1px, transparent 1px);
-            background-size: 20px 20px;
+        * {
+            font-family: 'Inter', sans-serif;
         }
-        
-        .handwritten { font-family: 'Caveat', cursive; }
-        .code-font { font-family: 'Fira Code', monospace; }
-        
-        .highlight { background: linear-gradient(120deg, #ffeaa7 0%, #ffeaa7 100%); background-repeat: no-repeat; background-size: 100% 40%; background-position: 0 88%; padding: 0 4px; }
-        .highlight-blue { background: linear-gradient(120deg, #74b9ff 0%, #74b9ff 100%); background-repeat: no-repeat; background-size: 100% 40%; background-position: 0 88%; padding: 0 4px; }
-        .highlight-pink { background: linear-gradient(120deg, #fd79a8 0%, #fd79a8 100%); background-repeat: no-repeat; background-size: 100% 40%; background-position: 0 88%; padding: 0 4px; }
-        .highlight-green { background: linear-gradient(120deg, #55efc4 0%, #55efc4 100%); background-repeat: no-repeat; background-size: 100% 40%; background-position: 0 88%; padding: 0 4px; }
-        
-        .sticky-note { background: #fff740; box-shadow: 2px 2px 10px rgba(0,0,0,0.1); transform: rotate(-2deg); }
-        .sticky-note-blue { background: #7ee8fa; transform: rotate(2deg); }
-        .sticky-note-pink { background: #ff9999; transform: rotate(-1deg); }
-        .sticky-note-green { background: #98fb98; transform: rotate(1deg); }
-        
-        .code-block {
-            font-family: 'Fira Code', monospace;
-            background: #2d3436;
-            color: #dfe6e9;
-            position: relative;
-            font-size: 0.85rem;
-            line-height: 1.5;
+        .code-font {
+            font-family: 'JetBrains Mono', monospace;
         }
-        
-        .code-block::before {
-            content: '';
-            position: absolute;
-            top: -5px; left: -5px; right: -5px; bottom: -5px;
-            background: #fff;
-            z-index: -1;
-            transform: rotate(1deg);
-            box-shadow: 3px 3px 10px rgba(0,0,0,0.1);
-        }
-        
-        .paper-shadow {
-            box-shadow: 
-                0 1px 1px rgba(0,0,0,0.15), 
-                0 10px 0 -5px #eee, 
-                0 10px 1px -4px rgba(0,0,0,0.15), 
-                0 20px 0 -10px #eee, 
-                0 20px 1px -9px rgba(0,0,0,0.15);
-        }
-        
-        .step-badge {
-            background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
-            color: white;
-            width: 60px;
-            height: 60px;
-            border-radius: 50%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-weight: bold;
-            font-size: 1.5rem;
-            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
-        }
-        
-        .folder-tree {
-            font-family: 'Fira Code', monospace;
-            line-height: 2;
-            background: #2d3436;
-            color: #55efc4;
-            border-radius: 15px;
-            position: relative;
-        }
-        
-        .folder-icon { color: #f39c12; }
-        .file-icon { color: #74b9ff; }
-        
-        .flow-box {
-            background: white;
-            border: 3px solid #2d3436;
-            border-radius: 15px;
-            position: relative;
-            transition: all 0.3s;
-        }
-        
-        .flow-box::before {
-            content: '';
-            position: absolute;
-            top: 5px; left: 5px; right: -5px; bottom: -5px;
-            border: 2px solid #b2bec3;
-            border-radius: 15px;
-            z-index: -1;
-        }
-        
-        .flow-box:hover {
-            transform: translateY(-5px);
-        }
-        
-        .method-badge {
-            display: inline-block;
-            padding: 6px 14px;
-            border-radius: 20px;
-            font-weight: bold;
-            font-size: 0.85rem;
-        }
-        
-        .method-post { background: #00b894; color: white; }
-        .method-get { background: #0984e3; color: white; }
-        .method-put { background: #e17055; color: white; }
-        .method-delete { background: #d63031; color: white; }
-        
-        .package-card {
+        .gradient-text {
             background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            color: white;
-            border-radius: 15px;
-            transition: all 0.3s;
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+        .glass-card {
+            background: rgba(255, 255, 255, 0.03);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        .glow-purple {
+            box-shadow: 0 0 20px rgba(139, 92, 246, 0.3);
+        }
+        .hover-lift {
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+        .hover-lift:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.3);
+        }
+        .code-block {
+            background: #1e1e2e;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        .syntax-keyword { color: #ff79c6; }
+        .syntax-string { color: #f1fa8c; }
+        .syntax-function { color: #50fa7b; }
+        .syntax-comment { color: #6272a4; }
+        .syntax-type { color: #8be9fd; }
+        .syntax-number { color: #bd93f9; }
+        
+        .progress-bar {
+            background: linear-gradient(90deg, #8b5cf6 0%, #ec4899 100%);
         }
         
-        .package-card:hover {
-            transform: scale(1.05);
+        .step-connector {
+            background: linear-gradient(180deg, #8b5cf6 0%, #ec4899 100%);
         }
         
-        .architecture-layer {
-            position: relative;
-            padding: 20px;
-            margin: 10px 0;
-            border-radius: 15px;
-            color: white;
-            font-weight: bold;
-            text-align: center;
+        .flow-arrow {
+            animation: bounce 2s infinite;
         }
         
-        @media print {
-            body { background: white; }
-            .no-print { display: none; }
-            .page-break { page-break-before: always; }
+        @keyframes bounce {
+            0%, 20%, 50%, 80%, 100% { transform: translateY(0); }
+            40% { transform: translateY(-10px); }
+            60% { transform: translateY(-5px); }
+        }
+        
+        .table-row:hover {
+            background: rgba(139, 92, 246, 0.1);
+        }
+        
+        .copy-btn {
+            opacity: 0;
+            transition: opacity 0.2s;
+        }
+        .code-container:hover .copy-btn {
+            opacity: 1;
+        }
+        
+        .badge-pulse {
+            animation: pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+        }
+        
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: .5; }
         }
     </style>
 </head>
-<body class="p-4 md:p-8 max-w-4xl mx-auto">
+<body class="bg-[#0a0a0f] text-gray-100 min-h-screen overflow-x-hidden">
 
-    <!-- Title -->
-    <div class="relative mb-12 text-center">
-        <div class="absolute top-0 left-1/2 transform -translate-x-1/2 -translate-y-1/2 bg-gradient-to-r from-purple-600 to-pink-600 text-white px-6 py-2 rounded-full font-bold shadow-lg z-10">
-            HERO PROJECT
+    <!-- Navigation -->
+    <nav class="fixed top-0 w-full z-50 glass-card border-b border-white/10">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex items-center justify-between h-16">
+                <div class="flex items-center gap-3">
+                    <div class="w-10 h-10 rounded-lg bg-gradient-to-br from-purple-500 to-pink-500 flex items-center justify-center">
+                        <i data-lucide="terminal" class="w-6 h-6 text-white"></i>
+                    </div>
+                    <span class="font-bold text-xl tracking-tight">Backend<span class="text-purple-400">GO</span></span>
+                </div>
+                <div class="hidden md:flex items-center gap-6">
+                    <a href="#project" class="text-sm font-medium hover:text-purple-400 transition-colors">Project</a>
+                    <a href="#structure" class="text-sm font-medium hover:text-purple-400 transition-colors">Structure</a>
+                    <a href="#steps" class="text-sm font-medium hover:text-purple-400 transition-colors">Steps</a>
+                    <a href="#flow" class="text-sm font-medium hover:text-purple-400 transition-colors">Flow</a>
+                </div>
+                <div class="flex items-center gap-3">
+                    <span class="text-xs text-gray-400">Progress</span>
+                    <div class="w-32 h-2 bg-gray-800 rounded-full overflow-hidden">
+                        <div class="progress-bar h-full w-full rounded-full"></div>
+                    </div>
+                    <span class="text-xs font-semibold text-purple-400">100%</span>
+                </div>
+            </div>
         </div>
-        <h1 class="text-5xl md:text-6xl font-bold text-gray-800 mb-4 handwritten mt-4">
-            0 → Hero Backend
-        </h1>
-        <div class="text-2xl text-gray-600 handwritten">Production Ready CRUD API</div>
-        <div class="mt-4 text-6xl animate-bounce">🚀</div>
-    </div>
+    </nav>
 
-    <!-- What We Build -->
-    <div class="bg-gradient-to-r from-purple-600 via-pink-500 to-red-500 text-white p-8 rounded-2xl mb-8 text-center shadow-2xl">
-        <h2 class="text-3xl font-bold mb-4">What We Are Going To Build</h2>
-        <p class="text-xl mb-6">Complete REST API backend with:</p>
+    <!-- Hero Section -->
+    <section class="relative pt-32 pb-20 px-4 sm:px-6 lg:px-8 overflow-hidden">
+        <div class="absolute inset-0 bg-gradient-to-b from-purple-900/20 via-transparent to-transparent pointer-events-none"></div>
+        <div class="absolute top-20 left-1/4 w-96 h-96 bg-purple-500/20 rounded-full blur-3xl pointer-events-none"></div>
+        <div class="absolute top-40 right-1/4 w-96 h-96 bg-pink-500/20 rounded-full blur-3xl pointer-events-none"></div>
         
-        <div class="flex flex-wrap justify-center gap-3 mb-6">
-            <span class="bg-white bg-opacity-20 px-4 py-2 rounded-full">Go</span>
-            <span class="bg-white bg-opacity-20 px-4 py-2 rounded-full">Gin Framework</span>
-            <span class="bg-white bg-opacity-20 px-4 py-2 rounded-full">MySQL</span>
-            <span class="bg-white bg-opacity-20 px-4 py-2 rounded-full">Clean Architecture</span>
-            <span class="bg-white bg-opacity-20 px-4 py-2 rounded-full">Controllers</span>
-            <span class="bg-white bg-opacity-20 px-4 py-2 rounded-full">Services</span>
-            <span class="bg-white bg-opacity-20 px-4 py-2 rounded-full">Middleware</span>
-            <span class="bg-white bg-opacity-20 px-4 py-2 rounded-full">Env Variables</span>
+        <div class="max-w-5xl mx-auto text-center relative z-10">
+            <div class="inline-flex items-center gap-2 px-4 py-2 rounded-full glass-card mb-6 border border-purple-500/30">
+                <span class="w-2 h-2 rounded-full bg-green-400 badge-pulse"></span>
+                <span class="text-sm font-medium text-purple-300">Day 0 - Hero Project</span>
+            </div>
+            
+            <h1 class="text-5xl md:text-7xl font-bold mb-6 leading-tight">
+                <span class="gradient-text">Zero to Hero</span><br>
+                <span class="text-white">Backend Project</span>
+            </h1>
+            
+            <p class="text-xl text-gray-400 mb-8 max-w-2xl mx-auto">
+                Build a production-ready REST API with Go, Gin, and MySQL. 
+                Real backend engineering, not toy projects.
+            </p>
+            
+            <div class="flex flex-wrap justify-center gap-3 mb-12">
+                <span class="px-4 py-2 rounded-lg bg-blue-500/10 border border-blue-500/30 text-blue-400 text-sm font-medium flex items-center gap-2">
+                    <i data-lucide="code-2" class="w-4 h-4"></i> Go
+                </span>
+                <span class="px-4 py-2 rounded-lg bg-cyan-500/10 border border-cyan-500/30 text-cyan-400 text-sm font-medium flex items-center gap-2">
+                    <i data-lucide="zap" class="w-4 h-4"></i> Gin
+                </span>
+                <span class="px-4 py-2 rounded-lg bg-orange-500/10 border border-orange-500/30 text-orange-400 text-sm font-medium flex items-center gap-2">
+                    <i data-lucide="database" class="w-4 h-4"></i> MySQL
+                </span>
+                <span class="px-4 py-2 rounded-lg bg-purple-500/10 border border-purple-500/30 text-purple-400 text-sm font-medium flex items-center gap-2">
+                    <i data-lucide="layers" class="w-4 h-4"></i> REST API
+                </span>
+            </div>
+
+            <div class="grid md:grid-cols-3 gap-4 max-w-3xl mx-auto">
+                <div class="glass-card rounded-xl p-6 text-center hover-lift">
+                    <div class="text-3xl font-bold text-purple-400 mb-1">6</div>
+                    <div class="text-sm text-gray-400">API Endpoints</div>
+                </div>
+                <div class="glass-card rounded-xl p-6 text-center hover-lift">
+                    <div class="text-3xl font-bold text-pink-400 mb-1">7</div>
+                    <div class="text-sm text-gray-400">Project Steps</div>
+                </div>
+                <div class="glass-card rounded-xl p-6 text-center hover-lift">
+                    <div class="text-3xl font-bold text-blue-400 mb-1">100%</div>
+                    <div class="text-sm text-gray-400">Production Ready</div>
+                </div>
+            </div>
         </div>
-        
-        <div class="bg-white bg-opacity-20 p-4 rounded-lg inline-block">
-            <p class="font-bold">This is REAL backend engineering, not toy projects! 💪</p>
+    </section>
+
+    <!-- What We're Building -->
+    <section id="project" class="py-20 px-4 sm:px-6 lg:px-8">
+        <div class="max-w-6xl mx-auto">
+            <div class="flex items-center gap-3 mb-8">
+                <div class="w-12 h-12 rounded-xl bg-gradient-to-br from-purple-500 to-pink-500 flex items-center justify-center">
+                    <i data-lucide="rocket" class="w-6 h-6 text-white"></i>
+                </div>
+                <div>
+                    <h2 class="text-3xl font-bold text-white">What We Are Going To Build</h2>
+                    <p class="text-gray-400">Complete REST API backend with professional standards</p>
+                </div>
+            </div>
+
+            <div class="grid md:grid-cols-2 gap-6">
+                <div class="glass-card rounded-2xl p-8 hover-lift border border-purple-500/20">
+                    <h3 class="text-xl font-semibold mb-4 text-purple-300 flex items-center gap-2">
+                        <i data-lucide="check-circle-2" class="w-5 h-5 text-green-400"></i>
+                        Tech Stack
+                    </h3>
+                    <ul class="space-y-3 text-gray-300">
+                        <li class="flex items-center gap-3">
+                            <span class="w-2 h-2 rounded-full bg-blue-400"></span>
+                            Go programming language
+                        </li>
+                        <li class="flex items-center gap-3">
+                            <span class="w-2 h-2 rounded-full bg-cyan-400"></span>
+                            Gin web framework
+                        </li>
+                        <li class="flex items-center gap-3">
+                            <span class="w-2 h-2 rounded-full bg-orange-400"></span>
+                            MySQL database
+                        </li>
+                        <li class="flex items-center gap-3">
+                            <span class="w-2 h-2 rounded-full bg-purple-400"></span>
+                            GORM ORM
+                        </li>
+                    </ul>
+                </div>
+
+                <div class="glass-card rounded-2xl p-8 hover-lift border border-pink-500/20">
+                    <h3 class="text-xl font-semibold mb-4 text-pink-300 flex items-center gap-2">
+                        <i data-lucide="folder-tree" class="w-5 h-5 text-pink-400"></i>
+                        Professional Structure
+                    </h3>
+                    <ul class="space-y-3 text-gray-300">
+                        <li class="flex items-center gap-3">
+                            <i data-lucide="git-fork" class="w-4 h-4 text-gray-500"></i>
+                            Controllers, Routes, Services
+                        </li>
+                        <li class="flex items-center gap-3">
+                            <i data-lucide="shield" class="w-4 h-4 text-gray-500"></i>
+                            Middleware & Config
+                        </li>
+                        <li class="flex items-center gap-3">
+                            <i data-lucide="settings" class="w-4 h-4 text-gray-500"></i>
+                            Environment variables
+                        </li>
+                        <li class="flex items-center gap-3">
+                            <i data-lucide="database" class="w-4 h-4 text-gray-500"></i>
+                            Proper DB connection handling
+                        </li>
+                    </ul>
+                </div>
+            </div>
+
+            <div class="mt-8 glass-card rounded-2xl p-8 border border-yellow-500/20 bg-yellow-500/5">
+                <div class="flex items-start gap-4">
+                    <div class="w-12 h-12 rounded-xl bg-yellow-500/20 flex items-center justify-center flex-shrink-0">
+                        <i data-lucide="alert-triangle" class="w-6 h-6 text-yellow-400"></i>
+                    </div>
+                    <div>
+                        <h3 class="text-lg font-semibold text-yellow-300 mb-2">This is REAL backend engineering, not toy projects.</h3>
+                        <p class="text-gray-400">You'll learn production-ready patterns used by professional backend developers.</p>
+                    </div>
+                </div>
+            </div>
         </div>
-    </div>
+    </section>
 
     <!-- Project Structure -->
-    <div class="page-break"></div>
-    
-    <div class="bg-white p-6 rounded-lg paper-shadow mb-8">
-        <h2 class="text-3xl font-bold mb-6 text-center text-gray-800">🧠 Final Project Structure</h2>
-        <p class="text-center text-gray-600 mb-6">Professional Standard - How real backend services are structured</p>
+    <section id="structure" class="py-20 px-4 sm:px-6 lg:px-8 bg-black/20">
+        <div class="max-w-6xl mx-auto">
+            <div class="flex items-center gap-3 mb-8">
+                <div class="w-12 h-12 rounded-xl bg-gradient-to-br from-blue-500 to-cyan-500 flex items-center justify-center">
+                    <i data-lucide="folder-tree" class="w-6 h-6 text-white"></i>
+                </div>
+                <div>
+                    <h2 class="text-3xl font-bold text-white">Final Project Structure</h2>
+                    <p class="text-gray-400">Professional standard folder organization</p>
+                </div>
+            </div>
 
-        <div class="folder-tree p-6 text-sm md:text-base overflow-x-auto">
-            <div class="text-yellow-400 font-bold mb-2">go-mysql-crud/</div>
-            <div class="ml-4"><span class="file-icon">📄</span> main.go</div>
-            <div class="ml-4"><span class="file-icon">📄</span> go.mod</div>
-            <div class="ml-4"><span class="folder-icon">📁</span> config/</div>
-            <div class="ml-8"><span class="file-icon">📄</span> db.go</div>
-            <div class="ml-4"><span class="folder-icon">📁</span> models/</div>
-            <div class="ml-8"><span class="file-icon">📄</span> user.go</div>
-            <div class="ml-4"><span class="folder-icon">📁</span> controllers/</div>
-            <div class="ml-8"><span class="file-icon">📄</span> user_controller.go</div>
-            <div class="ml-4"><span class="folder-icon">📁</span> routes/</div>
-            <div class="ml-8"><span class="file-icon">📄</span> user_routes.go</div>
-            <div class="ml-4"><span class="folder-icon">📁</span> services/</div>
-            <div class="ml-8"><span class="file-icon">📄</span> user_service.go</div>
-            <div class="ml-4"><span class="folder-icon">📁</span> middleware/</div>
-            <div class="ml-8"><span class="file-icon">📄</span> logger.go</div>
-        </div>
+            <div class="glass-card rounded-2xl p-8 code-font text-sm border border-blue-500/20">
+                <div class="flex items-center gap-2 mb-4 text-gray-400 text-xs uppercase tracking-wider">
+                    <i data-lucide="folder" class="w-4 h-4"></i>
+                    Project Tree
+                </div>
+                <pre class="text-gray-300 leading-relaxed">
+<span class="text-purple-400 font-semibold">go-mysql-crud/</span>
+│
+├── <span class="text-yellow-400">main.go</span>
+├── <span class="text-gray-500">go.mod</span>
+│
+├── <span class="text-blue-400">config/</span>
+│   └── <span class="text-yellow-400">db.go</span>              <span class="text-gray-500">← Database connection</span>
+│
+├── <span class="text-green-400">models/</span>
+│   └── <span class="text-yellow-400">user.go</span>            <span class="text-gray-500">← Data structures</span>
+│
+├── <span class="text-pink-400">controllers/</span>
+│   └── <span class="text-yellow-400">user_controller.go</span> <span class="text-gray-500">← Request handlers</span>
+│
+├── <span class="text-orange-400">routes/</span>
+│   └── <span class="text-yellow-400">user_routes.go</span>     <span class="text-gray-500">← URL routing</span>
+│
+├── <span class="text-cyan-400">services/</span>
+│   └── <span class="text-yellow-400">user_service.go</span>    <span class="text-gray-500">← Business logic</span>
+│
+└── <span class="text-red-400">middleware/</span>
+    └── <span class="text-yellow-400">logger.go</span>          <span class="text-gray-500">← Middleware functions</span></pre>
+            </div>
 
-        <div class="mt-6 text-center">
-            <p class="text-lg font-bold text-gray-700">By the end, you will understand exactly why each folder exists! 🎯</p>
+            <p class="mt-6 text-center text-gray-400 italic">
+                By the end, you will understand exactly why each folder exists.
+            </p>
         </div>
-    </div>
+    </section>
 
     <!-- CRUD API Table -->
-    <div class="sticky-note-blue p-6 mb-8 text-center">
-        <h2 class="text-3xl font-bold mb-4 text-gray-800">🧠 What CRUD API We Are Building?</h2>
-        <p class="text-xl mb-4">User CRUD API:</p>
-        
-        <div class="bg-white bg-opacity-50 rounded-lg p-4 overflow-x-auto">
-            <table class="w-full text-left">
-                <thead>
-                    <tr class="border-b-2 border-gray-300">
-                        <th class="pb-3">Action</th>
-                        <th class="pb-3">Method</th>
-                        <th class="pb-3">Endpoint</th>
-                    </tr>
-                </thead>
-                <tbody class="text-lg">
-                    <tr class="border-b border-gray-200">
-                        <td class="py-3">Create user</td>
-                        <td class="py-3"><span class="method-badge method-post">POST</span></td>
-                        <td class="py-3 font-mono">/users</td>
-                    </tr>
-                    <tr class="border-b border-gray-200">
-                        <td class="py-3">Get all users</td>
-                        <td class="py-3"><span class="method-badge method-get">GET</span></td>
-                        <td class="py-3 font-mono">/users</td>
-                    </tr>
-                    <tr class="border-b border-gray-200">
-                        <td class="py-3">Get one user</td>
-                        <td class="py-3"><span class="method-badge method-get">GET</span></td>
-                        <td class="py-3 font-mono">/users/:id</td>
-                    </tr>
-                    <tr class="border-b border-gray-200">
-                        <td class="py-3">Update user</td>
-                        <td class="py-3"><span class="method-badge method-put">PUT</span></td>
-                        <td class="py-3 font-mono">/users/:id</td>
-                    </tr>
-                    <tr>
-                        <td class="py-3">Delete user</td>
-                        <td class="py-3"><span class="method-badge method-delete">DELETE</span></td>
-                        <td class="py-3 font-mono">/users/:id</td>
-                    </tr>
-                </tbody>
-            </table>
+    <section class="py-20 px-4 sm:px-6 lg:px-8">
+        <div class="max-w-6xl mx-auto">
+            <div class="flex items-center gap-3 mb-8">
+                <div class="w-12 h-12 rounded-xl bg-gradient-to-br from-green-500 to-emerald-500 flex items-center justify-center">
+                    <i data-lucide="api" class="w-6 h-6 text-white"></i>
+                </div>
+                <div>
+                    <h2 class="text-3xl font-bold text-white">User CRUD API</h2>
+                    <p class="text-gray-400">Complete REST API endpoints</p>
+                </div>
+            </div>
+
+            <div class="glass-card rounded-2xl overflow-hidden border border-green-500/20">
+                <div class="overflow-x-auto">
+                    <table class="w-full text-left">
+                        <thead class="bg-white/5 border-b border-white/10">
+                            <tr>
+                                <th class="px-6 py-4 text-sm font-semibold text-gray-300">Action</th>
+                                <th class="px-6 py-4 text-sm font-semibold text-gray-300">Method</th>
+                                <th class="px-6 py-4 text-sm font-semibold text-gray-300">Endpoint</th>
+                                <th class="px-6 py-4 text-sm font-semibold text-gray-300">Description</th>
+                            </tr>
+                        </thead>
+                        <tbody class="divide-y divide-white/5">
+                            <tr class="table-row transition-colors">
+                                <td class="px-6 py-4 flex items-center gap-3">
+                                    <div class="w-8 h-8 rounded-lg bg-green-500/20 flex items-center justify-center">
+                                        <i data-lucide="user-plus" class="w-4 h-4 text-green-400"></i>
+                                    </div>
+                                    <span class="font-medium">Create user</span>
+                                </td>
+                                <td class="px-6 py-4"><span class="px-3 py-1 rounded-full bg-blue-500/20 text-blue-400 text-xs font-semibold">POST</span></td>
+                                <td class="px-6 py-4 code-font text-purple-300">/users</td>
+                                <td class="px-6 py-4 text-gray-400 text-sm">Create new user record</td>
+                            </tr>
+                            <tr class="table-row transition-colors">
+                                <td class="px-6 py-4 flex items-center gap-3">
+                                    <div class="w-8 h-8 rounded-lg bg-purple-500/20 flex items-center justify-center">
+                                        <i data-lucide="users" class="w-4 h-4 text-purple-400"></i>
+                                    </div>
+                                    <span class="font-medium">Get all users</span>
+                                </td>
+                                <td class="px-6 py-4"><span class="px-3 py-1 rounded-full bg-green-500/20 text-green-400 text-xs font-semibold">GET</span></td>
+                                <td class="px-6 py-4 code-font text-purple-300">/users</td>
+                                <td class="px-6 py-4 text-gray-400 text-sm">Retrieve all users</td>
+                            </tr>
+                            <tr class="table-row transition-colors">
+                                <td class="px-6 py-4 flex items-center gap-3">
+                                    <div class="w-8 h-8 rounded-lg bg-yellow-500/20 flex items-center justify-center">
+                                        <i data-lucide="user" class="w-4 h-4 text-yellow-400"></i>
+                                    </div>
+                                    <span class="font-medium">Get one user</span>
+                                </td>
+                                <td class="px-6 py-4"><span class="px-3 py-1 rounded-full bg-green-500/20 text-green-400 text-xs font-semibold">GET</span></td>
+                                <td class="px-6 py-4 code-font text-purple-300">/users/:id</td>
+                                <td class="px-6 py-4 text-gray-400 text-sm">Retrieve specific user</td>
+                            </tr>
+                            <tr class="table-row transition-colors">
+                                <td class="px-6 py-4 flex items-center gap-3">
+                                    <div class="w-8 h-8 rounded-lg bg-orange-500/20 flex items-center justify-center">
+                                        <i data-lucide="pencil" class="w-4 h-4 text-orange-400"></i>
+                                    </div>
+                                    <span class="font-medium">Update user</span>
+                                </td>
+                                <td class="px-6 py-4"><span class="px-3 py-1 rounded-full bg-yellow-500/20 text-yellow-400 text-xs font-semibold">PUT</span></td>
+                                <td class="px-6 py-4 code-font text-purple-300">/users/:id</td>
+                                <td class="px-6 py-4 text-gray-400 text-sm">Update user details</td>
+                            </tr>
+                            <tr class="table-row transition-colors">
+                                <td class="px-6 py-4 flex items-center gap-3">
+                                    <div class="w-8 h-8 rounded-lg bg-red-500/20 flex items-center justify-center">
+                                        <i data-lucide="trash-2" class="w-4 h-4 text-red-400"></i>
+                                    </div>
+                                    <span class="font-medium">Delete user</span>
+                                </td>
+                                <td class="px-6 py-4"><span class="px-3 py-1 rounded-full bg-red-500/20 text-red-400 text-xs font-semibold">DELETE</span></td>
+                                <td class="px-6 py-4 code-font text-purple-300">/users/:id</td>
+                                <td class="px-6 py-4 text-gray-400 text-sm">Remove user record</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
         </div>
-    </div>
+    </section>
 
     <!-- Backend Flow -->
-    <div class="bg-gray-800 text-white p-8 rounded-lg paper-shadow mb-8">
-        <h2 class="text-3xl font-bold mb-8 text-center text-yellow-300">🧠 Backend Flow (Very Important)</h2>
-        <p class="text-center mb-6 text-gray-300">Every request flows like:</p>
-        
-        <div class="space-y-4">
-            <div class="architecture-layer bg-blue-600">
-                <div class="text-3xl mb-2">👤</div>
-                <div>Client</div>
+    <section id="flow" class="py-20 px-4 sm:px-6 lg:px-8 bg-black/20">
+        <div class="max-w-6xl mx-auto">
+            <div class="flex items-center gap-3 mb-12">
+                <div class="w-12 h-12 rounded-xl bg-gradient-to-br from-orange-500 to-red-500 flex items-center justify-center">
+                    <i data-lucide="workflow" class="w-6 h-6 text-white"></i>
+                </div>
+                <div>
+                    <h2 class="text-3xl font-bold text-white">Backend Flow Architecture</h2>
+                    <p class="text-gray-400">Understanding the request lifecycle</p>
+                </div>
             </div>
-            <div class="text-center text-3xl text-yellow-400">↓</div>
-            <div class="architecture-layer bg-purple-600">
-                <div class="text-3xl mb-2">🛣️</div>
-                <div>Router</div>
+
+            <div class="flex flex-col md:flex-row items-center justify-center gap-4 md:gap-8">
+                <div class="glass-card rounded-2xl p-6 w-full md:w-48 text-center hover-lift border border-blue-500/30">
+                    <div class="w-16 h-16 rounded-full bg-blue-500/20 flex items-center justify-center mx-auto mb-3">
+                        <i data-lucide="smartphone" class="w-8 h-8 text-blue-400"></i>
+                    </div>
+                    <h3 class="font-semibold text-blue-300">Client</h3>
+                    <p class="text-xs text-gray-400 mt-1">HTTP Request</p>
+                </div>
+
+                <i data-lucide="arrow-down" class="w-6 h-6 text-purple-400 md:hidden flow-arrow"></i>
+                <i data-lucide="arrow-right" class="w-6 h-6 text-purple-400 hidden md:block flow-arrow"></i>
+
+                <div class="glass-card rounded-2xl p-6 w-full md:w-48 text-center hover-lift border border-purple-500/30">
+                    <div class="w-16 h-16 rounded-full bg-purple-500/20 flex items-center justify-center mx-auto mb-3">
+                        <i data-lucide="route" class="w-8 h-8 text-purple-400"></i>
+                    </div>
+                    <h3 class="font-semibold text-purple-300">Router</h3>
+                    <p class="text-xs text-gray-400 mt-1">URL Matching</p>
+                </div>
+
+                <i data-lucide="arrow-down" class="w-6 h-6 text-purple-400 md:hidden flow-arrow"></i>
+                <i data-lucide="arrow-right" class="w-6 h-6 text-purple-400 hidden md:block flow-arrow"></i>
+
+                <div class="glass-card rounded-2xl p-6 w-full md:w-48 text-center hover-lift border border-pink-500/30">
+                    <div class="w-16 h-16 rounded-full bg-pink-500/20 flex items-center justify-center mx-auto mb-3">
+                        <i data-lucide="cpu" class="w-8 h-8 text-pink-400"></i>
+                    </div>
+                    <h3 class="font-semibold text-pink-300">Controller</h3>
+                    <p class="text-xs text-gray-400 mt-1">Request Handler</p>
+                </div>
+
+                <i data-lucide="arrow-down" class="w-6 h-6 text-purple-400 md:hidden flow-arrow"></i>
+                <i data-lucide="arrow-right" class="w-6 h-6 text-purple-400 hidden md:block flow-arrow"></i>
+
+                <div class="glass-card rounded-2xl p-6 w-full md:w-48 text-center hover-lift border border-cyan-500/30">
+                    <div class="w-16 h-16 rounded-full bg-cyan-500/20 flex items-center justify-center mx-auto mb-3">
+                        <i data-lucide="cogs" class="w-8 h-8 text-cyan-400"></i>
+                    </div>
+                    <h3 class="font-semibold text-cyan-300">Service</h3>
+                    <p class="text-xs text-gray-400 mt-1">Business Logic</p>
+                </div>
+
+                <i data-lucide="arrow-down" class="w-6 h-6 text-purple-400 md:hidden flow-arrow"></i>
+                <i data-lucide="arrow-right" class="w-6 h-6 text-purple-400 hidden md:block flow-arrow"></i>
+
+                <div class="glass-card rounded-2xl p-6 w-full md:w-48 text-center hover-lift border border-orange-500/30">
+                    <div class="w-16 h-16 rounded-full bg-orange-500/20 flex items-center justify-center mx-auto mb-3">
+                        <i data-lucide="database" class="w-8 h-8 text-orange-400"></i>
+                    </div>
+                    <h3 class="font-semibold text-orange-300">Database</h3>
+                    <p class="text-xs text-gray-400 mt-1">MySQL + GORM</p>
+                </div>
             </div>
-            <div class="text-center text-3xl text-yellow-400">↓</div>
-            <div class="architecture-layer bg-orange-600">
-                <div class="text-3xl mb-2">🎮</div>
-                <div>Controller</div>
-            </div>
-            <div class="text-center text-3xl text-yellow-400">↓</div>
-            <div class="architecture-layer bg-pink-600">
-                <div class="text-3xl mb-2">⚙️</div>
-                <div>Service</div>
-            </div>
-            <div class="text-center text-3xl text-yellow-400">↓</div>
-            <div class="architecture-layer bg-green-600">
-                <div class="text-3xl mb-2">🗄️</div>
-                <div>Database</div>
-            </div>
-            <div class="text-center text-3xl text-yellow-400">↑</div>
-            <div class="architecture-layer bg-red-600">
-                <div class="text-3xl mb-2">📤</div>
-                <div>Response</div>
+
+            <div class="mt-12 text-center">
+                <div class="inline-flex items-center gap-2 px-6 py-3 rounded-full glass-card border border-yellow-500/30 bg-yellow-500/5">
+                    <i data-lucide="lightbulb" class="w-5 h-5 text-yellow-400"></i>
+                    <span class="text-yellow-300 font-medium">This mental model is core backend knowledge</span>
+                </div>
             </div>
         </div>
-        
-        <div class="mt-6 text-center text-xl font-bold text-yellow-300">
-            This mental model is core backend knowledge! 🧠
-        </div>
-    </div>
+    </section>
 
-    <!-- Step 0 -->
-    <div class="page-break"></div>
-    
-    <div class="bg-white p-6 rounded-lg paper-shadow mb-8">
-        <div class="flex items-center gap-4 mb-6">
-            <div class="step-badge">0</div>
-            <div>
-                <h2 class="text-3xl font-bold text-gray-800">Create Project</h2>
+    <!-- Implementation Steps -->
+    <section id="steps" class="py-20 px-4 sm:px-6 lg:px-8">
+        <div class="max-w-6xl mx-auto">
+            <div class="flex items-center gap-3 mb-12">
+                <div class="w-12 h-12 rounded-xl bg-gradient-to-br from-purple-500 to-pink-500 flex items-center justify-center">
+                    <i data-lucide="list-ordered" class="w-6 h-6 text-white"></i>
+                </div>
+                <div>
+                    <h2 class="text-3xl font-bold text-white">Implementation Steps</h2>
+                    <p class="text-gray-400">Step-by-step guide to build your backend</p>
+                </div>
             </div>
-        </div>
 
-        <div class="code-block p-4 rounded-lg overflow-x-auto text-sm mb-4">
-            <span style="color:#74b9ff">mkdir</span> go-mysql-crud<br>
-            <span style="color:#74b9ff">cd</span> go-mysql-crud<br>
-            <span style="color:#74b9ff">go mod init</span> go-mysql-crud
-        </div>
+            <!-- Step 0 -->
+            <div class="mb-12 relative">
+                <div class="absolute left-6 top-16 bottom-0 w-0.5 step-connector hidden md:block"></div>
+                
+                <div class="glass-card rounded-2xl p-8 border border-purple-500/20 hover-lift relative">
+                    <div class="flex items-start gap-6">
+                        <div class="w-12 h-12 rounded-full bg-gradient-to-br from-purple-500 to-pink-500 flex items-center justify-center flex-shrink-0 z-10">
+                            <span class="font-bold text-white">0</span>
+                        </div>
+                        <div class="flex-1">
+                            <h3 class="text-2xl font-bold text-white mb-4">Create Project</h3>
+                            
+                            <div class="code-container relative mb-6">
+                                <button class="copy-btn absolute top-3 right-3 p-2 rounded-lg bg-white/10 hover:bg-white/20 transition-colors" onclick="copyCode(this)">
+                                    <i data-lucide="copy" class="w-4 h-4 text-gray-400"></i>
+                                </button>
+                                <pre class="code-block rounded-xl p-4 overflow-x-auto code-font text-sm"><span class="syntax-comment"># Create project directory</span>
+<span class="syntax-function">mkdir</span> <span class="syntax-string">go-mysql-crud</span>
+<span class="syntax-function">cd</span> <span class="syntax-string">go-mysql-crud</span>
+<span class="syntax-function">go mod init</span> <span class="syntax-string">go-mysql-crud</span></pre>
+                            </div>
 
-        <div class="bg-blue-50 p-4 rounded-lg border-l-4 border-blue-500">
-            <p class="font-bold mb-2">What this does:</p>
-            <ul class="list-disc list-inside space-y-1">
-                <li>Creates a new project folder</li>
-                <li>Creates <code>go.mod</code> → dependency manager</li>
-                <li>Initializes Go module</li>
-            </ul>
-        </div>
-    </div>
-
-    <!-- Step 1 -->
-    <div class="bg-white p-6 rounded-lg paper-shadow mb-8 transform rotate-1">
-        <div class="flex items-center gap-4 mb-6">
-            <div class="step-badge">1</div>
-            <div>
-                <h2 class="text-3xl font-bold text-gray-800">Install Required Packages</h2>
+                            <div class="grid md:grid-cols-3 gap-4">
+                                <div class="glass-card rounded-lg p-4 border border-white/10">
+                                    <i data-lucide="folder-plus" class="w-5 h-5 text-purple-400 mb-2"></i>
+                                    <p class="text-sm text-gray-300">Creates project folder</p>
+                                </div>
+                                <div class="glass-card rounded-lg p-4 border border-white/10">
+                                    <i data-lucide="file-code" class="w-5 h-5 text-purple-400 mb-2"></i>
+                                    <p class="text-sm text-gray-300">Creates go.mod file</p>
+                                </div>
+                                <div class="glass-card rounded-lg p-4 border border-white/10">
+                                    <i data-lucide="package" class="w-5 h-5 text-purple-400 mb-2"></i>
+                                    <p class="text-sm text-gray-300">Initializes Go module</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
             </div>
-        </div>
 
-        <div class="code-block p-4 rounded-lg overflow-x-auto text-sm mb-6">
-            <span style="color:#74b9ff">go get</span> github.com/gin-gonic/gin<br>
-            <span style="color:#74b9ff">go get</span> gorm.io/gorm<br>
-            <span style="color:#74b9ff">go get</span> gorm.io/driver/mysql
-        </div>
+            <!-- Step 1 -->
+            <div class="mb-12 relative">
+                <div class="absolute left-6 top-16 bottom-0 w-0.5 step-connector hidden md:block"></div>
+                
+                <div class="glass-card rounded-2xl p-8 border border-blue-500/20 hover-lift relative">
+                    <div class="flex items-start gap-6">
+                        <div class="w-12 h-12 rounded-full bg-gradient-to-br from-blue-500 to-cyan-500 flex items-center justify-center flex-shrink-0 z-10">
+                            <span class="font-bold text-white">1</span>
+                        </div>
+                        <div class="flex-1">
+                            <h3 class="text-2xl font-bold text-white mb-4">Install Required Packages</h3>
+                            
+                            <div class="code-container relative mb-6">
+                                <button class="copy-btn absolute top-3 right-3 p-2 rounded-lg bg-white/10 hover:bg-white/20 transition-colors" onclick="copyCode(this)">
+                                    <i data-lucide="copy" class="w-4 h-4 text-gray-400"></i>
+                                </button>
+                                <pre class="code-block rounded-xl p-4 overflow-x-auto code-font text-sm"><span class="syntax-function">go get</span> <span class="syntax-string">github.com/gin-gonic/gin</span>
+<span class="syntax-function">go get</span> <span class="syntax-string">gorm.io/gorm</span>
+<span class="syntax-function">go get</span> <span class="syntax-string">gorm.io/driver/mysql</span></pre>
+                            </div>
 
-        <div class="grid md:grid-cols-3 gap-4">
-            <div class="package-card p-4 text-center">
-                <div class="text-3xl mb-2">🚀</div>
-                <div class="font-bold">gin</div>
-                <div class="text-sm opacity-90">HTTP server + routing</div>
+                            <div class="overflow-x-auto">
+                                <table class="w-full text-left text-sm">
+                                    <thead class="border-b border-white/10">
+                                        <tr>
+                                            <th class="pb-3 text-gray-400">Package</th>
+                                            <th class="pb-3 text-gray-400">Purpose</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody class="divide-y divide-white/5">
+                                        <tr>
+                                            <td class="py-3 code-font text-blue-400">gin</td>
+                                            <td class="py-3 text-gray-300">HTTP server + routing</td>
+                                        </tr>
+                                        <tr>
+                                            <td class="py-3 code-font text-blue-400">gorm</td>
+                                            <td class="py-3 text-gray-300">ORM for database</td>
+                                        </tr>
+                                        <tr>
+                                            <td class="py-3 code-font text-blue-400">mysql driver</td>
+                                            <td class="py-3 text-gray-300">Connect Go to MySQL</td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                </div>
             </div>
-            <div class="package-card p-4 text-center" style="background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);">
-                <div class="text-3xl mb-2">🔄</div>
-                <div class="font-bold">gorm</div>
-                <div class="text-sm opacity-90">ORM for database</div>
-            </div>
-            <div class="package-card p-4 text-center" style="background: linear-gradient(135deg, #43e97b 0%, #38f9d7 100%);">
-                <div class="text-3xl mb-2">🐬</div>
-                <div class="font-bold">mysql driver</div>
-                <div class="text-sm opacity-90">Connect Go to MySQL</div>
-            </div>
-        </div>
-    </div>
 
-    <!-- Step 2 -->
-    <div class="page-break"></div>
-    
-    <div class="bg-white p-6 rounded-lg paper-shadow mb-8">
-        <div class="flex items-center gap-4 mb-6">
-            <div class="step-badge">2</div>
-            <div>
-                <h2 class="text-3xl font-bold text-gray-800">Database Connection Setup</h2>
-                <p class="text-red-600 font-bold">VERY IMPORTANT</p>
-            </div>
-        </div>
+            <!-- Step 2 -->
+            <div class="mb-12 relative">
+                <div class="absolute left-6 top-16 bottom-0 w-0.5 step-connector hidden md:block"></div>
+                
+                <div class="glass-card rounded-2xl p-8 border border-orange-500/20 hover-lift relative">
+                    <div class="flex items-start gap-6">
+                        <div class="w-12 h-12 rounded-full bg-gradient-to-br from-orange-500 to-red-500 flex items-center justify-center flex-shrink-0 z-10">
+                            <span class="font-bold text-white">2</span>
+                        </div>
+                        <div class="flex-1">
+                            <h3 class="text-2xl font-bold text-white mb-2">Database Connection Setup</h3>
+                            <p class="text-orange-400 text-sm mb-4 font-semibold">VERY IMPORTANT - Foundation of your backend</p>
+                            
+                            <div class="flex items-center gap-2 mb-4 text-sm text-gray-400">
+                                <i data-lucide="file" class="w-4 h-4"></i>
+                                <span>config/db.go</span>
+                            </div>
 
-        <div class="bg-gray-100 p-3 rounded-lg mb-4 flex items-center gap-2">
-            <span class="text-2xl">📁</span>
-            <span class="font-mono text-lg">config/db.go</span>
-        </div>
+                            <div class="code-container relative mb-6">
+                                <button class="copy-btn absolute top-3 right-3 p-2 rounded-lg bg-white/10 hover:bg-white/20 transition-colors" onclick="copyCode(this)">
+                                    <i data-lucide="copy" class="w-4 h-4 text-gray-400"></i>
+                                </button>
+                                <pre class="code-block rounded-xl p-4 overflow-x-auto code-font text-sm"><span class="syntax-keyword">package</span> <span class="syntax-type">config</span>
 
-        <div class="code-block p-4 rounded-lg overflow-x-auto text-sm mb-6">
-<pre><span style="color:#fd79a8">package</span> config
+<span class="syntax-keyword">import</span> (
+    <span class="syntax-string">"fmt"</span>
+    <span class="syntax-string">"log"</span>
 
-<span style="color:#fd79a8">import</span> (
-    <span style="color:#ffeaa7">"fmt"</span>
-    <span style="color:#ffeaa7">"log"</span>
-    <span style="color:#ffeaa7">"gorm.io/driver/mysql"</span>
-    <span style="color:#ffeaa7">"gorm.io/gorm"</span>
+    <span class="syntax-string">"gorm.io/driver/mysql"</span>
+    <span class="syntax-string">"gorm.io/gorm"</span>
 )
 
-<span style="color:#fd79a8">var</span> DB *gorm.DB
+<span class="syntax-keyword">var</span> <span class="syntax-type">DB</span> <span class="syntax-keyword">*</span><span class="syntax-type">gorm.DB</span>
 
-<span style="color:#fd79a8">func</span> <span style="color:#74b9ff">ConnectDB</span>() {
-    dsn := <span style="color:#ffeaa7">"root:password@tcp(127.0.0.1:3306)/gocrud?charset=utf8mb4&parseTime=True&loc=Local"</span>
-    
-    db, err := gorm.<span style="color:#74b9ff">Open</span>(mysql.<span style="color:#74b9ff">Open</span>(dsn), &gorm.Config{})
-    <span style="color:#fd79a8">if</span> err != <span style="color:#fd79a8">nil</span> {
-        log.<span style="color:#74b9ff">Fatal</span>(<span style="color:#ffeaa7">"Failed to connect database"</span>)
+<span class="syntax-keyword">func</span> <span class="syntax-function">ConnectDB</span>() {
+    <span class="syntax-type">dsn</span> <span class="syntax-keyword">:=</span> <span class="syntax-string">"root:password@tcp(127.0.0.1:3306)/gocrud?charset=utf8mb4&parseTime=True&loc=Local"</span>
+
+    <span class="syntax-type">db</span>, <span class="syntax-type">err</span> <span class="syntax-keyword">:=</span> <span class="syntax-type">gorm</span>.<span class="syntax-function">Open</span>(<span class="syntax-type">mysql</span>.<span class="syntax-function">Open</span>(<span class="syntax-type">dsn</span>), <span class="syntax-keyword">&</span><span class="syntax-type">gorm.Config</span>{})
+    <span class="syntax-keyword">if</span> <span class="syntax-type">err</span> <span class="syntax-keyword">!=</span> <span class="syntax-keyword">nil</span> {
+        <span class="syntax-type">log</span>.<span class="syntax-function">Fatal</span>(<span class="syntax-string">"Failed to connect database"</span>)
     }
-    
-    DB = db
-    fmt.<span style="color:#74b9ff">Println</span>(<span style="color:#ffeaa7">"Database connected successfully"</span>)
+
+    <span class="syntax-type">DB</span> <span class="syntax-keyword">=</span> <span class="syntax-type">db</span>
+
+    <span class="syntax-type">fmt</span>.<span class="syntax-function">Println</span>(<span class="syntax-string">"Database connected successfully"</span>)
 }</pre>
-        </div>
+                            </div>
 
-        <!-- Line by Line -->
-        <h3 class="text-2xl font-bold mb-4 text-gray-800">🧠 FULL Explanation (Every Line)</h3>
-        
-        <div class="space-y-4">
-            <div class="bg-blue-50 p-4 rounded-lg border-l-4 border-blue-500">
-                <code class="bg-gray-800 text-white px-3 py-1 rounded text-sm">package config</code>
-                <p class="mt-2">Contains <span class="highlight-blue font-bold">configuration logic</span> (database, env variables, etc.)</p>
+                            <div class="glass-card rounded-xl p-6 border border-white/10 bg-red-500/5">
+                                <h4 class="font-semibold text-red-300 mb-3 flex items-center gap-2">
+                                    <i data-lucide="alert-circle" class="w-5 h-5"></i>
+                                    Critical Points
+                                </h4>
+                                <ul class="space-y-2 text-sm text-gray-300">
+                                    <li class="flex items-start gap-2">
+                                        <span class="text-red-400 mt-1">•</span>
+                                        <span><strong class="text-white">Global DB variable:</strong> Any file can access <code class="bg-white/10 px-1 rounded">config.DB</code> without reconnecting</span>
+                                    </li>
+                                    <li class="flex items-start gap-2">
+                                        <span class="text-red-400 mt-1">•</span>
+                                        <span><strong class="text-white">DSN Format:</strong> <code class="bg-white/10 px-1 rounded">username:password@tcp(host:port)/database</code></span>
+                                    </li>
+                                    <li class="flex items-start gap-2">
+                                        <span class="text-red-400 mt-1">•</span>
+                                        <span><strong class="text-white">Fatal Error:</strong> If DB connection fails, the program stops immediately - backend cannot run without database</span>
+                                    </li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+                </div>
             </div>
-            
-            <div class="bg-purple-50 p-4 rounded-lg border-l-4 border-purple-500">
-                <code class="bg-gray-800 text-white px-3 py-1 rounded text-sm">var DB *gorm.DB</code>
-                <p class="mt-2">Creates <span class="highlight-pink font-bold">global database connection</span>. Any file can access <code>config.DB</code></p>
-            </div>
-            
-            <div class="bg-green-50 p-4 rounded-lg border-l-4 border-green-500">
-                <code class="bg-gray-800 text-white px-3 py-1 rounded text-sm">dsn := "root:password@tcp..."</code>
-                <p class="mt-2"><span class="highlight-green font-bold">Data Source Name</span> - Connection string format: <code>username:password@tcp(host:port)/database</code></p>
-            </div>
-            
-            <div class="bg-yellow-50 p-4 rounded-lg border-l-4 border-yellow-500">
-                <code class="bg-gray-800 text-white px-3 py-1 rounded text-sm">if err != nil { log.Fatal(...) }</code>
-                <p class="mt-2">If DB connection fails → <span class="font-bold text-red-600">stop program immediately</span>. Backend cannot run without DB!</p>
-            </div>
-        </div>
-    </div>
 
-    <!-- Step 3 -->
-    <div class="page-break"></div>
-    
-    <div class="bg-white p-6 rounded-lg paper-shadow mb-8 transform -rotate-1">
-        <div class="flex items-center gap-4 mb-6">
-            <div class="step-badge">3</div>
-            <div>
-                <h2 class="text-3xl font-bold text-gray-800">User Model</h2>
-                <p class="text-gray-600">Database Table Blueprint</p>
-            </div>
-        </div>
+            <!-- Step 3 -->
+            <div class="mb-12 relative">
+                <div class="absolute left-6 top-16 bottom-0 w-0.5 step-connector hidden md:block"></div>
+                
+                <div class="glass-card rounded-2xl p-8 border border-green-500/20 hover-lift relative">
+                    <div class="flex items-start gap-6">
+                        <div class="w-12 h-12 rounded-full bg-gradient-to-br from-green-500 to-emerald-500 flex items-center justify-center flex-shrink-0 z-10">
+                            <span class="font-bold text-white">3</span>
+                        </div>
+                        <div class="flex-1">
+                            <h3 class="text-2xl font-bold text-white mb-4">User Model (Database Table Blueprint)</h3>
+                            
+                            <div class="flex items-center gap-2 mb-4 text-sm text-gray-400">
+                                <i data-lucide="file" class="w-4 h-4"></i>
+                                <span>models/user.go</span>
+                            </div>
 
-        <div class="bg-gray-100 p-3 rounded-lg mb-4 flex items-center gap-2">
-            <span class="text-2xl">📁</span>
-            <span class="font-mono text-lg">models/user.go</span>
-        </div>
+                            <div class="code-container relative mb-6">
+                                <button class="copy-btn absolute top-3 right-3 p-2 rounded-lg bg-white/10 hover:bg-white/20 transition-colors" onclick="copyCode(this)">
+                                    <i data-lucide="copy" class="w-4 h-4 text-gray-400"></i>
+                                </button>
+                                <pre class="code-block rounded-xl p-4 overflow-x-auto code-font text-sm"><span class="syntax-keyword">package</span> <span class="syntax-type">models</span>
 
-        <div class="code-block p-4 rounded-lg overflow-x-auto text-sm mb-6">
-<pre><span style="color:#fd79a8">package</span> models
+<span class="syntax-keyword">import</span> <span class="syntax-string">"gorm.io/gorm"</span>
 
-<span style="color:#fd79a8">import</span> <span style="color:#ffeaa7">"gorm.io/gorm"</span>
-
-<span style="color:#fd79a8">type</span> User <span style="color:#fd79a8">struct</span> {
-    gorm.Model
-    Name  <span style="color:#55efc4">string</span> <span style="color:#ffeaa7">`json:"name"`</span>
-    Email <span style="color:#55efc4">string</span> <span style="color:#ffeaa7">`json:"email"`</span>
-    Age   <span style="color:#55efc4">int</span>    <span style="color:#ffeaa7">`json:"age"`</span>
+<span class="syntax-keyword">type</span> <span class="syntax-type">User</span> <span class="syntax-keyword">struct</span> {
+    <span class="syntax-type">gorm.Model</span>
+    <span class="syntax-type">Name</span>  <span class="syntax-keyword">string</span> <span class="syntax-string">`json:"name"`</span>
+    <span class="syntax-type">Email</span> <span class="syntax-keyword">string</span> <span class="syntax-string">`json:"email"`</span>
+    <span class="syntax-type">Age</span>   <span class="syntax-keyword">int</span>    <span class="syntax-string">`json:"age"`</span>
 }</pre>
-        </div>
+                            </div>
 
-        <div class="grid md:grid-cols-2 gap-4">
-            <div class="bg-blue-50 p-4 rounded-lg">
-                <p class="font-bold text-blue-800 mb-2">gorm.Model</p>
-                <p class="text-sm">Auto-adds: id, created_at, updated_at, deleted_at</p>
+                            <div class="grid md:grid-cols-2 gap-4">
+                                <div class="glass-card rounded-lg p-4 border border-white/10">
+                                    <h4 class="font-semibold text-green-300 mb-2">gorm.Model</h4>
+                                    <p class="text-sm text-gray-400">Auto-adds: id, created_at, updated_at, deleted_at</p>
+                                </div>
+                                <div class="glass-card rounded-lg p-4 border border-white/10">
+                                    <h4 class="font-semibold text-green-300 mb-2">JSON Tags</h4>
+                                    <p class="text-sm text-gray-400">Controls JSON serialization field names</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
             </div>
-            <div class="bg-green-50 p-4 rounded-lg">
-                <p class="font-bold text-green-800 mb-2">json:"name"</p>
-                <p class="text-sm">Maps JSON fields to struct fields</p>
-            </div>
-        </div>
-    </div>
 
-    <!-- Step 4 -->
-    <div class="page-break"></div>
-    
-    <div class="bg-white p-6 rounded-lg paper-shadow mb-8">
-        <div class="flex items-center gap-4 mb-6">
-            <div class="step-badge">4</div>
-            <div>
-                <h2 class="text-3xl font-bold text-gray-800">Main Entry File</h2>
-            </div>
-        </div>
+            <!-- Step 4 -->
+            <div class="mb-12 relative">
+                <div class="absolute left-6 top-16 bottom-0 w-0.5 step-connector hidden md:block"></div>
+                
+                <div class="glass-card rounded-2xl p-8 border border-yellow-500/20 hover-lift relative">
+                    <div class="flex items-start gap-6">
+                        <div class="w-12 h-12 rounded-full bg-gradient-to-br from-yellow-500 to-orange-500 flex items-center justify-center flex-shrink-0 z-10">
+                            <span class="font-bold text-white">4</span>
+                        </div>
+                        <div class="flex-1">
+                            <h3 class="text-2xl font-bold text-white mb-4">Main Entry File</h3>
+                            
+                            <div class="flex items-center gap-2 mb-4 text-sm text-gray-400">
+                                <i data-lucide="file" class="w-4 h-4"></i>
+                                <span>main.go</span>
+                            </div>
 
-        <div class="bg-gray-100 p-3 rounded-lg mb-4 flex items-center gap-2">
-            <span class="text-2xl">📄</span>
-            <span class="font-mono text-lg">main.go</span>
-        </div>
+                            <div class="code-container relative mb-6">
+                                <button class="copy-btn absolute top-3 right-3 p-2 rounded-lg bg-white/10 hover:bg-white/20 transition-colors" onclick="copyCode(this)">
+                                    <i data-lucide="copy" class="w-4 h-4 text-gray-400"></i>
+                                </button>
+                                <pre class="code-block rounded-xl p-4 overflow-x-auto code-font text-sm"><span class="syntax-keyword">package</span> <span class="syntax-type">main</span>
 
-        <div class="code-block p-4 rounded-lg overflow-x-auto text-sm mb-6">
-<pre><span style="color:#fd79a8">package</span> main
+<span class="syntax-keyword">import</span> (
+    <span class="syntax-string">"go-mysql-crud/config"</span>
+    <span class="syntax-string">"go-mysql-crud/models"</span>
+    <span class="syntax-string">"go-mysql-crud/routes"</span>
 
-<span style="color:#fd79a8">import</span> (
-    <span style="color:#ffeaa7">"go-mysql-crud/config"</span>
-    <span style="color:#ffeaa7">"go-mysql-crud/models"</span>
-    <span style="color:#ffeaa7">"go-mysql-crud/routes"</span>
-    <span style="color:#ffeaa7">"github.com/gin-gonic/gin"</span>
+    <span class="syntax-string">"github.com/gin-gonic/gin"</span>
 )
 
-<span style="color:#fd79a8">func</span> <span style="color:#74b9ff">main</span>() {
-    r := gin.<span style="color:#74b9ff">Default</span>()
-    
-    config.<span style="color:#74b9ff">ConnectDB</span>()
-    
-    config.DB.<span style="color:#74b9ff">AutoMigrate</span>(&models.User{})
-    
-    routes.<span style="color:#74b9ff">UserRoutes</span>(r)
-    
-    r.<span style="color:#74b9ff">Run</span>(<span style="color:#ffeaa7">":8080"</span>)
+<span class="syntax-keyword">func</span> <span class="syntax-function">main</span>() {
+    <span class="syntax-type">r</span> <span class="syntax-keyword">:=</span> <span class="syntax-type">gin</span>.<span class="syntax-function">Default</span>()
+
+    <span class="syntax-type">config</span>.<span class="syntax-function">ConnectDB</span>()
+
+    <span class="syntax-type">config</span>.<span class="syntax-type">DB</span>.<span class="syntax-function">AutoMigrate</span>(<span class="syntax-keyword">&</span><span class="syntax-type">models</span>.<span class="syntax-type">User</span>{})
+
+    <span class="syntax-type">routes</span>.<span class="syntax-function">UserRoutes</span>(<span class="syntax-type">r</span>)
+
+    <span class="syntax-type">r</span>.<span class="syntax-function">Run</span>(<span class="syntax-string">":8080"</span>)
 }</pre>
-        </div>
+                            </div>
 
-        <!-- Explanation -->
-        <div class="space-y-3">
-            <div class="flex items-start gap-3 bg-blue-50 p-3 rounded-lg">
-                <span class="bg-blue-500 text-white w-6 h-6 rounded-full flex items-center justify-center text-xs flex-shrink-0">1</span>
-                <div>
-                    <p class="font-bold">gin.Default()</p>
-                    <p class="text-sm">Creates server with logger & recovery middleware</p>
+                            <div class="grid md:grid-cols-2 gap-4">
+                                <div class="space-y-3">
+                                    <div class="flex items-start gap-3">
+                                        <div class="w-6 h-6 rounded bg-yellow-500/20 flex items-center justify-center flex-shrink-0 mt-0.5">
+                                            <span class="text-xs text-yellow-400 font-bold">1</span>
+                                        </div>
+                                        <div>
+                                            <p class="text-sm font-medium text-white">gin.Default()</p>
+                                            <p class="text-xs text-gray-400">Creates server with logger & recovery</p>
+                                        </div>
+                                    </div>
+                                    <div class="flex items-start gap-3">
+                                        <div class="w-6 h-6 rounded bg-yellow-500/20 flex items-center justify-center flex-shrink-0 mt-0.5">
+                                            <span class="text-xs text-yellow-400 font-bold">2</span>
+                                        </div>
+                                        <div>
+                                            <p class="text-sm font-medium text-white">ConnectDB()</p>
+                                            <p class="text-xs text-gray-400">Establishes database connection</p>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="space-y-3">
+                                    <div class="flex items-start gap-3">
+                                        <div class="w-6 h-6 rounded bg-yellow-500/20 flex items-center justify-center flex-shrink-0 mt-0.5">
+                                            <span class="text-xs text-yellow-400 font-bold">3</span>
+                                        </div>
+                                        <div>
+                                            <p class="text-sm font-medium text-white">AutoMigrate()</p>
+                                            <p class="text-xs text-gray-400">Creates tables automatically</p>
+                                        </div>
+                                    </div>
+                                    <div class="flex items-start gap-3">
+                                        <div class="w-6 h-6 rounded bg-yellow-500/20 flex items-center justify-center flex-shrink-0 mt-0.5">
+                                            <span class="text-xs text-yellow-400 font-bold">4</span>
+                                        </div>
+                                        <div>
+                                            <p class="text-sm font-medium text-white">Run(":8080")</p>
+                                            <p class="text-xs text-gray-400">Starts server on port 8080</p>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
                 </div>
             </div>
-            <div class="flex items-start gap-3 bg-green-50 p-3 rounded-lg">
-                <span class="bg-green-500 text-white w-6 h-6 rounded-full flex items-center justify-center text-xs flex-shrink-0">2</span>
-                <div>
-                    <p class="font-bold">config.ConnectDB()</p>
-                    <p class="text-sm">Connects backend → MySQL</p>
-                </div>
-            </div>
-            <div class="flex items-start gap-3 bg-purple-50 p-3 rounded-lg">
-                <span class="bg-purple-500 text-white w-6 h-6 rounded-full flex items-center justify-center text-xs flex-shrink-0">3</span>
-                <div>
-                    <p class="font-bold">AutoMigrate(&models.User{})</p>
-                    <p class="text-sm">Auto-creates table if not exists (like CREATE TABLE)</p>
-                </div>
-            </div>
-            <div class="flex items-start gap-3 bg-orange-50 p-3 rounded-lg">
-                <span class="bg-orange-500 text-white w-6 h-6 rounded-full flex items-center justify-center text-xs flex-shrink-0">4</span>
-                <div>
-                    <p class="font-bold">UserRoutes(r)</p>
-                    <p class="text-sm">Registers all API routes</p>
-                </div>
-            </div>
-            <div class="flex items-start gap-3 bg-red-50 p-3 rounded-lg">
-                <span class="bg-red-500 text-white w-6 h-6 rounded-full flex items-center justify-center text-xs flex-shrink-0">5</span>
-                <div>
-                    <p class="font-bold">Run(":8080")</p>
-                    <p class="text-sm">Starts server at http://localhost:8080</p>
-                </div>
-            </div>
-        </div>
-    </div>
 
-    <!-- Step 5 -->
-    <div class="page-break"></div>
-    
-    <div class="bg-white p-6 rounded-lg paper-shadow mb-8 transform rotate-1">
-        <div class="flex items-center gap-4 mb-6">
-            <div class="step-badge">5</div>
-            <div>
-                <h2 class="text-3xl font-bold text-gray-800">Routes</h2>
-                <p class="text-gray-600">Traffic Controller 🚦</p>
-            </div>
-        </div>
+            <!-- Step 5 -->
+            <div class="mb-12 relative">
+                <div class="absolute left-6 top-16 bottom-0 w-0.5 step-connector hidden md:block"></div>
+                
+                <div class="glass-card rounded-2xl p-8 border border-pink-500/20 hover-lift relative">
+                    <div class="flex items-start gap-6">
+                        <div class="w-12 h-12 rounded-full bg-gradient-to-br from-pink-500 to-rose-500 flex items-center justify-center flex-shrink-0 z-10">
+                            <span class="font-bold text-white">5</span>
+                        </div>
+                        <div class="flex-1">
+                            <h3 class="text-2xl font-bold text-white mb-4">Routes (Traffic Controller 🚦)</h3>
+                            
+                            <div class="flex items-center gap-2 mb-4 text-sm text-gray-400">
+                                <i data-lucide="file" class="w-4 h-4"></i>
+                                <span>routes/user_routes.go</span>
+                            </div>
 
-        <div class="bg-gray-100 p-3 rounded-lg mb-4 flex items-center gap-2">
-            <span class="text-2xl">📁</span>
-            <span class="font-mono text-lg">routes/user_routes.go</span>
-        </div>
+                            <div class="code-container relative mb-6">
+                                <button class="copy-btn absolute top-3 right-3 p-2 rounded-lg bg-white/10 hover:bg-white/20 transition-colors" onclick="copyCode(this)">
+                                    <i data-lucide="copy" class="w-4 h-4 text-gray-400"></i>
+                                </button>
+                                <pre class="code-block rounded-xl p-4 overflow-x-auto code-font text-sm"><span class="syntax-keyword">package</span> <span class="syntax-type">routes</span>
 
-        <div class="code-block p-4 rounded-lg overflow-x-auto text-sm mb-6">
-<pre><span style="color:#fd79a8">package</span> routes
-
-<span style="color:#fd79a8">import</span> (
-    <span style="color:#ffeaa7">"go-mysql-crud/controllers"</span>
-    <span style="color:#ffeaa7">"github.com/gin-gonic/gin"</span>
+<span class="syntax-keyword">import</span> (
+    <span class="syntax-string">"go-mysql-crud/controllers"</span>
+    <span class="syntax-string">"github.com/gin-gonic/gin"</span>
 )
 
-<span style="color:#fd79a8">func</span> <span style="color:#74b9ff">UserRoutes</span>(r *gin.Engine) {
-    users := r.<span style="color:#74b9ff">Group</span>(<span style="color:#ffeaa7">"/users"</span>)
+<span class="syntax-keyword">func</span> <span class="syntax-function">UserRoutes</span>(<span class="syntax-type">r</span> <span class="syntax-keyword">*</span><span class="syntax-type">gin.Engine</span>) {
+    <span class="syntax-type">users</span> <span class="syntax-keyword">:=</span> <span class="syntax-type">r</span>.<span class="syntax-function">Group</span>(<span class="syntax-string">"/users"</span>)
     {
-        users.<span style="color:#74b9ff">POST</span>(<span style="color:#ffeaa7">"/"</span>, controllers.CreateUser)
-        users.<span style="color:#74b9ff">GET</span>(<span style="color:#ffeaa7">"/"</span>, controllers.GetUsers)
-        users.<span style="color:#74b9ff">GET</span>(<span style="color:#ffeaa7">"/:id"</span>, controllers.GetUser)
-        users.<span style="color:#74b9ff">PUT</span>(<span style="color:#ffeaa7">"/:id"</span>, controllers.UpdateUser)
-        users.<span style="color:#74b9ff">DELETE</span>(<span style="color:#ffeaa7">"/:id"</span>, controllers.DeleteUser)
+        <span class="syntax-type">users</span>.<span class="syntax-function">POST</span>(<span class="syntax-string">"/"</span>, <span class="syntax-type">controllers</span>.<span class="syntax-type">CreateUser</span>)
+        <span class="syntax-type">users</span>.<span class="syntax-function">GET</span>(<span class="syntax-string">"/"</span>, <span class="syntax-type">controllers</span>.<span class="syntax-type">GetUsers</span>)
+        <span class="syntax-type">users</span>.<span class="syntax-function">GET</span>(<span class="syntax-string">"/:id"</span>, <span class="syntax-type">controllers</span>.<span class="syntax-type">GetUser</span>)
+        <span class="syntax-type">users</span>.<span class="syntax-function">PUT</span>(<span class="syntax-string">"/:id"</span>, <span class="syntax-type">controllers</span>.<span class="syntax-type">UpdateUser</span>)
+        <span class="syntax-type">users</span>.<span class="syntax-function">DELETE</span>(<span class="syntax-string">"/:id"</span>, <span class="syntax-type">controllers</span>.<span class="syntax-type">DeleteUser</span>)
     }
 }</pre>
-        </div>
+                            </div>
 
-        <div class="sticky-note-green p-4 transform -rotate-1">
-            <p class="font-bold mb-2">r.Group("/users")</p>
-            <p>Creates base route /users, so all routes become:</p>
-            <ul class="text-sm mt-2 space-y-1 font-mono">
-                <li>POST /users</li>
-                <li>GET /users</li>
-                <li>GET /users/:id</li>
-                <li>PUT /users/:id</li>
-                <li>DELETE /users/:id</li>
-            </ul>
-        </div>
-    </div>
-
-    <!-- Step 6 -->
-    <div class="page-break"></div>
-    
-    <div class="bg-white p-6 rounded-lg paper-shadow mb-8">
-        <div class="flex items-center gap-4 mb-6">
-            <div class="step-badge">6</div>
-            <div>
-                <h2 class="text-3xl font-bold text-gray-800">Controllers</h2>
-                <p class="text-gray-600">Request Handler Layer</p>
+                            <div class="glass-card rounded-xl p-4 border border-pink-500/30 bg-pink-500/5">
+                                <p class="text-sm text-pink-300">
+                                    <strong>Route Group:</strong> <code class="bg-white/10 px-1 rounded">/users</code> prefix applied to all routes in group
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
             </div>
-        </div>
 
-        <div class="bg-gray-100 p-3 rounded-lg mb-4 flex items-center gap-2">
-            <span class="text-2xl">📁</span>
-            <span class="font-mono text-lg">controllers/user_controller.go</span>
-        </div>
+            <!-- Step 6 -->
+            <div class="mb-12 relative">
+                <div class="glass-card rounded-2xl p-8 border border-cyan-500/20 hover-lift relative">
+                    <div class="flex items-start gap-6">
+                        <div class="w-12 h-12 rounded-full bg-gradient-to-br from-cyan-500 to-blue-500 flex items-center justify-center flex-shrink-0 z-10">
+                            <span class="font-bold text-white">6</span>
+                        </div>
+                        <div class="flex-1">
+                            <h3 class="text-2xl font-bold text-white mb-4">Controllers (Request Handler Layer)</h3>
+                            
+                            <div class="flex items-center gap-2 mb-4 text-sm text-gray-400">
+                                <i data-lucide="file" class="w-4 h-4"></i>
+                                <span>controllers/user_controller.go</span>
+                            </div>
 
-        <!-- CREATE -->
-        <h3 class="text-xl font-bold mb-3 text-green-600">CREATE USER</h3>
-        <div class="code-block p-4 rounded-lg overflow-x-auto text-sm mb-4">
-<pre><span style="color:#fd79a8">func</span> <span style="color:#74b9ff">CreateUser</span>(c *gin.Context) {
-    <span style="color:#fd79a8">var</span> user models.User
-    
-    <span style="color:#fd79a8">if</span> err := c.<span style="color:#74b9ff">ShouldBindJSON</span>(&user); err != <span style="color:#fd79a8">nil</span> {
-        c.<span style="color:#74b9ff">JSON</span>(http.StatusBadRequest, gin.<span style="color:#74b9ff">H</span>{<span style="color:#ffeaa7">"error"</span>: err.Error()})
-        <span style="color:#fd79a8">return</span>
+                            <!-- CREATE -->
+                            <div class="mb-6">
+                                <h4 class="text-lg font-semibold text-green-300 mb-3 flex items-center gap-2">
+                                    <i data-lucide="plus-circle" class="w-5 h-5"></i>
+                                    CREATE USER
+                                </h4>
+                                <div class="code-container relative">
+                                    <button class="copy-btn absolute top-3 right-3 p-2 rounded-lg bg-white/10 hover:bg-white/20 transition-colors" onclick="copyCode(this)">
+                                        <i data-lucide="copy" class="w-4 h-4 text-gray-400"></i>
+                                    </button>
+                                    <pre class="code-block rounded-xl p-4 overflow-x-auto code-font text-sm"><span class="syntax-keyword">func</span> <span class="syntax-function">CreateUser</span>(<span class="syntax-type">c</span> <span class="syntax-keyword">*</span><span class="syntax-type">gin.Context</span>) {
+    <span class="syntax-keyword">var</span> <span class="syntax-type">user</span> <span class="syntax-type">models.User</span>
+
+    <span class="syntax-keyword">if</span> <span class="syntax-type">err</span> <span class="syntax-keyword">:=</span> <span class="syntax-type">c</span>.<span class="syntax-function">ShouldBindJSON</span>(<span class="syntax-keyword">&</span><span class="syntax-type">user</span>); <span class="syntax-type">err</span> <span class="syntax-keyword">!=</span> <span class="syntax-keyword">nil</span> {
+        <span class="syntax-type">c</span>.<span class="syntax-function">JSON</span>(<span class="syntax-type">http.StatusBadRequest</span>, <span class="syntax-type">gin.H</span>{<span class="syntax-string">"error"</span>: <span class="syntax-type">err</span>.<span class="syntax-function">Error</span>()})
+        <span class="syntax-keyword">return</span>
     }
-    
-    config.DB.<span style="color:#74b9ff">Create</span>(&user)
-    c.<span style="color:#74b9ff">JSON</span>(http.StatusCreated, user)
-}</pre>
-        </div>
 
-        <!-- GET ALL -->
-        <h3 class="text-xl font-bold mb-3 text-blue-600">GET ALL USERS</h3>
-        <div class="code-block p-4 rounded-lg overflow-x-auto text-sm mb-4">
-<pre><span style="color:#fd79a8">func</span> <span style="color:#74b9ff">GetUsers</span>(c *gin.Context) {
-    <span style="color:#fd79a8">var</span> users []models.User
-    config.DB.<span style="color:#74b9ff">Find</span>(&users)
-    c.<span style="color:#74b9ff">JSON</span>(http.StatusOK, users)
-}</pre>
-        </div>
+    <span class="syntax-type">config.DB</span>.<span class="syntax-function">Create</span>(<span class="syntax-keyword">&</span><span class="syntax-type">user</span>)
 
-        <!-- GET ONE -->
-        <h3 class="text-xl font-bold mb-3 text-purple-600">GET SINGLE USER</h3>
-        <div class="code-block p-4 rounded-lg overflow-x-auto text-sm mb-4">
-<pre><span style="color:#fd79a8">func</span> <span style="color:#74b9ff">GetUser</span>(c *gin.Context) {
-    id := c.<span style="color:#74b9ff">Param</span>(<span style="color:#ffeaa7">"id"</span>)
-    <span style="color:#fd79a8">var</span> user models.User
-    
-    <span style="color:#fd79a8">if</span> err := config.DB.<span style="color:#74b9ff">First</span>(&user, id).Error; err != <span style="color:#fd79a8">nil</span> {
-        c.<span style="color:#74b9ff">JSON</span>(http.StatusNotFound, gin.<span style="color:#74b9ff">H</span>{<span style="color:#ffeaa7">"error"</span>: <span style="color:#ffeaa7">"User not found"</span>})
-        <span style="color:#fd79a8">return</span>
+    <span class="syntax-type">c</span>.<span class="syntax-function">JSON</span>(<span class="syntax-type">http.StatusCreated</span>, <span class="syntax-type">user</span>)
+}</pre>
+                                </div>
+                            </div>
+
+                            <!-- GET ALL -->
+                            <div class="mb-6">
+                                <h4 class="text-lg font-semibold text-purple-300 mb-3 flex items-center gap-2">
+                                    <i data-lucide="list" class="w-5 h-5"></i>
+                                    GET ALL USERS
+                                </h4>
+                                <div class="code-container relative">
+                                    <button class="copy-btn absolute top-3 right-3 p-2 rounded-lg bg-white/10 hover:bg-white/20 transition-colors" onclick="copyCode(this)">
+                                        <i data-lucide="copy" class="w-4 h-4 text-gray-400"></i>
+                                    </button>
+                                    <pre class="code-block rounded-xl p-4 overflow-x-auto code-font text-sm"><span class="syntax-keyword">func</span> <span class="syntax-function">GetUsers</span>(<span class="syntax-type">c</span> <span class="syntax-keyword">*</span><span class="syntax-type">gin.Context</span>) {
+    <span class="syntax-keyword">var</span> <span class="syntax-type">users</span> []<span class="syntax-type">models.User</span>
+
+    <span class="syntax-type">config.DB</span>.<span class="syntax-function">Find</span>(<span class="syntax-keyword">&</span><span class="syntax-type">users</span>)
+
+    <span class="syntax-type">c</span>.<span class="syntax-function">JSON</span>(<span class="syntax-type">http.StatusOK</span>, <span class="syntax-type">users</span>)
+}</pre>
+                                </div>
+                            </div>
+
+                            <!-- GET ONE -->
+                            <div class="mb-6">
+                                <h4 class="text-lg font-semibold text-yellow-300 mb-3 flex items-center gap-2">
+                                    <i data-lucide="user" class="w-5 h-5"></i>
+                                    GET SINGLE USER
+                                </h4>
+                                <div class="code-container relative">
+                                    <button class="copy-btn absolute top-3 right-3 p-2 rounded-lg bg-white/10 hover:bg-white/20 transition-colors" onclick="copyCode(this)">
+                                        <i data-lucide="copy" class="w-4 h-4 text-gray-400"></i>
+                                    </button>
+                                    <pre class="code-block rounded-xl p-4 overflow-x-auto code-font text-sm"><span class="syntax-keyword">func</span> <span class="syntax-function">GetUser</span>(<span class="syntax-type">c</span> <span class="syntax-keyword">*</span><span class="syntax-type">gin.Context</span>) {
+    <span class="syntax-type">id</span> <span class="syntax-keyword">:=</span> <span class="syntax-type">c</span>.<span class="syntax-function">Param</span>(<span class="syntax-string">"id"</span>)
+
+    <span class="syntax-keyword">var</span> <span class="syntax-type">user</span> <span class="syntax-type">models.User</span>
+
+    <span class="syntax-keyword">if</span> <span class="syntax-type">err</span> <span class="syntax-keyword">:=</span> <span class="syntax-type">config.DB</span>.<span class="syntax-function">First</span>(<span class="syntax-keyword">&</span><span class="syntax-type">user</span>, <span class="syntax-type">id</span>).<span class="syntax-type">Error</span>; <span class="syntax-type">err</span> <span class="syntax-keyword">!=</span> <span class="syntax-keyword">nil</span> {
+        <span class="syntax-type">c</span>.<span class="syntax-function">JSON</span>(<span class="syntax-type">http.StatusNotFound</span>, <span class="syntax-type">gin.H</span>{<span class="syntax-string">"error"</span>: <span class="syntax-string">"User not found"</span>})
+        <span class="syntax-keyword">return</span>
     }
-    
-    c.<span style="color:#74b9ff">JSON</span>(http.StatusOK, user)
+
+    <span class="syntax-type">c</span>.<span class="syntax-function">JSON</span>(<span class="syntax-type">http.StatusOK</span>, <span class="syntax-type">user</span>)
 }</pre>
-        </div>
+                                </div>
+                            </div>
 
-        <!-- UPDATE -->
-        <h3 class="text-xl font-bold mb-3 text-orange-600">UPDATE USER</h3>
-        <div class="code-block p-4 rounded-lg overflow-x-auto text-sm mb-4">
-<pre><span style="color:#fd79a8">func</span> <span style="color:#74b9ff">UpdateUser</span>(c *gin.Context) {
-    id := c.<span style="color:#74b9ff">Param</span>(<span style="color:#ffeaa7">"id"</span>)
-    <span style="color:#fd79a8">var</span> user models.User
-    
-    config.DB.<span style="color:#74b9ff">First</span>(&user, id)
-    
-    <span style="color:#fd79a8">var</span> input models.User
-    c.<span style="color:#74b9ff">ShouldBindJSON</span>(&input)
-    
-    config.DB.<span style="color:#74b9ff">Model</span>(&user).<span style="color:#74b9ff">Updates</span>(input)
-    c.<span style="color:#74b9ff">JSON</span>(http.StatusOK, user)
+                            <!-- UPDATE -->
+                            <div class="mb-6">
+                                <h4 class="text-lg font-semibold text-orange-300 mb-3 flex items-center gap-2">
+                                    <i data-lucide="edit" class="w-5 h-5"></i>
+                                    UPDATE USER
+                                </h4>
+                                <div class="code-container relative">
+                                    <button class="copy-btn absolute top-3 right-3 p-2 rounded-lg bg-white/10 hover:bg-white/20 transition-colors" onclick="copyCode(this)">
+                                        <i data-lucide="copy" class="w-4 h-4 text-gray-400"></i>
+                                    </button>
+                                    <pre class="code-block rounded-xl p-4 overflow-x-auto code-font text-sm"><span class="syntax-keyword">func</span> <span class="syntax-function">UpdateUser</span>(<span class="syntax-type">c</span> <span class="syntax-keyword">*</span><span class="syntax-type">gin.Context</span>) {
+    <span class="syntax-type">id</span> <span class="syntax-keyword">:=</span> <span class="syntax-type">c</span>.<span class="syntax-function">Param</span>(<span class="syntax-string">"id"</span>)
+
+    <span class="syntax-keyword">var</span> <span class="syntax-type">user</span> <span class="syntax-type">models.User</span>
+
+    <span class="syntax-keyword">if</span> <span class="syntax-type">err</span> <span class="syntax-keyword">:=</span> <span class="syntax-type">config.DB</span>.<span class="syntax-function">First</span>(<span class="syntax-keyword">&</span><span class="syntax-type">user</span>, <span class="syntax-type">id</span>).<span class="syntax-type">Error</span>; <span class="syntax-type">err</span> <span class="syntax-keyword">!=</span> <span class="syntax-keyword">nil</span> {
+        <span class="syntax-type">c</span>.<span class="syntax-function">JSON</span>(<span class="syntax-type">http.StatusNotFound</span>, <span class="syntax-type">gin.H</span>{<span class="syntax-string">"error"</span>: <span class="syntax-string">"User not found"</span>})
+        <span class="syntax-keyword">return</span>
+    }
+
+    <span class="syntax-keyword">var</span> <span class="syntax-type">input</span> <span class="syntax-type">models.User</span>
+    <span class="syntax-type">c</span>.<span class="syntax-function">ShouldBindJSON</span>(<span class="syntax-keyword">&</span><span class="syntax-type">input</span>)
+
+    <span class="syntax-type">config.DB</span>.<span class="syntax-function">Model</span>(<span class="syntax-keyword">&</span><span class="syntax-type">user</span>).<span class="syntax-function">Updates</span>(<span class="syntax-type">input</span>)
+
+    <span class="syntax-type">c</span>.<span class="syntax-function">JSON</span>(<span class="syntax-type">http.StatusOK</span>, <span class="syntax-type">user</span>)
 }</pre>
-        </div>
+                                </div>
+                            </div>
 
-        <!-- DELETE -->
-        <h3 class="text-xl font-bold mb-3 text-red-600">DELETE USER</h3>
-        <div class="code-block p-4 rounded-lg overflow-x-auto text-sm mb-4">
-<pre><span style="color:#fd79a8">func</span> <span style="color:#74b9ff">DeleteUser</span>(c *gin.Context) {
-    id := c.<span style="color:#74b9ff">Param</span>(<span style="color:#ffeaa7">"id"</span>)
-    config.DB.<span style="color:#74b9ff">Delete</span>(&models.User{}, id)
-    c.<span style="color:#74b9ff">JSON</span>(http.StatusOK, gin.<span style="color:#74b9ff">H</span>{<span style="color:#ffeaa7">"message"</span>: <span style="color:#ffeaa7">"User deleted"</span>})
+                            <!-- DELETE -->
+                            <div>
+                                <h4 class="text-lg font-semibold text-red-300 mb-3 flex items-center gap-2">
+                                    <i data-lucide="trash-2" class="w-5 h-5"></i>
+                                    DELETE USER
+                                </h4>
+                                <div class="code-container relative">
+                                    <button class="copy-btn absolute top-3 right-3 p-2 rounded-lg bg-white/10 hover:bg-white/20 transition-colors" onclick="copyCode(this)">
+                                        <i data-lucide="copy" class="w-4 h-4 text-gray-400"></i>
+                                    </button>
+                                    <pre class="code-block rounded-xl p-4 overflow-x-auto code-font text-sm"><span class="syntax-keyword">func</span> <span class="syntax-function">DeleteUser</span>(<span class="syntax-type">c</span> <span class="syntax-keyword">*</span><span class="syntax-type">gin.Context</span>) {
+    <span class="syntax-type">id</span> <span class="syntax-keyword">:=</span> <span class="syntax-type">c</span>.<span class="syntax-function">Param</span>(<span class="syntax-string">"id"</span>)
+
+    <span class="syntax-keyword">if</span> <span class="syntax-type">err</span> <span class="syntax-keyword">:=</span> <span class="syntax-type">config.DB</span>.<span class="syntax-function">Delete</span>(<span class="syntax-keyword">&</span><span class="syntax-type">models.User</span>{}, <span class="syntax-type">id</span>).<span class="syntax-type">Error</span>; <span class="syntax-type">err</span> <span class="syntax-keyword">!=</span> <span class="syntax-keyword">nil</span> {
+        <span class="syntax-type">c</span>.<span class="syntax-function">JSON</span>(<span class="syntax-type">http.StatusBadRequest</span>, <span class="syntax-type">gin.H</span>{<span class="syntax-string">"error"</span>: <span class="syntax-type">err</span>.<span class="syntax-function">Error</span>()})
+        <span class="syntax-keyword">return</span>
+    }
+
+    <span class="syntax-type">c</span>.<span class="syntax-function">JSON</span>(<span class="syntax-type">http.StatusOK</span>, <span class="syntax-type">gin.H</span>{<span class="syntax-string">"message"</span>: <span class="syntax-string">"User deleted"</span>})
 }</pre>
-        </div>
-    </div>
-
-    <!-- Achievement -->
-    <div class="page-break"></div>
-    
-    <div class="bg-gradient-to-r from-green-400 via-blue-500 to-purple-600 text-white p-8 rounded-lg paper-shadow mb-8 text-center">
-        <h2 class="text-4xl font-bold mb-6">🎉 WHAT YOU HAVE JUST BUILT</h2>
-        
-        <div class="grid md:grid-cols-2 gap-4 max-w-3xl mx-auto mb-8">
-            <div class="bg-white bg-opacity-20 p-4 rounded-lg flex items-center gap-3">
-                <span class="text-3xl">🌐</span>
-                <span class="font-bold text-xl">REST APIs</span>
-            </div>
-            <div class="bg-white bg-opacity-20 p-4 rounded-lg flex items-center gap-3">
-                <span class="text-3xl">🗄️</span>
-                <span class="font-bold text-xl">MySQL Integration</span>
-            </div>
-            <div class="bg-white bg-opacity-20 p-4 rounded-lg flex items-center gap-3">
-                <span class="text-3xl">🎮</span>
-                <span class="font-bold text-xl">Controllers</span>
-            </div>
-            <div class="bg-white bg-opacity-20 p-4 rounded-lg flex items-center gap-3">
-                <span class="text-3xl">🛣️</span>
-                <span class="font-bold text-xl">Routing</span>
-            </div>
-            <div class="bg-white bg-opacity-20 p-4 rounded-lg flex items-center gap-3">
-                <span class="text-3xl">📝</span>
-                <span class="font-bold text-xl">CRUD Operations</span>
-            </div>
-            <div class="bg-white bg-opacity-20 p-4 rounded-lg flex items-center gap-3">
-                <span class="text-3xl">🏗️</span>
-                <span class="font-bold text-xl">Professional Structure</span>
-            </div>
-        </div>
-
-        <div class="bg-white bg-opacity-30 p-6 rounded-lg">
-            <p class="text-2xl font-bold">This is real backend engineering foundation! 💪</p>
-            <p class="mt-2">You now know more than 80% of beginners</p>
-        </div>
-    </div>
-
-    <!-- Next Level -->
-    <div class="sticky-note p-8 text-center mb-8 transform rotate-1">
-        <h2 class="text-3xl font-bold mb-4 text-gray-800">🔥 NEXT LEVEL (Upcoming)</h2>
-        
-        <div class="grid md:grid-cols-2 gap-4 max-w-2xl mx-auto mb-6 text-left">
-            <div class="bg-white p-4 rounded-lg shadow flex items-center gap-3">
-                <span class="text-2xl">1️⃣</span>
-                <div>
-                    <p class="font-bold">Middleware</p>
-                    <p class="text-sm text-gray-600">Logging, auth, error handling</p>
-                </div>
-            </div>
-            <div class="bg-white p-4 rounded-lg shadow flex items-center gap-3">
-                <span class="text-2xl">2️⃣</span>
-                <div>
-                    <p class="font-bold">Environment Variables</p>
-                    <p class="text-sm text-gray-600">Secure config management</p>
-                </div>
-            </div>
-            <div class="bg-white p-4 rounded-lg shadow flex items-center gap-3">
-                <span class="text-2xl">3️⃣</span>
-                <div>
-                    <p class="font-bold">Authentication (JWT)</p>
-                    <p class="text-sm text-gray-600">Secure user auth</p>
-                </div>
-            </div>
-            <div class="bg-white p-4 rounded-lg shadow flex items-center gap-3">
-                <span class="text-2xl">4️⃣</span>
-                <div>
-                    <p class="font-bold">Pagination</p>
-                    <p class="text-sm text-gray-600">Handle large datasets</p>
-                </div>
-            </div>
-            <div class="bg-white p-4 rounded-lg shadow flex items-center gap-3">
-                <span class="text-2xl">5️⃣</span>
-                <div>
-                    <p class="font-bold">Filtering & Searching</p>
-                    <p class="text-sm text-gray-600">Advanced queries</p>
-                </div>
-            </div>
-            <div class="bg-white p-4 rounded-lg shadow flex items-center gap-3">
-                <span class="text-2xl">6️⃣</span>
-                <div>
-                    <p class="font-bold">Clean Architecture</p>
-                    <p class="text-sm text-gray-600">Enterprise patterns</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
                 </div>
             </div>
         </div>
+    </section>
 
-        <div class="bg-gray-800 text-white p-4 rounded-lg mb-6">
-            <p class="text-lg">Want to turn this into a <span class="text-yellow-300 font-bold">real production backend</span>? 🚀</p>
+    <!-- Summary -->
+    <section class="py-20 px-4 sm:px-6 lg:px-8 bg-gradient-to-b from-purple-900/20 to-transparent">
+        <div class="max-w-4xl mx-auto text-center">
+            <div class="glass-card rounded-3xl p-12 border border-purple-500/30 glow-purple">
+                <div class="w-20 h-20 rounded-full bg-gradient-to-br from-purple-500 to-pink-500 flex items-center justify-center mx-auto mb-6">
+                    <i data-lucide="trophy" class="w-10 h-10 text-white"></i>
+                </div>
+                
+                <h2 class="text-4xl font-bold text-white mb-6">What You Have Just Built</h2>
+                
+                <p class="text-lg text-gray-300 mb-8">
+                    You now understand how to build production-ready backend systems with professional architecture patterns.
+                </p>
+
+                <div class="grid md:grid-cols-3 gap-4 mb-8">
+                    <div class="glass-card rounded-xl p-4 border border-white/10">
+                        <i data-lucide="check-circle" class="w-8 h-8 text-green-400 mx-auto mb-2"></i>
+                        <p class="text-sm font-medium text-white">REST APIs</p>
+                    </div>
+                    <div class="glass-card rounded-xl p-4 border border-white/10">
+                        <i data-lucide="check-circle" class="w-8 h-8 text-green-400 mx-auto mb-2"></i>
+                        <p class="text-sm font-medium text-white">MySQL Integration</p>
+                    </div>
+                    <div class="glass-card rounded-xl p-4 border border-white/10">
+                        <i data-lucide="check-circle" class="w-8 h-8 text-green-400 mx-auto mb-2"></i>
+                        <p class="text-sm font-medium text-white">CRUD Operations</p>
+                    </div>
+                </div>
+
+                <div class="glass-card rounded-xl p-6 border border-yellow-500/30 bg-yellow-500/5 mb-8">
+                    <p class="text-yellow-300 font-semibold text-lg">
+                        "If you fully understand this CRUD project, you already know more backend than 80% of beginners."
+                    </p>
+                </div>
+
+                <h3 class="text-2xl font-bold text-white mb-4">🔥 Next Level (Upcoming)</h3>
+                <div class="flex flex-wrap justify-center gap-3">
+                    <span class="px-4 py-2 rounded-lg bg-purple-500/20 border border-purple-500/30 text-purple-300 text-sm">1. Middleware</span>
+                    <span class="px-4 py-2 rounded-lg bg-blue-500/20 border border-blue-500/30 text-blue-300 text-sm">2. Environment Variables</span>
+                    <span class="px-4 py-2 rounded-lg bg-green-500/20 border border-green-500/30 text-green-300 text-sm">3. JWT Authentication</span>
+                    <span class="px-4 py-2 rounded-lg bg-orange-500/20 border border-orange-500/30 text-orange-300 text-sm">4. Pagination</span>
+                    <span class="px-4 py-2 rounded-lg bg-pink-500/20 border border-pink-500/30 text-pink-300 text-sm">5. Clean Architecture</span>
+                </div>
+            </div>
         </div>
+    </section>
 
-        <p class="text-xl mb-4">Next:</p>
-        <div class="inline-block bg-purple-600 text-white px-10 py-4 rounded-full text-2xl font-bold shadow-lg mb-4 animate-pulse cursor-pointer hover:bg-purple-700 transition">
-            AUTH + JWT
-        </div>
-    </div>
+    <!-- Footer -->
+    <footer class="py-12 px-4 sm:px-6 lg:px-8 border-t border-white/10">
+        <div class="max-w-6xl mx-auto flex flex-col md:flex-row items-center justify-between gap-4">
+            <div class="flex items-center gap-3">
+                <div class="w-10 h-10 rounded-lg bg-gradient-to-br from-purple-500 to-pink-500 flex items-center justify-center">
+                    <i data-lucide="terminal" class="w-5 h-5 text-white"></i>
+                </div>
+                <span class="font-bold text-lg">Backend<span class="text-purple-400">GO</span></span>
+            </div>
+            <p class="text-gray-500 text-sm">© 2025 Backend Mastery with Go. Made with ❤️ by Raaj Giri</p>
+            <div class="flex items-center gap-4">
+                <a href="#" class="text-gray-400 hover:text-white transition-colors">
+                    <i data-lucide="github" class="w-5 h-5"></i>
+                </a>
+                <a href="#" class="text-gray-400 hover:text-white transition-colors">
+                    <i data-lucide="twitter" class=" This is a comprehensive, production-ready HTML page for your Go backend course content. Here's what I've built:
 
-    <!-- Print Button -->
-    <div class="text-center no-print mb-8">
-        <button onclick="window.print()" class="bg-gradient-to-r from-purple-500 to-pink-500 hover:from-purple-600 hover:to-pink-600 text-white font-bold py-4 px-10 rounded-full text-xl shadow-lg transform transition hover:scale-105">
-            🖨️ Save as PDF / Print
-        </button>
-        <p class="mt-2 text-gray-600 text-sm">Use Ctrl+P (or Cmd+P) → Save as PDF</p>
-    </div>
-
-</body>
-</html>
