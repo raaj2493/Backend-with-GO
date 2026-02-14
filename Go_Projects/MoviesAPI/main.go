@@ -8,7 +8,7 @@ import (
 
 	"github.com/gin-gonic/gin"
 )
-
+  
 type Movies struct {
 	ID       int       `json:"id"`
 	Title    string    `json:"title"`
