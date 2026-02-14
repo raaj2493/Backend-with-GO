@@ -18,7 +18,7 @@ type Movies struct {
 }
 
 type Director struct {
-	Name string `json:"name"`
+	Name string `json:"name"`    
 }
 
 var movies []Movies
