@@ -73,7 +73,7 @@ func getMovieByID(c *gin.Context) {
 
 /* ================= CREATE MOVIE ================= */
 
-func createMovie(c *gin.Context) {
+func createMovie(c *gin.Context) {  
 	var input Movies
 
 	if err := c.ShouldBindJSON(&input); err != nil {
