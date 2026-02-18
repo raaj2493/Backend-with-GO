@@ -8,17 +8,17 @@ import (
 
 	"github.com/gin-gonic/gin"
 )
-
+  
 type Movies struct {
 	ID       int       `json:"id"`
 	Title    string    `json:"title"`
 	Year     int       `json:"year"`
 	Rating   float64   `json:"rating"`
-	Director *Director `json:"director"`
+	Director *Director `json:"director"`  
 }
 
 type Director struct {
-	Name string `json:"name"`
+	Name string `json:"name"`    
 }
 
 var movies []Movies
@@ -73,7 +73,7 @@ func getMovieByID(c *gin.Context) {
 
 /* ================= CREATE MOVIE ================= */
 
-func createMovie(c *gin.Context) {
+func createMovie(c *gin.Context) {  
 	var input Movies
 
 	if err := c.ShouldBindJSON(&input); err != nil {
