@@ -7,7 +7,7 @@ import(
 )
 
 var (
-	DB *gorm.DB , error
+	DB *gorm.DB 
 )
 
 func Connect(){
