@@ -72,4 +72,33 @@ func createMovies(c *gin.Context){
 }
 
 
+func updateMovies(c *gin.Context){
+	var updateMovie Movie;
+	 err := c.BindJSON(&updateMovie);
+	 id := c.Params("id");
+
+	 if err != nil {
+		c.JSON(http.StatusBadRequest , gin.H{
+			"error": "Invalid JSON",
+		})
+	 }
+
+	 for index , movie := range movie{
+		if movie.ID == id {
+              updateMovie.ID = id ;
+			  movie[index] = updateMovie
+
+			  c.JSON(http.StatusOK , gin.H{
+					"message": "Movie updated successfully",
+				"movie":   updateMovie,
+			  })
+
+		}
+		c.JSON(http.StatusNotFound, gin.H{
+		"error": "Movie not found",
+	})
+
+	 }
+}
+
 
