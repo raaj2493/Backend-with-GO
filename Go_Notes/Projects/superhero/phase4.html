@@ -1,0 +1,1094 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Phase 4: Complete CRUD API with Gin</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Caveat:wght@400;600;700&family=Patrick+Hand&family=Indie+Flower&display=swap" rel="stylesheet">
+    <style>
+        /* ═══════════════════════════════════════════════════════════════ */
+        /*                    BASE STYLES — DO NOT MODIFY                  */
+        /* ═══════════════════════════════════════════════════════════════ */
+
+        body {
+            font-family: 'Patrick Hand', cursive;
+            background-color: #f4f1ea;
+            background-image: 
+                linear-gradient(#e1e1e1 1px, transparent 1px),
+                linear-gradient(90deg, #e1e1e1 1px, transparent 1px);
+            background-size: 20px 20px;
+        }
+
+        /* ─── Typography ─── */
+        .handwritten {
+            font-family: 'Caveat', cursive;
+        }
+
+        /* ─── Highlights (underline marker effect) ─── */
+        .highlight {
+            background: linear-gradient(120deg, #ffeaa7 0%, #ffeaa7 100%);
+            background-repeat: no-repeat;
+            background-size: 100% 40%;
+            background-position: 0 88%;
+            padding: 0 4px;
+        }
+
+        .highlight-blue {
+            background: linear-gradient(120deg, #74b9ff 0%, #74b9ff 100%);
+            background-repeat: no-repeat;
+            background-size: 100% 40%;
+            background-position: 0 88%;
+            padding: 0 4px;
+        }
+
+        .highlight-pink {
+            background: linear-gradient(120deg, #fd79a8 0%, #fd79a8 100%);
+            background-repeat: no-repeat;
+            background-size: 100% 40%;
+            background-position: 0 88%;
+            padding: 0 4px;
+        }
+
+        .highlight-green {
+            background: linear-gradient(120deg, #55efc4 0%, #55efc4 100%);
+            background-repeat: no-repeat;
+            background-size: 100% 40%;
+            background-position: 0 88%;
+            padding: 0 4px;
+        }
+
+        /* ─── Sticky Notes (colored, rotated cards) ─── */
+        .sticky-note {
+            background: #fff740;
+            box-shadow: 2px 2px 10px rgba(0,0,0,0.1);
+            transform: rotate(-2deg);
+        }
+
+        .sticky-note-blue {
+            background: #7ee8fa;
+            transform: rotate(2deg);
+        }
+
+        .sticky-note-pink {
+            background: #ff9999;
+            transform: rotate(-1deg);
+        }
+
+        .sticky-note-green {
+            background: #55efc4;
+            transform: rotate(1deg);
+        }
+
+        .sticky-note-purple {
+            background: #a29bfe;
+            transform: rotate(-1.5deg);
+        }
+
+        .sticky-note-orange {
+            background: #fab1a0;
+            transform: rotate(1.5deg);
+        }
+
+        /* ─── Code Blocks (dark theme + paper shadow behind) ─── */
+        .code-block {
+            font-family: 'Courier New', monospace;
+            background: #2d3436;
+            color: #dfe6e9;
+            position: relative;
+        }
+
+        .code-block::before {
+            content: '';
+            position: absolute;
+            top: -5px;
+            left: -5px;
+            right: -5px;
+            bottom: -5px;
+            background: #fff;
+            z-index: -1;
+            transform: rotate(1deg);
+            box-shadow: 3px 3px 10px rgba(0,0,0,0.1);
+        }
+
+        /* ─── Inline Code ─── */
+        code.inline-code {
+            font-family: 'Courier New', monospace;
+            background: #2d3436;
+            color: #dfe6e9;
+            padding: 2px 8px;
+            border-radius: 4px;
+            font-size: 0.9em;
+        }
+
+        /* ─── Arrow Connector (inline) ─── */
+        .arrow {
+            position: relative;
+            display: inline-block;
+        }
+
+        .arrow::after {
+            content: '→';
+            margin: 0 10px;
+            color: #e17055;
+            font-weight: bold;
+            font-size: 1.5em;
+        }
+
+        /* ─── Animations ─── */
+        @keyframes float {
+            0%, 100% { transform: translateY(0px) rotate(0deg); }
+            50% { transform: translateY(-10px) rotate(2deg); }
+        }
+
+        .float-anim {
+            animation: float 3s ease-in-out infinite;
+        }
+
+        @keyframes bounce {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-10px); }
+        }
+
+        .emoji-big {
+            font-size: 2.5rem;
+            display: inline-block;
+            animation: bounce 2s infinite;
+        }
+
+        /* ─── Paper Shadow Cards (white content cards) ─── */
+        .paper-shadow {
+            box-shadow: 
+                0 1px 1px rgba(0,0,0,0.15), 
+                0 10px 0 -5px #eee, 
+                0 10px 1px -4px rgba(0,0,0,0.15), 
+                0 20px 0 -10px #eee, 
+                0 20px 1px -9px rgba(0,0,0,0.15);
+        }
+
+        /* ─── Diagram Boxes (double border shadow effect) ─── */
+        .diagram-box {
+            border: 3px solid #2d3436;
+            border-radius: 15px;
+            position: relative;
+            background: white;
+        }
+
+        .diagram-box::before {
+            content: '';
+            position: absolute;
+            top: 5px;
+            left: 5px;
+            right: -5px;
+            bottom: -5px;
+            border: 2px solid #b2bec3;
+            border-radius: 15px;
+            z-index: -1;
+        }
+
+        /* ─── SVG Connector Animation ─── */
+        .connector {
+            stroke: #e17055;
+            stroke-width: 3;
+            fill: none;
+            stroke-dasharray: 5,5;
+            animation: dash 20s linear infinite;
+        }
+
+        @keyframes dash {
+            to { stroke-dashoffset: -100; }
+        }
+
+        /* ─── Tape Decoration (top of title sections) ─── */
+        .tape {
+            position: absolute;
+            top: -15px;
+            left: 50%;
+            transform: translateX(-50%) rotate(-2deg);
+            width: 100px;
+            height: 30px;
+            background: rgba(255,255,255,0.4);
+            box-shadow: 0 1px 3px rgba(0,0,0,0.2);
+        }
+
+        /* ─── Step Number Badges ─── */
+        .step-badge {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            font-size: 1.2rem;
+            flex-shrink: 0;
+        }
+
+        /* ─── Info Boxes (colored left border) ─── */
+        .info-box-blue {
+            background: #ebf8ff;
+            border-left: 4px solid #4299e1;
+        }
+
+        .info-box-green {
+            background: #f0fff4;
+            border-left: 4px solid #48bb78;
+        }
+
+        .info-box-yellow {
+            background: #fffff0;
+            border-left: 4px solid #ecc94b;
+        }
+
+        .info-box-red {
+            background: #fff5f5;
+            border-left: 4px solid #f56565;
+        }
+
+        .info-box-purple {
+            background: #faf5ff;
+            border-left: 4px solid #9f7aea;
+        }
+
+        /* ─── Comparison Cards ─── */
+        .card-good {
+            background: #f0fff4;
+            border: 2px solid #9ae6b4;
+        }
+
+        .card-bad {
+            background: #fff5f5;
+            border: 2px solid #feb2b2;
+        }
+
+        .card-neutral {
+            background: #f7fafc;
+            border: 2px solid #e2e8f0;
+        }
+
+        /* ─── Tag Pills ─── */
+        .tag-pill {
+            background: white;
+            padding: 4px 12px;
+            border-radius: 9999px;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+            font-size: 0.85rem;
+            display: inline-block;
+            margin: 2px;
+        }
+
+        /* ─── Flow Arrow (vertical) ─── */
+        .flow-arrow {
+            text-align: center;
+            font-size: 2rem;
+            color: #a0aec0;
+            margin: 8px 0;
+        }
+
+        /* ─── Dark Hero Section ─── */
+        .hero-dark {
+            background: #2d3748;
+            color: white;
+        }
+
+        .hero-dark .highlight {
+            color: #2d3748;
+        }
+
+        /* ─── Print Styles ─── */
+        @media print {
+            body { background: white; }
+            .no-print { display: none; }
+            .page-break { page-break-before: always; }
+        }
+
+        /* ─── Responsive Tweaks ─── */
+        @media (max-width: 768px) {
+            .emoji-big { font-size: 1.8rem; }
+            .handwritten { font-size: 0.9em; }
+        }
+    </style>
+<base target="_blank">
+</head>
+<body class="p-4 md:p-8 max-w-4xl mx-auto">
+
+    <!-- ═══════════════════════════════════════════════════════════════ -->
+    <!--                    TITLE SECTION                                -->
+    <!-- ═══════════════════════════════════════════════════════════════ -->
+    <div class="relative mb-12 text-center">
+        <div class="tape"></div>
+        <h1 class="text-5xl md:text-7xl font-bold text-gray-800 mb-4 handwritten transform -rotate-1">
+            Phase 4: Complete CRUD API
+        </h1>
+        <div class="text-2xl text-gray-600 handwritten">with Gin — Everything Comes Together! 🎯</div>
+        <div class="mt-4 text-6xl float-anim">🚀</div>
+    </div>
+
+    <!-- ═══════════════════════════════════════════════════════════════ -->
+    <!--              START HERE BADGE + INTRO CARD                      -->
+    <!-- ═══════════════════════════════════════════════════════════════ -->
+    <div class="bg-white p-6 rounded-lg paper-shadow mb-8 relative transform rotate-1">
+        <div class="absolute -top-3 -right-3 bg-red-500 text-white px-4 py-1 rounded-full text-sm font-bold transform rotate-12">START HERE</div>
+        <h2 class="text-3xl font-bold mb-4 text-gray-800">What We've Built So Far <span class="emoji-big">🏗️</span></h2>
+        <div class="space-y-2 text-xl text-gray-700">
+            <div class="flex items-center gap-2">
+                <span class="w-2 h-2 bg-blue-500 rounded-full"></span>
+                <span>Docker ✅ — Container running smoothly</span>
+            </div>
+            <div class="flex items-center gap-2">
+                <span class="w-2 h-2 bg-green-500 rounded-full"></span>
+                <span>PostgreSQL ✅ — Database connected</span>
+            </div>
+            <div class="flex items-center gap-2">
+                <span class="w-2 h-2 bg-yellow-500 rounded-full"></span>
+                <span>Go Connection ✅ — <code class="inline-code">database/sql</code> wired up</span>
+            </div>
+            <div class="flex items-center gap-2">
+                <span class="w-2 h-2 bg-purple-500 rounded-full"></span>
+                <span>Repository ✅ — <code class="inline-code">Query()</code> & <code class="inline-code">Scan()</code> working</span>
+            </div>
+            <div class="flex items-center gap-2">
+                <span class="w-2 h-2 bg-pink-500 rounded-full"></span>
+                <span>But... <span class="font-bold">NO API yet!</span> 😱</span>
+            </div>
+        </div>
+        <div class="mt-4 p-4 info-box-blue rounded-lg">
+            <p class="text-lg font-semibold text-blue-900">
+                🎯 <span class="highlight">Goal:</span> Build a full CRUD API with Gin — POST, GET, PUT, DELETE — and deeply understand the <span class="highlight-blue">request/response lifecycle</span>.
+            </p>
+        </div>
+    </div>
+
+    <!-- ═══════════════════════════════════════════════════════════════ -->
+    <!--              BEFORE vs AFTER COMPARISON                         -->
+    <!-- ═══════════════════════════════════════════════════════════════ -->
+    <div class="grid md:grid-cols-2 gap-4 mb-8">
+        <div class="card-bad p-4 rounded-lg transform -rotate-1">
+            <h4 class="font-bold text-xl mb-2 text-red-800">❌ Before (What We Had)</h4>
+            <ul class="list-disc list-inside space-y-1 text-red-700">
+                <li><code class="inline-code">main.go</code> → prints data to terminal</li>
+                <li>No HTTP endpoints</li>
+                <li>No way for a client to talk to our app</li>
+                <li>Just a script, not a server</li>
+            </ul>
+        </div>
+
+        <div class="card-good p-4 rounded-lg transform rotate-1">
+            <h4 class="font-bold text-xl mb-2 text-green-800">✅ After (What We're Building)</h4>
+            <ul class="list-disc list-inside space-y-1 text-green-700">
+                <li>Full REST API with 5 endpoints</li>
+                <li>JSON request/response</li>
+                <li>Postman-friendly</li>
+                <li>Real backend architecture!</li>
+            </ul>
+        </div>
+    </div>
+
+    <!-- ═══════════════════════════════════════════════════════════════ -->
+    <!--              ARCHITECTURE FLOW DIAGRAM                          -->
+    <!-- ═══════════════════════════════════════════════════════════════ -->
+    <div class="hero-dark p-8 rounded-lg paper-shadow mb-8 text-center transform -rotate-1">
+        <h3 class="text-2xl font-bold mb-6 text-yellow-300">🏗️ The Final Architecture</h3>
+
+        <div class="flex flex-wrap justify-center items-center gap-2 text-base md:text-lg font-mono">
+            <div class="bg-blue-600 px-3 py-2 rounded">Client</div>
+            <span class="text-yellow-400">→</span>
+            <div class="bg-green-600 px-3 py-2 rounded">Gin Router</div>
+            <span class="text-yellow-400">→</span>
+            <div class="bg-purple-600 px-3 py-2 rounded">Handler</div>
+            <span class="text-yellow-400">→</span>
+            <div class="bg-orange-600 px-3 py-2 rounded">Repository</div>
+            <span class="text-yellow-400">→</span>
+            <div class="bg-pink-600 px-3 py-2 rounded">PostgreSQL</div>
+            <span class="text-yellow-400">→</span>
+            <div class="bg-blue-600 px-3 py-2 rounded">JSON Response</div>
+        </div>
+
+        <div class="mt-6 text-2xl font-bold text-white">
+            Think of it like a <span class="highlight">restaurant</span> 🍽️ — Client orders, Gin takes the order, Handler cooks, Repository gets ingredients from PostgreSQL, and serves back a delicious JSON meal!
+        </div>
+    </div>
+
+    <!-- ═══════════════════════════════════════════════════════════════ -->
+    <!--              FOLDER STRUCTURE                                   -->
+    <!-- ═══════════════════════════════════════════════════════════════ -->
+    <div class="sticky-note-blue p-6 mb-8 transform rotate-1">
+        <h3 class="text-2xl font-bold mb-3 text-gray-800">📁 Updated Folder Structure</h3>
+        <div class="code-block p-4 rounded-lg overflow-x-auto text-sm md:text-base">
+<pre><span style="color:#55efc4">superhero-api/</span>
+├── <span style="color:#74b9ff">cmd/</span>
+│   └── <span style="color:#74b9ff">server/</span>
+│       └── <span style="color:#ffeaa7">main.go</span>
+│
+├── <span style="color:#74b9ff">internal/</span>
+│   ├── <span style="color:#74b9ff">config/</span>
+│   ├── <span style="color:#74b9ff">database/</span>
+│   ├── <span style="color:#74b9ff">models/</span>
+│   ├── <span style="color:#74b9ff">repository/</span>
+│   ├── <span style="color:#74b9ff">handlers/</span>          <span style="color:#55efc4">← NEW!</span>
+│   │   └── <span style="color:#ffeaa7">superhero_handler.go</span>
+│   └── <span style="color:#74b9ff">routes/</span>            <span style="color:#55efc4">← NEW!</span>
+│       └── <span style="color:#ffeaa7">routes.go</span></pre>
+        </div>
+    </div>
+
+    <!-- ═══════════════════════════════════════════════════════════════ -->
+    <!--              STEP 1: REQUEST MODELS                             -->
+    <!-- ═══════════════════════════════════════════════════════════════ -->
+    <div class="bg-white p-6 rounded-lg paper-shadow mb-8 transform -rotate-1">
+        <div class="flex items-center gap-2 mb-4">
+            <span class="step-badge">1</span>
+            <h2 class="text-3xl font-bold text-gray-800">Create Request Models</h2>
+        </div>
+
+        <div class="info-box-yellow p-4 rounded-lg mb-4">
+            <p class="text-xl">🤔 <span class="font-bold">Why separate request structs?</span> We don't want users sending <code class="inline-code">"id": 999</code> or <code class="inline-code">"created_at": "random"</code> during creation!</p>
+        </div>
+
+        <p class="mb-4 text-lg">Think of it like a <span class="highlight">job application form</span> 📋 — you only fill in YOUR info, not the company's internal ID or hire date!</p>
+
+        <div class="code-block p-4 rounded-lg overflow-x-auto text-sm md:text-base mb-4">
+<pre><span style="color:#fd79a8">package</span> models
+
+<span style="color:#fd79a8">import</span> <span style="color:#ffeaa7">"time"</span>
+
+<span style="color:#55efc4">// Database Model — represents a ROW in PostgreSQL</span>
+<span style="color:#fd79a8">type</span> <span style="color:#55efc4">Superhero</span> <span style="color:#fd79a8">struct</span> {
+    ID         <span style="color:#55efc4">int</span>       <span style="color:#ffeaa7">`json:"id"`</span>
+    Name       <span style="color:#55efc4">string</span>    <span style="color:#ffeaa7">`json:"name"`</span>
+    RealName   <span style="color:#55efc4">string</span>    <span style="color:#ffeaa7">`json:"real_name"`</span>
+    Universe   <span style="color:#55efc4">string</span>    <span style="color:#ffeaa7">`json:"universe"`</span>
+    PowerLevel <span style="color:#55efc4">int</span>       <span style="color:#ffeaa7">`json:"power_level"`</span>
+    CreatedAt  time.Time  <span style="color:#ffeaa7">`json:"created_at"`</span>
+}
+
+<span style="color:#55efc4">// Request Model — what the CLIENT sends</span>
+<span style="color:#fd79a8">type</span> <span style="color:#55efc4">CreateSuperheroRequest</span> <span style="color:#fd79a8">struct</span> {
+    Name       <span style="color:#55efc4">string</span> <span style="color:#ffeaa7">`json:"name"`</span>
+    RealName   <span style="color:#55efc4">string</span> <span style="color:#ffeaa7">`json:"real_name"`</span>
+    Universe   <span style="color:#55efc4">string</span> <span style="color:#ffeaa7">`json:"universe"`</span>
+    PowerLevel <span style="color:#55efc4">int</span>    <span style="color:#ffeaa7">`json:"power_level"`</span>
+}
+
+<span style="color:#55efc4">// Request Model — for updates (same fields, different purpose!)</span>
+<span style="color:#fd79a8">type</span> <span style="color:#55efc4">UpdateSuperheroRequest</span> <span style="color:#fd79a8">struct</span> {
+    Name       <span style="color:#55efc4">string</span> <span style="color:#ffeaa7">`json:"name"`</span>
+    RealName   <span style="color:#55efc4">string</span> <span style="color:#ffeaa7">`json:"real_name"`</span>
+    Universe   <span style="color:#55efc4">string</span> <span style="color:#ffeaa7">`json:"universe"`</span>
+    PowerLevel <span style="color:#55efc4">int</span>    <span style="color:#ffeaa7">`json:"power_level"`</span>
+}</pre>
+        </div>
+
+        <div class="grid md:grid-cols-2 gap-4">
+            <div class="card-neutral p-4 rounded-lg">
+                <h4 class="font-bold text-lg mb-2">🗄️ <span class="highlight">Superhero</span></h4>
+                <p class="text-gray-700">Represents a <span class="font-bold">Database Row</span> — includes auto-generated <code class="inline-code">id</code> and <code class="inline-code">created_at</code></p>
+            </div>
+            <div class="card-neutral p-4 rounded-lg">
+                <h4 class="font-bold text-lg mb-2">📨 <span class="highlight-blue">Create/Update Request</span></h4>
+                <p class="text-gray-700">Represents <span class="font-bold">Incoming JSON</span> — only fields the user should provide</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- ═══════════════════════════════════════════════════════════════ -->
+    <!--              STEP 2: COMPLETE REPOSITORY                          -->
+    <!-- ═══════════════════════════════════════════════════════════════ -->
+    <div class="bg-white p-6 rounded-lg paper-shadow mb-8 transform rotate-1">
+        <div class="flex items-center gap-2 mb-4">
+            <span class="step-badge">2</span>
+            <h2 class="text-3xl font-bold text-gray-800">Complete the Repository</h2>
+        </div>
+
+        <div class="info-box-green p-4 rounded-lg mb-4">
+            <p class="text-xl">💡 <span class="font-bold">New Methods:</span> <code class="inline-code">Create()</code>, <code class="inline-code">GetAll()</code>, <code class="inline-code">GetByID()</code>, <code class="inline-code">Update()</code>, <code class="inline-code">Delete()</code> — the full CRUD set!</p>
+        </div>
+
+        <div class="code-block p-4 rounded-lg overflow-x-auto text-sm md:text-base mb-4">
+<pre><span style="color:#fd79a8">package</span> repository
+
+<span style="color:#fd79a8">import</span> (
+    <span style="color:#ffeaa7">"database/sql"</span>
+    <span style="color:#ffeaa7">"superhero-api/internal/models"</span>
+)
+
+<span style="color:#fd79a8">type</span> <span style="color:#55efc4">SuperheroRepository</span> <span style="color:#fd79a8">struct</span> {
+    DB *sql.DB
+}
+
+<span style="color:#fd79a8">func</span> <span style="color:#74b9ff">NewSuperheroRepository</span>(db *sql.DB) *SuperheroRepository {
+    <span style="color:#fd79a8">return</span> &SuperheroRepository{DB: db}
+}
+
+<span style="color:#55efc4">// CREATE — Exec() because no rows are returned</span>
+<span style="color:#fd79a8">func</span> (r *SuperheroRepository) <span style="color:#74b9ff">Create</span>(req models.CreateSuperheroRequest) <span style="color:#55efc4">error</span> {
+    _, err := r.DB.<span style="color:#74b9ff">Exec</span>(<span style="color:#ffeaa7">`
+        INSERT INTO superheroes
+        (name, real_name, universe, power_level)
+        VALUES ($1,$2,$3,$4)
+    `</span>, req.Name, req.RealName, req.Universe, req.PowerLevel)
+    <span style="color:#fd79a8">return</span> err
+}
+
+<span style="color:#55efc4">// READ ALL — Query() because multiple rows</span>
+<span style="color:#fd79a8">func</span> (r *SuperheroRepository) <span style="color:#74b9ff">GetAll</span>() ([]models.Superhero, <span style="color:#55efc4">error</span>) {
+    rows, err := r.DB.<span style="color:#74b9ff">Query</span>(<span style="color:#ffeaa7">`
+        SELECT id, name, real_name, universe, power_level, created_at
+        FROM superheroes ORDER BY id
+    `</span>)
+    <span style="color:#fd79a8">if</span> err != <span style="color:#55efc4">nil</span> { <span style="color:#fd79a8">return</span> <span style="color:#55efc4">nil</span>, err }
+    <span style="color:#fd79a8">defer</span> rows.<span style="color:#74b9ff">Close</span>()
+
+    <span style="color:#fd79a8">var</span> heroes []models.Superhero
+    <span style="color:#fd79a8">for</span> rows.<span style="color:#74b9ff">Next</span>() {
+        <span style="color:#fd79a8">var</span> hero models.Superhero
+        err := rows.<span style="color:#74b9ff">Scan</span>(&hero.ID, &hero.Name, &hero.RealName,
+            &hero.Universe, &hero.PowerLevel, &hero.CreatedAt)
+        <span style="color:#fd79a8">if</span> err != <span style="color:#55efc4">nil</span> { <span style="color:#fd79a8">return</span> <span style="color:#55efc4">nil</span>, err }
+        heroes = <span style="color:#74b9ff">append</span>(heroes, hero)
+    }
+    <span style="color:#fd79a8">return</span> heroes, <span style="color:#55efc4">nil</span>
+}
+
+<span style="color:#55efc4">// READ ONE — QueryRow() because exactly one row</span>
+<span style="color:#fd79a8">func</span> (r *SuperheroRepository) <span style="color:#74b9ff">GetByID</span>(id <span style="color:#55efc4">int</span>) (models.Superhero, <span style="color:#55efc4">error</span>) {
+    <span style="color:#fd79a8">var</span> hero models.Superhero
+    err := r.DB.<span style="color:#74b9ff">QueryRow</span>(<span style="color:#ffeaa7">`
+        SELECT id, name, real_name, universe, power_level, created_at
+        FROM superheroes WHERE id=$1
+    `</span>, id).<span style="color:#74b9ff">Scan</span>(&hero.ID, &hero.Name, &hero.RealName,
+        &hero.Universe, &hero.PowerLevel, &hero.CreatedAt)
+    <span style="color:#fd79a8">return</span> hero, err
+}
+
+<span style="color:#55efc4">// UPDATE — Exec() because no rows returned</span>
+<span style="color:#fd79a8">func</span> (r *SuperheroRepository) <span style="color:#74b9ff">Update</span>(id <span style="color:#55efc4">int</span>, req models.UpdateSuperheroRequest) <span style="color:#55efc4">error</span> {
+    _, err := r.DB.<span style="color:#74b9ff">Exec</span>(<span style="color:#ffeaa7">`
+        UPDATE superheroes
+        SET name=$1, real_name=$2, universe=$3, power_level=$4
+        WHERE id=$5
+    `</span>, req.Name, req.RealName, req.Universe, req.PowerLevel, id)
+    <span style="color:#fd79a8">return</span> err
+}
+
+<span style="color:#55efc4">// DELETE — Exec() because no rows returned</span>
+<span style="color:#fd79a8">func</span> (r *SuperheroRepository) <span style="color:#74b9ff">Delete</span>(id <span style="color:#55efc4">int</span>) <span style="color:#55efc4">error</span> {
+    _, err := r.DB.<span style="color:#74b9ff">Exec</span>(<span style="color:#ffeaa7">`
+        DELETE FROM superheroes WHERE id=$1
+    `</span>, id)
+    <span style="color:#fd79a8">return</span> err
+}</pre>
+        </div>
+    </div>
+
+    <!-- ═══════════════════════════════════════════════════════════════ -->
+    <!--              DEEP DIVE: Exec() vs QueryRow() vs Query()         -->
+    <!-- ═══════════════════════════════════════════════════════════════ -->
+    <div class="sticky-note-purple p-6 mb-8 transform -rotate-1">
+        <h3 class="text-2xl font-bold mb-3 text-gray-800">🔍 Deep Dive: Exec() vs QueryRow() vs Query()</h3>
+
+        <div class="overflow-hidden rounded-lg border-2 border-gray-800 mt-4">
+            <table class="w-full text-lg">
+                <thead class="bg-gray-800 text-white">
+                    <tr>
+                        <th class="p-3 text-left">Method</th>
+                        <th class="p-3 text-left">Returns</th>
+                        <th class="p-3 text-left">Use When</th>
+                        <th class="p-3 text-left">SQL Examples</th>
+                    </tr>
+                </thead>
+                <tbody class="divide-y-2 divide-gray-300">
+                    <tr class="bg-green-50">
+                        <td class="p-3 font-bold"><code class="inline-code">Exec()</code></td>
+                        <td class="p-3"><code class="inline-code">sql.Result</code></td>
+                        <td class="p-3">No rows returned</td>
+                        <td class="p-3"><span class="highlight-green">INSERT, UPDATE, DELETE</span></td>
+                    </tr>
+                    <tr class="bg-white">
+                        <td class="p-3 font-bold"><code class="inline-code">QueryRow()</code></td>
+                        <td class="p-3"><code class="inline-code">*sql.Row</code></td>
+                        <td class="p-3">Exactly <span class="font-bold">one</span> row</td>
+                        <td class="p-3"><span class="highlight-blue">SELECT ... WHERE id=1</span></td>
+                    </tr>
+                    <tr class="bg-yellow-50">
+                        <td class="p-3 font-bold"><code class="inline-code">Query()</code></td>
+                        <td class="p-3"><code class="inline-code">*sql.Rows</code></td>
+                        <td class="p-3">Multiple rows</td>
+                        <td class="p-3"><span class="highlight">SELECT * FROM ...</span></td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <!-- ═══════════════════════════════════════════════════════════════ -->
+    <!--              STEP 3: CREATE HANDLER LAYER                     -->
+    <!-- ═══════════════════════════════════════════════════════════════ -->
+    <div class="bg-white p-6 rounded-lg paper-shadow mb-8 transform -rotate-1">
+        <div class="flex items-center gap-2 mb-4">
+            <span class="step-badge">3</span>
+            <h2 class="text-3xl font-bold text-gray-800">Create the Handler Layer</h2>
+        </div>
+
+        <div class="info-box-purple p-4 rounded-lg mb-4">
+            <p class="text-xl">🎭 <span class="font-bold">Handlers</span> are like <span class="highlight">waiters</span> at a restaurant — they take your order (HTTP request), pass it to the kitchen (repository), and bring back your food (JSON response)!</p>
+        </div>
+
+        <div class="code-block p-4 rounded-lg overflow-x-auto text-sm md:text-base mb-4">
+<pre><span style="color:#fd79a8">package</span> handlers
+
+<span style="color:#fd79a8">import</span> (
+    <span style="color:#ffeaa7">"net/http"</span>
+    <span style="color:#ffeaa7">"strconv"</span>
+    <span style="color:#ffeaa7">"github.com/gin-gonic/gin"</span>
+    <span style="color:#ffeaa7">"superhero-api/internal/models"</span>
+    <span style="color:#ffeaa7">"superhero-api/internal/repository"</span>
+)
+
+<span style="color:#fd79a8">type</span> <span style="color:#55efc4">SuperheroHandler</span> <span style="color:#fd79a8">struct</span> {
+    Repo *repository.SuperheroRepository
+}
+
+<span style="color:#fd79a8">func</span> <span style="color:#74b9ff">NewSuperheroHandler</span>(repo *repository.SuperheroRepository) *SuperheroHandler {
+    <span style="color:#fd79a8">return</span> &SuperheroHandler{Repo: repo}
+}
+
+<span style="color:#55efc4">// POST /superheroes — Create a new hero!</span>
+<span style="color:#fd79a8">func</span> (h *SuperheroHandler) <span style="color:#74b9ff">Create</span>(c *gin.Context) {
+    <span style="color:#fd79a8">var</span> req models.CreateSuperheroRequest
+
+    <span style="color:#55efc4">// 🧲 ShouldBindJSON = magic decoder!</span>
+    <span style="color:#55efc4">// Takes raw JSON body → fills the struct automatically</span>
+    <span style="color:#fd79a8">if</span> err := c.<span style="color:#74b9ff">ShouldBindJSON</span>(&req); err != <span style="color:#55efc4">nil</span> {
+        c.<span style="color:#74b9ff">JSON</span>(http.StatusBadRequest, gin.H{<span style="color:#ffeaa7">"error"</span>: err.Error()})
+        <span style="color:#fd79a8">return</span>
+    }
+
+    <span style="color:#fd79a8">if</span> err := h.Repo.<span style="color:#74b9ff">Create</span>(req); err != <span style="color:#55efc4">nil</span> {
+        c.<span style="color:#74b9ff">JSON</span>(http.StatusInternalServerError, gin.H{<span style="color:#ffeaa7">"error"</span>: err.Error()})
+        <span style="color:#fd79a8">return</span>
+    }
+
+    c.<span style="color:#74b9ff">JSON</span>(http.StatusCreated, gin.H{<span style="color:#ffeaa7">"message"</span>: <span style="color:#ffeaa7">"superhero created"</span>})
+}
+
+<span style="color:#55efc4">// GET /superheroes — Get ALL heroes!</span>
+<span style="color:#fd79a8">func</span> (h *SuperheroHandler) <span style="color:#74b9ff">GetAll</span>(c *gin.Context) {
+    heroes, err := h.Repo.<span style="color:#74b9ff">GetAll</span>()
+    <span style="color:#fd79a8">if</span> err != <span style="color:#55efc4">nil</span> {
+        c.<span style="color:#74b9ff">JSON</span>(http.StatusInternalServerError, gin.H{<span style="color:#ffeaa7">"error"</span>: err.Error()})
+        <span style="color:#fd79a8">return</span>
+    }
+    c.<span style="color:#74b9ff">JSON</span>(http.StatusOK, heroes)
+}
+
+<span style="color:#55efc4">// GET /superheroes/:id — Get ONE hero by ID!</span>
+<span style="color:#fd79a8">func</span> (h *SuperheroHandler) <span style="color:#74b9ff">GetByID</span>(c *gin.Context) {
+    idParam := c.<span style="color:#74b9ff">Param</span>(<span style="color:#ffeaa7">"id"</span>)
+    id, err := strconv.<span style="color:#74b9ff">Atoi</span>(idParam)
+    <span style="color:#fd79a8">if</span> err != <span style="color:#55efc4">nil</span> {
+        c.<span style="color:#74b9ff">JSON</span>(http.StatusBadRequest, gin.H{<span style="color:#ffeaa7">"error"</span>: <span style="color:#ffeaa7">"invalid id"</span>})
+        <span style="color:#fd79a8">return</span>
+    }
+
+    hero, err := h.Repo.<span style="color:#74b9ff">GetByID</span>(id)
+    <span style="color:#fd79a8">if</span> err != <span style="color:#55efc4">nil</span> {
+        c.<span style="color:#74b9ff">JSON</span>(http.StatusNotFound, gin.H{<span style="color:#ffeaa7">"error"</span>: <span style="color:#ffeaa7">"hero not found"</span>})
+        <span style="color:#fd79a8">return</span>
+    }
+
+    c.<span style="color:#74b9ff">JSON</span>(http.StatusOK, hero)
+}
+
+<span style="color:#55efc4">// PUT /superheroes/:id — Update a hero!</span>
+<span style="color:#fd79a8">func</span> (h *SuperheroHandler) <span style="color:#74b9ff">Update</span>(c *gin.Context) {
+    id, err := strconv.<span style="color:#74b9ff">Atoi</span>(c.<span style="color:#74b9ff">Param</span>(<span style="color:#ffeaa7">"id"</span>))
+    <span style="color:#fd79a8">if</span> err != <span style="color:#55efc4">nil</span> {
+        c.<span style="color:#74b9ff">JSON</span>(http.StatusBadRequest, gin.H{<span style="color:#ffeaa7">"error"</span>: <span style="color:#ffeaa7">"invalid id"</span>})
+        <span style="color:#fd79a8">return</span>
+    }
+
+    <span style="color:#fd79a8">var</span> req models.UpdateSuperheroRequest
+    <span style="color:#fd79a8">if</span> err := c.<span style="color:#74b9ff">ShouldBindJSON</span>(&req); err != <span style="color:#55efc4">nil</span> {
+        c.<span style="color:#74b9ff">JSON</span>(http.StatusBadRequest, gin.H{<span style="color:#ffeaa7">"error"</span>: err.Error()})
+        <span style="color:#fd79a8">return</span>
+    }
+
+    <span style="color:#fd79a8">if</span> err := h.Repo.<span style="color:#74b9ff">Update</span>(id, req); err != <span style="color:#55efc4">nil</span> {
+        c.<span style="color:#74b9ff">JSON</span>(http.StatusInternalServerError, gin.H{<span style="color:#ffeaa7">"error"</span>: err.Error()})
+        <span style="color:#fd79a8">return</span>
+    }
+
+    c.<span style="color:#74b9ff">JSON</span>(http.StatusOK, gin.H{<span style="color:#ffeaa7">"message"</span>: <span style="color:#ffeaa7">"updated"</span>})
+}
+
+<span style="color:#55efc4">// DELETE /superheroes/:id — Remove a hero!</span>
+<span style="color:#fd79a8">func</span> (h *SuperheroHandler) <span style="color:#74b9ff">Delete</span>(c *gin.Context) {
+    id, err := strconv.<span style="color:#74b9ff">Atoi</span>(c.<span style="color:#74b9ff">Param</span>(<span style="color:#ffeaa7">"id"</span>))
+    <span style="color:#fd79a8">if</span> err != <span style="color:#55efc4">nil</span> {
+        c.<span style="color:#74b9ff">JSON</span>(http.StatusBadRequest, gin.H{<span style="color:#ffeaa7">"error"</span>: <span style="color:#ffeaa7">"invalid id"</span>})
+        <span style="color:#fd79a8">return</span>
+    }
+
+    <span style="color:#fd79a8">if</span> err := h.Repo.<span style="color:#74b9ff">Delete</span>(id); err != <span style="color:#55efc4">nil</span> {
+        c.<span style="color:#74b9ff">JSON</span>(http.StatusInternalServerError, gin.H{<span style="color:#ffeaa7">"error"</span>: err.Error()})
+        <span style="color:#fd79a8">return</span>
+    }
+
+    c.<span style="color:#74b9ff">JSON</span>(http.StatusOK, gin.H{<span style="color:#ffeaa7">"message"</span>: <span style="color:#ffeaa7">"deleted"</span>})
+}</pre>
+        </div>
+
+        <div class="info-box-green p-4 rounded-lg border-2 border-green-300 mt-4">
+            <p class="font-bold text-green-800">✅ What just happened? Every handler follows the same pattern: Parse input → Call Repo → Return JSON. Like a recipe you can repeat!</p>
+        </div>
+    </div>
+
+    <!-- ═══════════════════════════════════════════════════════════════ -->
+    <!--              DEEP DIVE: ShouldBindJSON()                        -->
+    <!-- ═══════════════════════════════════════════════════════════════ -->
+    <div class="sticky-note p-6 mb-8 text-center transform rotate-1">
+        <h3 class="text-3xl font-bold mb-2 text-gray-800">🧲 ShouldBindJSON() Explained</h3>
+        <p class="text-2xl text-gray-800">
+            It's like a <span class="highlight">magnet</span> that pulls JSON from the request body and sticks it into your Go struct! Behind the scenes, it's <code class="inline-code">json.Unmarshal()</code> with extra Gin magic ✨
+        </p>
+        <div class="mt-4 text-left text-lg bg-white p-4 rounded-lg shadow-inner">
+            <p><span class="font-bold">Input JSON:</span></p>
+            <code class="inline-code">{"name":"Thor","real_name":"Thor Odinson","universe":"Marvel","power_level":99}</code>
+            <p class="mt-2"><span class="font-bold">Output:</span> A fully populated <code class="inline-code">CreateSuperheroRequest</code> struct!</p>
+        </div>
+    </div>
+
+    <!-- ═══════════════════════════════════════════════════════════════ -->
+    <!--              STEP 4: CREATE ROUTES                              -->
+    <!-- ═══════════════════════════════════════════════════════════════ -->
+    <div class="bg-white p-6 rounded-lg paper-shadow mb-8 transform rotate-1">
+        <div class="flex items-center gap-2 mb-4">
+            <span class="step-badge">4</span>
+            <h2 class="text-3xl font-bold text-gray-800">Create Routes</h2>
+        </div>
+
+        <div class="info-box-yellow p-4 rounded-lg mb-4">
+            <p class="text-xl">🛣️ <span class="font-bold">Why a separate routes file?</span> Without it, <code class="inline-code">main.go</code> would be 1000 lines of messy route definitions. Routes stay organized and clean!</p>
+        </div>
+
+        <div class="code-block p-4 rounded-lg overflow-x-auto text-sm md:text-base mb-4">
+<pre><span style="color:#fd79a8">package</span> routes
+
+<span style="color:#fd79a8">import</span> (
+    <span style="color:#ffeaa7">"github.com/gin-gonic/gin"</span>
+    <span style="color:#ffeaa7">"superhero-api/internal/handlers"</span>
+)
+
+<span style="color:#fd79a8">func</span> <span style="color:#74b9ff">RegisterRoutes</span>(router *gin.Engine, handler *handlers.SuperheroHandler) {
+    router.<span style="color:#74b9ff">POST</span>(<span style="color:#ffeaa7">"/superheroes"</span>, handler.Create)
+    router.<span style="color:#74b9ff">GET</span>(<span style="color:#ffeaa7">"/superheroes"</span>, handler.GetAll)
+    router.<span style="color:#74b9ff">GET</span>(<span style="color:#ffeaa7">"/superheroes/:id"</span>, handler.GetByID)
+    router.<span style="color:#74b9ff">PUT</span>(<span style="color:#ffeaa7">"/superheroes/:id"</span>, handler.Update)
+    router.<span style="color:#74b9ff">DELETE</span>(<span style="color:#ffeaa7">"/superheroes/:id"</span>, handler.Delete)
+}</pre>
+        </div>
+
+        <div class="bg-white p-4 rounded-lg paper-shadow mt-4">
+            <h4 class="font-bold text-lg mb-2">🗺️ URL Pattern Cheat Sheet</h4>
+            <div class="grid grid-cols-2 gap-2 text-sm">
+                <div class="bg-blue-50 p-2 rounded"><code class="inline-code">/superheroes</code> → All heroes</div>
+                <div class="bg-green-50 p-2 rounded"><code class="inline-code">/superheroes/:id</code> → One hero (replace <code class="inline-code">:id</code> with number)</div>
+            </div>
+        </div>
+    </div>
+
+    <!-- ═══════════════════════════════════════════════════════════════ -->
+    <!--              STEP 5: REPLACE MAIN FILE                          -->
+    <!-- ═══════════════════════════════════════════════════════════════ -->
+    <div class="bg-white p-6 rounded-lg paper-shadow mb-8 transform -rotate-1">
+        <div class="flex items-center gap-2 mb-4">
+            <span class="step-badge">5</span>
+            <h2 class="text-3xl font-bold text-gray-800">Wire It All Together in main.go</h2>
+        </div>
+
+        <div class="info-box-green p-4 rounded-lg mb-4">
+            <p class="text-xl">🔌 <span class="font-bold">The Grand Assembly!</span> Connect config → database → repository → handler → router → run server!</p>
+        </div>
+
+        <div class="code-block p-4 rounded-lg overflow-x-auto text-sm md:text-base mb-4">
+<pre><span style="color:#fd79a8">package</span> main
+
+<span style="color:#fd79a8">import</span> (
+    <span style="color:#ffeaa7">"log"</span>
+    <span style="color:#ffeaa7">"github.com/gin-gonic/gin"</span>
+    <span style="color:#ffeaa7">"superhero-api/internal/config"</span>
+    <span style="color:#ffeaa7">"superhero-api/internal/database"</span>
+    <span style="color:#ffeaa7">"superhero-api/internal/handlers"</span>
+    <span style="color:#ffeaa7">"superhero-api/internal/repository"</span>
+    <span style="color:#ffeaa7">"superhero-api/internal/routes"</span>
+)
+
+<span style="color:#fd79a8">func</span> <span style="color:#74b9ff">main</span>() {
+    <span style="color:#55efc4">// 1. Load config (like reading a settings file)</span>
+    cfg := config.<span style="color:#74b9ff">Load</span>()
+
+    <span style="color:#55efc4">// 2. Connect to PostgreSQL (open the database door)</span>
+    db, err := database.<span style="color:#74b9ff">NewPostgresDB</span>(cfg)
+    <span style="color:#fd79a8">if</span> err != <span style="color:#55efc4">nil</span> {
+        log.<span style="color:#74b9ff">Fatal</span>(err)
+    }
+
+    <span style="color:#55efc4">// 3. Create repository (the kitchen)</span>
+    repo := repository.<span style="color:#74b9ff">NewSuperheroRepository</span>(db)
+
+    <span style="color:#55efc4">// 4. Create handler (the waiter)</span>
+    handler := handlers.<span style="color:#74b9ff">NewSuperheroHandler</span>(repo)
+
+    <span style="color:#55efc4">// 5. Create router (the menu)</span>
+    router := gin.<span style="color:#74b9ff">Default</span>()
+
+    <span style="color:#55efc4">// 6. Register routes (put items on the menu)</span>
+    routes.<span style="color:#74b9ff">RegisterRoutes</span>(router, handler)
+
+    <span style="color:#55efc4">// 7. Start the server! 🚀</span>
+    log.<span style="color:#74b9ff">Println</span>(<span style="color:#ffeaa7">"Server running on :8080"</span>)
+    router.<span style="color:#74b9ff">Run</span>(<span style="color:#ffeaa7">":8080"</span>)
+}</pre>
+        </div>
+
+        <div class="mt-4 p-4 info-box-green rounded-lg border-2 border-green-300">
+            <p class="font-bold text-green-800">🎉 Success! Your server is now listening on port 8080, ready to accept HTTP requests!</p>
+        </div>
+    </div>
+
+    <!-- ═══════════════════════════════════════════════════════════════ -->
+    <!--              REQUEST LIFECYCLE FLOW                             -->
+    <!-- ═══════════════════════════════════════════════════════════════ -->
+    <div class="sticky-note-green p-6 mb-8 transform rotate-1">
+        <h3 class="text-2xl font-bold mb-3 text-gray-800">🔄 Complete Request Lifecycle: GET /superheroes/1</h3>
+
+        <div class="bg-white p-6 rounded-lg paper-shadow mt-4">
+            <div class="space-y-2">
+                <div class="diagram-box p-4 text-center bg-blue-50 mx-auto max-w-xs">
+                    <div class="text-4xl mb-2">👤</div>
+                    <div class="font-bold text-xl">Client (Postman)</div>
+                    <div class="text-sm text-gray-600">GET /superheroes/1</div>
+                </div>
+                <div class="flow-arrow">⬇️</div>
+                <div class="diagram-box p-4 text-center bg-green-50 mx-auto max-w-xs">
+                    <div class="text-4xl mb-2">🛣️</div>
+                    <div class="font-bold text-xl">Gin Router</div>
+                    <div class="text-sm text-gray-600">Matches /superheroes/:id</div>
+                </div>
+                <div class="flow-arrow">⬇️</div>
+                <div class="diagram-box p-4 text-center bg-yellow-50 mx-auto max-w-xs">
+                    <div class="text-4xl mb-2">🎭</div>
+                    <div class="font-bold text-xl">GetByID Handler</div>
+                    <div class="text-sm text-gray-600">Extracts id=1, calls repo</div>
+                </div>
+                <div class="flow-arrow">⬇️</div>
+                <div class="diagram-box p-4 text-center bg-purple-50 mx-auto max-w-xs">
+                    <div class="text-4xl mb-2">📦</div>
+                    <div class="font-bold text-xl">Repository.GetByID()</div>
+                    <div class="text-sm text-gray-600">QueryRow() → Scan()</div>
+                </div>
+                <div class="flow-arrow">⬇️</div>
+                <div class="diagram-box p-4 text-center bg-pink-50 mx-auto max-w-xs">
+                    <div class="text-4xl mb-2">🐘</div>
+                    <div class="font-bold text-xl">PostgreSQL</div>
+                    <div class="text-sm text-gray-600">Executes SELECT query</div>
+                </div>
+                <div class="flow-arrow">⬇️</div>
+                <div class="diagram-box p-4 text-center bg-blue-50 mx-auto max-w-xs">
+                    <div class="text-4xl mb-2">📋</div>
+                    <div class="font-bold text-xl">Superhero Struct</div>
+                    <div class="text-sm text-gray-600">Filled with data</div>
+                </div>
+                <div class="flow-arrow">⬇️</div>
+                <div class="diagram-box p-4 text-center bg-green-50 mx-auto max-w-xs">
+                    <div class="text-4xl mb-2">📤</div>
+                    <div class="font-bold text-xl">JSON Response</div>
+                    <div class="text-sm text-gray-600">{"id":1,"name":"Batman",...}</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- ═══════════════════════════════════════════════════════════════ -->
+    <!--              API TESTING SECTION                                -->
+    <!-- ═══════════════════════════════════════════════════════════════ -->
+    <div class="hero-dark p-8 rounded-lg paper-shadow mb-8 text-center transform rotate-1">
+        <h3 class="text-2xl font-bold mb-6 text-yellow-300">🧪 API Testing with Postman</h3>
+
+        <div class="grid md:grid-cols-2 gap-4 text-left">
+            <div class="bg-gray-700 p-4 rounded-lg">
+                <h4 class="font-bold text-green-400 mb-2">🟢 POST /superheroes</h4>
+                <div class="code-block p-2 rounded text-xs">
+<pre>{
+  "name": "Batman",
+  "real_name": "Bruce Wayne",
+  "universe": "DC",
+  "power_level": 90
+}</pre>
+                </div>
+                <p class="text-sm text-gray-300 mt-2">Creates a new superhero</p>
+            </div>
+            <div class="bg-gray-700 p-4 rounded-lg">
+                <h4 class="font-bold text-blue-400 mb-2">🔵 GET /superheroes</h4>
+                <p class="text-sm text-gray-300">Returns all superheroes</p>
+            </div>
+            <div class="bg-gray-700 p-4 rounded-lg">
+                <h4 class="font-bold text-blue-400 mb-2">🔵 GET /superheroes/1</h4>
+                <p class="text-sm text-gray-300">Returns superhero with id=1</p>
+            </div>
+            <div class="bg-gray-700 p-4 rounded-lg">
+                <h4 class="font-bold text-yellow-400 mb-2">🟡 PUT /superheroes/1</h4>
+                <div class="code-block p-2 rounded text-xs">
+<pre>{
+  "name": "Batman",
+  "real_name": "Bruce Wayne",
+  "universe": "DC",
+  "power_level": 95
+}</pre>
+                </div>
+                <p class="text-sm text-gray-300 mt-2">Updates power_level to 95</p>
+            </div>
+            <div class="bg-gray-700 p-4 rounded-lg md:col-span-2">
+                <h4 class="font-bold text-red-400 mb-2">🔴 DELETE /superheroes/1</h4>
+                <p class="text-sm text-gray-300">Removes superhero with id=1</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- ═══════════════════════════════════════════════════════════════ -->
+    <!--              WHAT WE LEARNED                                    -->
+    <!-- ═══════════════════════════════════════════════════════════════ -->
+    <div class="bg-white p-6 rounded-lg paper-shadow mb-8 transform -rotate-1">
+        <h3 class="text-2xl font-bold mb-4 text-gray-800">🎓 What We Learned <span class="emoji-big">🧠</span></h3>
+
+        <div class="flex flex-wrap justify-center gap-2 text-sm mb-6">
+            <span class="tag-pill">Gin Routing</span>
+            <span class="tag-pill">Handlers</span>
+            <span class="tag-pill">JSON Binding</span>
+            <span class="tag-pill">URL Params</span>
+            <span class="tag-pill">QueryRow()</span>
+            <span class="tag-pill">Exec()</span>
+            <span class="tag-pill">CRUD Operations</span>
+            <span class="tag-pill">Request Lifecycle</span>
+            <span class="tag-pill">Response Lifecycle</span>
+        </div>
+
+        <div class="grid md:grid-cols-2 gap-4">
+            <div class="info-box-blue p-4 rounded-lg">
+                <h4 class="font-bold text-blue-900 mb-2">🆕 New Concepts</h4>
+                <ul class="list-disc list-inside space-y-1 text-blue-800">
+                    <li><code class="inline-code">ShouldBindJSON()</code> — JSON → Struct</li>
+                    <li><code class="inline-code">c.Param()</code> — URL parameters</li>
+                    <li><code class="inline-code">c.JSON()</code> — Struct → JSON response</li>
+                    <li><code class="inline-code">QueryRow()</code> — Single row SELECT</li>
+                    <li><code class="inline-code">Exec()</code> — INSERT/UPDATE/DELETE</li>
+                </ul>
+            </div>
+            <div class="info-box-purple p-4 rounded-lg">
+                <h4 class="font-bold text-purple-900 mb-2">📁 Files Created</h4>
+                <ul class="list-disc list-inside space-y-1 text-purple-800">
+                    <li><code class="inline-code">internal/handlers/superhero_handler.go</code></li>
+                    <li><code class="inline-code">internal/routes/routes.go</code></li>
+                </ul>
+                <h4 class="font-bold text-purple-900 mb-2 mt-3">📝 Files Modified</h4>
+                <ul class="list-disc list-inside space-y-1 text-purple-800">
+                    <li><code class="inline-code">internal/models/superhero.go</code></li>
+                    <li><code class="inline-code">internal/repository/superhero_repository.go</code></li>
+                    <li><code class="inline-code">cmd/server/main.go</code></li>
+                </ul>
+            </div>
+        </div>
+    </div>
+
+    <!-- ═══════════════════════════════════════════════════════════════ -->
+    <!--              ARCHITECTURE RECAP                                 -->
+    <!-- ═══════════════════════════════════════════════════════════════ -->
+    <div class="sticky-note-blue p-8 text-center transform rotate-1 mb-8">
+        <h3 class="text-3xl font-bold mb-4 text-gray-800">🏗️ Architecture Recap</h3>
+
+        <div class="flex flex-wrap justify-center items-center gap-2 text-lg mt-6">
+            <div class="diagram-box p-3 bg-blue-100">Client</div>
+            <span class="text-2xl text-blue-500">→</span>
+            <div class="diagram-box p-3 bg-green-100">Gin Router</div>
+            <span class="text-2xl text-green-500">→</span>
+            <div class="diagram-box p-3 bg-yellow-100">Handler</div>
+            <span class="text-2xl text-yellow-500">→</span>
+            <div class="diagram-box p-3 bg-purple-100">Repository</div>
+            <span class="text-2xl text-purple-500">→</span>
+            <div class="diagram-box p-3 bg-pink-100">database/sql</div>
+            <span class="text-2xl text-pink-500">→</span>
+            <div class="diagram-box p-3 bg-blue-100">PostgreSQL</div>
+        </div>
+
+        <div class="mt-6 text-2xl font-bold text-gray-800">
+            You now have a <span class="highlight">production-ready CRUD API</span>! 🎉
+        </div>
+    </div>
+
+    <!-- ═══════════════════════════════════════════════════════════════ -->
+    <!--              NEXT STEPS                                         -->
+    <!-- ═══════════════════════════════════════════════════════════════ -->
+    <div class="bg-white p-6 rounded-lg paper-shadow mb-8 transform rotate-1">
+        <h3 class="text-2xl font-bold mb-4 text-gray-800">📚 What's Next? <span class="emoji-big">🚀</span></h3>
+        <p class="mb-4 text-lg">Ready to take your API from "working" to <span class="highlight">"professional"</span>?</p>
+
+        <ul class="space-y-3">
+            <li class="flex items-center gap-3">
+                <span class="text-2xl">👉</span>
+                <span class="bg-blue-100 px-3 py-1 rounded-lg font-semibold">Professional Structure & Organization</span>
+            </li>
+            <li class="flex items-center gap-3">
+                <span class="text-2xl">👉</span>
+                <span class="bg-green-100 px-3 py-1 rounded-lg font-semibold">Input Validation & Error Handling</span>
+            </li>
+            <li class="flex items-center gap-3">
+                <span class="text-2xl">👉</span>
+                <span class="bg-purple-100 px-3 py-1 rounded-lg font-semibold">Logging & Middleware</span>
+            </li>
+            <li class="flex items-center gap-3">
+                <span class="text-2xl">👉</span>
+                <span class="bg-yellow-100 px-3 py-1 rounded-lg font-semibold">Environment Variables & Config</span>
+            </li>
+            <li class="flex items-center gap-3">
+                <span class="text-2xl">👉</span>
+                <span class="bg-pink-100 px-3 py-1 rounded-lg font-semibold">Database Migrations</span>
+            </li>
+        </ul>
+
+        <div class="mt-6 p-4 info-box-green rounded-lg border-2 border-green-300">
+            <p class="font-bold text-green-800 text-lg">🎯 Phase 5: Professional Structure, Validation, Logging, Environment Variables, Migrations, and Production-Grade Improvements!</p>
+        </div>
+    </div>
+
+    <!-- ═══════════════════════════════════════════════════════════════ -->
+    <!--              PRINT BUTTON                                       -->
+    <!-- ═══════════════════════════════════════════════════════════════ -->
+    <div class="text-center no-print mb-8">
+        <button onclick="window.print()" class="bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 px-8 rounded-full text-xl shadow-lg transform transition hover:scale-105">
+            🖨️ Save as PDF / Print
+        </button>
+        <p class="mt-2 text-gray-600 text-sm">Use your browser's print dialog to save as PDF</p>
+    </div>
+
+
+    <!-- ═══════════════════════════════════════════════════════════════ -->
+    <!--              MOVE TO PHASE 5 BUTTON                             -->
+    <!-- ═══════════════════════════════════════════════════════════════ -->
+    <div class="text-center mb-12 no-print">
+        <div class="sticky-note-green p-8 inline-block transform rotate-2 max-w-lg mx-auto">
+            <h3 class="text-3xl font-bold mb-4 text-gray-800">🚀 Ready for Phase 5?</h3>
+            <p class="text-xl text-gray-800 mb-6">
+                Let's turn this working CRUD API into a <span class="highlight">production-grade</span> backend!
+            </p>
+            <a href="phase5_professional_api.html" class="bg-purple-600 hover:bg-purple-700 text-white font-bold py-4 px-10 rounded-full text-xl shadow-lg transform transition hover:scale-105 hover:rotate-1 inline-block no-underline">
+                👉 Continue to Phase 5
+            </a>
+            <p class="mt-3 text-sm text-gray-600">Professional Structure • Validation • Logging • Migrations</p>
+        </div>
+    </div>
+
+</body>
+</html>
