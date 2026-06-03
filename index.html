@@ -295,15 +295,15 @@
             </div>
 
             <div class="bg-white bg-opacity-10 backdrop-blur-md rounded-2xl p-6 max-w-2xl mx-auto mb-8">
-    <div class="flex justify-between items-center mb-3">
-        <span class="font-bold">Your Progress</span>
-        <span class="text-2xl font-bold">6/6 Days</span>
-    </div>
-    <div class="progress-bar">
-        <div class="progress-fill" style="width: 100%"></div>
-    </div>
-    <p class="mt-3 text-sm opacity-80">100% Complete - You're a backend master! 🎉</p>
-</div>
+                <div class="flex justify-between items-center mb-3">
+                    <span class="font-bold">Your Progress</span>
+                    <span class="text-2xl font-bold">6/6 Days</span>
+                </div>
+                <div class="progress-bar">
+                    <div class="progress-fill" style="width: 100%"></div>
+                </div>
+                <p class="mt-3 text-sm opacity-80">100% Complete - You're a backend master! 🎉</p>
+            </div>
 
             <a href="https://github.com/raaj2493/Backend-with-GO" target="_blank" class="github-btn">
                 <i class="fab fa-github text-xl"></i>
@@ -314,18 +314,22 @@
 
     <!-- Quick Stats -->
     <section class="py-10 px-4 bg-white shadow-lg relative z-20">
-        <div class="max-w-6xl mx-auto grid grid-cols-2 md:grid-cols-4 gap-6 text-center">
+        <div class="max-w-6xl mx-auto grid grid-cols-2 md:grid-cols-5 gap-6 text-center">
             <div>
-                <div class="text-3xl font-bold text-purple-600">6</div>
+                <div class="text-3xl font-bold text-purple-600">7</div>
                 <div class="text-gray-600">Modules</div>
             </div>
             <div>
-                <div class="text-3xl font-bold text-blue-600">25+</div>
+                <div class="text-3xl font-bold text-blue-600">30+</div>
                 <div class="text-gray-600">Code Examples</div>
             </div>
             <div>
                 <div class="text-3xl font-bold text-green-600">5</div>
                 <div class="text-gray-600">CRUD Operations</div>
+            </div>
+            <div>
+                <div class="text-3xl font-bold text-yellow-600">1</div>
+                <div class="text-gray-600">First Principles</div>
             </div>
             <div>
                 <div class="text-3xl font-bold text-pink-600">100%</div>
@@ -339,7 +343,7 @@
         <div class="max-w-6xl mx-auto">
             <div class="text-center mb-12">
                 <h2 class="text-4xl font-bold text-gray-800 mb-4 handwritten">📚 Learning Path</h2>
-                <p class="text-xl text-gray-600">Click any day to start learning</p>
+                <p class="text-xl text-gray-600">Click any card to start learning — Master backend from first principles to production</p>
             </div>
 
             <div class="grid md:grid-cols-2 lg:grid-cols-3 gap-8 relative">
@@ -421,59 +425,78 @@
                 </a>
 
                 <!-- Day 6 - JWT Authentication -->
-<a href="Go_Notes/Day6/day6.html" class="day-card p-6 block">
-    <div class="flex items-start justify-between mb-4">
-        <div class="day-number" style="background: linear-gradient(135deg, #ffecd2 0%, #fcb69f 100%); color: #333;">6</div>
-        <span class="bg-green-100 text-green-800 px-3 py-1 rounded-full text-sm font-bold">✓ Done</span>
-    </div>
-    <h3 class="text-2xl font-bold text-gray-800 mb-2">JWT Authentication</h3>
-    <p class="text-gray-600 mb-4">Password hashing, JWT tokens, Middleware, Route protection</p>
-    <div class="flex flex-wrap gap-2">
-        <span class="bg-blue-100 text-blue-800 px-2 py-1 rounded text-xs">JWT</span>
-        <span class="bg-purple-100 text-purple-800 px-2 py-1 rounded text-xs">bcrypt</span>
-        <span class="bg-pink-100 text-pink-800 px-2 py-1 rounded text-xs">Middleware</span>
-        <span class="bg-red-100 text-red-800 px-2 py-1 rounded text-xs">Security</span>
-    </div>
-</a>
+                <a href="Go_Notes/Day6/day6.html" class="day-card p-6 block">
+                    <div class="flex items-start justify-between mb-4">
+                        <div class="day-number" style="background: linear-gradient(135deg, #ffecd2 0%, #fcb69f 100%); color: #333;">6</div>
+                        <span class="bg-green-100 text-green-800 px-3 py-1 rounded-full text-sm font-bold">✓ Done</span>
+                    </div>
+                    <h3 class="text-2xl font-bold text-gray-800 mb-2">JWT Authentication</h3>
+                    <p class="text-gray-600 mb-4">Password hashing, JWT tokens, Middleware, Route protection</p>
+                    <div class="flex flex-wrap gap-2">
+                        <span class="bg-blue-100 text-blue-800 px-2 py-1 rounded text-xs">JWT</span>
+                        <span class="bg-purple-100 text-purple-800 px-2 py-1 rounded text-xs">bcrypt</span>
+                        <span class="bg-pink-100 text-pink-800 px-2 py-1 rounded text-xs">Middleware</span>
+                        <span class="bg-red-100 text-red-800 px-2 py-1 rounded text-xs">Security</span>
+                    </div>
+                </a>
 
-<!-- Projects Hub Card - This is the gateway -->
-<a href="/Backend-with-GO/Go_Notes/Projects/projects.html" class="day-card p-6 block col-span-full bg-gradient-to-br from-purple-100 to-pink-100 border-purple-300">
-    <div class="flex items-start justify-between mb-4">
-        <div class="day-number" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);">
-            <i class="fas fa-rocket text-white text-xl"></i>
-        </div>
-        <span class="bg-purple-100 text-purple-800 px-3 py-1 rounded-full text-sm font-bold">
-            <i class="fas fa-folder-open mr-1"></i> Open
-        </span>
-    </div>
-    <h3 class="text-3xl font-bold text-gray-800 mb-2">Projects Hub</h3>
-    <p class="text-gray-600 mb-4 text-lg">Apply your knowledge with real-world applications. Build production-ready backend systems!</p>
-    
-    <div class="bg-white bg-opacity-50 p-4 rounded-lg mb-4">
-        <div class="flex items-center gap-4 text-sm">
-            <div class="flex items-center gap-2">
-                <span class="w-3 h-3 bg-green-500 rounded-full"></span>
-                <span>1 Available</span>
-            </div>
-            <div class="flex items-center gap-2">
-                <span class="w-3 h-3 bg-gray-400 rounded-full"></span>
-                <span>5 Upcoming</span>
-            </div>
-        </div>
-    </div>
-    
-    <div class="flex flex-wrap gap-2">
-        <span class="bg-blue-100 text-blue-800 px-3 py-1 rounded text-sm">Real-World</span>
-        <span class="bg-purple-100 text-purple-800 px-3 py-1 rounded text-sm">Production</span>
-        <span class="bg-pink-100 text-pink-800 px-3 py-1 rounded text-sm">Portfolio</span>
-    </div>
-    
-    <div class="mt-4 text-center">
-        <span class="inline-flex items-center gap-2 text-purple-700 font-bold">
-            Explore Projects <i class="fas fa-arrow-right"></i>
-        </span>
-    </div>
-</a>
+                <!-- Backend from First Principles Card - Normal design, placed above Projects Hub -->
+                <a href="/Backend-with-GO/Go_Notes/Backend_FirstPrincipals/whyfirstprincipals.html" class="day-card p-6 block col-span-full">
+                    <div class="flex items-start justify-between mb-4">
+                        <div class="day-number" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);">0</div>
+                        <span class="bg-yellow-100 text-yellow-800 px-3 py-1 rounded-full text-sm font-bold">
+                            <i class="fas fa-crown mr-1"></i> Foundation
+                        </span>
+                    </div>
+                    <h3 class="text-2xl font-bold text-gray-800 mb-2">Backend from First Principles</h3>
+                    <p class="text-gray-600 mb-4">Understanding the WHY before the HOW — Server fundamentals, request lifecycle, statelessness, DNS → Firewall → Reverse Proxy, and the mental models that make you a great backend engineer.</p>
+                    <div class="flex flex-wrap gap-2">
+                        <span class="bg-blue-100 text-blue-800 px-2 py-1 rounded text-xs">Architecture</span>
+                        <span class="bg-purple-100 text-purple-800 px-2 py-1 rounded text-xs">Mental Models</span>
+                        <span class="bg-pink-100 text-pink-800 px-2 py-1 rounded text-xs">Request Lifecycle</span>
+                        <span class="bg-green-100 text-green-800 px-2 py-1 rounded text-xs">DNS → Firewall → Proxy</span>
+                        <span class="bg-yellow-100 text-yellow-800 px-2 py-1 rounded text-xs">First Principles</span>
+                    </div>
+                </a>
+
+                <!-- Projects Hub Card -->
+                <a href="/Backend-with-GO/Go_Notes/Projects/projects.html" class="day-card p-6 block col-span-full bg-gradient-to-br from-purple-100 to-pink-100 border-purple-300">
+                    <div class="flex items-start justify-between mb-4">
+                        <div class="day-number" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);">
+                            <i class="fas fa-rocket text-white text-xl"></i>
+                        </div>
+                        <span class="bg-purple-100 text-purple-800 px-3 py-1 rounded-full text-sm font-bold">
+                            <i class="fas fa-folder-open mr-1"></i> Open
+                        </span>
+                    </div>
+                    <h3 class="text-3xl font-bold text-gray-800 mb-2">Projects Hub</h3>
+                    <p class="text-gray-600 mb-4 text-lg">Apply your knowledge with real-world applications. Build production-ready backend systems!</p>
+                    
+                    <div class="bg-white bg-opacity-50 p-4 rounded-lg mb-4">
+                        <div class="flex items-center gap-4 text-sm">
+                            <div class="flex items-center gap-2">
+                                <span class="w-3 h-3 bg-green-500 rounded-full"></span>
+                                <span>1 Available</span>
+                            </div>
+                            <div class="flex items-center gap-2">
+                                <span class="w-3 h-3 bg-gray-400 rounded-full"></span>
+                                <span>5 Upcoming</span>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="flex flex-wrap gap-2">
+                        <span class="bg-blue-100 text-blue-800 px-3 py-1 rounded text-sm">Real-World</span>
+                        <span class="bg-purple-100 text-purple-800 px-3 py-1 rounded text-sm">Production</span>
+                        <span class="bg-pink-100 text-pink-800 px-3 py-1 rounded text-sm">Portfolio</span>
+                    </div>
+                    
+                    <div class="mt-4 text-center">
+                        <span class="inline-flex items-center gap-2 text-purple-700 font-bold">
+                            Explore Projects <i class="fas fa-arrow-right"></i>
+                        </span>
+                    </div>
+                </a>
 
             </div>
         </div>
@@ -517,7 +540,7 @@
                 </div>
                 <div class="checklist-item">
                     <i class="fas fa-check-circle"></i>
-                    <span>Production-ready code patterns</span>
+                    <span>First Principles of Backend Engineering</span>
                 </div>
             </div>
         </div>
@@ -634,7 +657,7 @@
         window.addEventListener('load', () => {
             const progressFill = document.querySelector('.progress-fill');
             setTimeout(() => {
-                progressFill.style.width = '83%';
+                progressFill.style.width = '100%';
             }, 500);
         });
 
@@ -648,7 +671,6 @@
             
             if (section.classList.contains('open')) {
                 btn.querySelector('span').textContent = 'Show Less';
-                // Smooth scroll to section
                 setTimeout(() => {
                     section.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
                 }, 100);

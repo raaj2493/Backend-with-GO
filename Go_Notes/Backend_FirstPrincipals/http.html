@@ -1,0 +1,600 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>HTTP Deep Dive · Complete Reference Notebook</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Caveat:wght@400;600;700&family=Patrick+Hand&family=Indie+Flower&display=swap" rel="stylesheet">
+    <style>
+        /* ═══════════════════════════════════════════════════════════════ */
+        /*                    BASE STYLES — Complete System               */
+        /* ═══════════════════════════════════════════════════════════════ */
+
+        body {
+            font-family: 'Patrick Hand', cursive;
+            background-color: #f4f1ea;
+            background-image: 
+                linear-gradient(#e1e1e1 1px, transparent 1px),
+                linear-gradient(90deg, #e1e1e1 1px, transparent 1px);
+            background-size: 20px 20px;
+        }
+
+        .handwritten {
+            font-family: 'Caveat', cursive;
+        }
+
+        .highlight {
+            background: linear-gradient(120deg, #ffeaa7 0%, #ffeaa7 100%);
+            background-repeat: no-repeat;
+            background-size: 100% 40%;
+            background-position: 0 88%;
+            padding: 0 4px;
+        }
+
+        .highlight-blue {
+            background: linear-gradient(120deg, #74b9ff 0%, #74b9ff 100%);
+            background-repeat: no-repeat;
+            background-size: 100% 40%;
+            background-position: 0 88%;
+            padding: 0 4px;
+        }
+
+        .highlight-pink {
+            background: linear-gradient(120deg, #fd79a8 0%, #fd79a8 100%);
+            background-repeat: no-repeat;
+            background-size: 100% 40%;
+            background-position: 0 88%;
+            padding: 0 4px;
+        }
+
+        .highlight-green {
+            background: linear-gradient(120deg, #55efc4 0%, #55efc4 100%);
+            background-repeat: no-repeat;
+            background-size: 100% 40%;
+            background-position: 0 88%;
+            padding: 0 4px;
+        }
+
+        .sticky-note {
+            background: #fff740;
+            box-shadow: 2px 2px 10px rgba(0,0,0,0.1);
+            transform: rotate(-2deg);
+        }
+
+        .sticky-note-blue {
+            background: #7ee8fa;
+            transform: rotate(2deg);
+        }
+
+        .sticky-note-pink {
+            background: #ff9999;
+            transform: rotate(-1deg);
+        }
+
+        .sticky-note-green {
+            background: #55efc4;
+            transform: rotate(1deg);
+        }
+
+        .sticky-note-purple {
+            background: #a29bfe;
+            transform: rotate(-1.5deg);
+        }
+
+        .sticky-note-orange {
+            background: #fab1a0;
+            transform: rotate(1.5deg);
+        }
+
+        .code-block {
+            font-family: 'Courier New', monospace;
+            background: #2d3436;
+            color: #dfe6e9;
+            position: relative;
+        }
+
+        .code-block::before {
+            content: '';
+            position: absolute;
+            top: -5px;
+            left: -5px;
+            right: -5px;
+            bottom: -5px;
+            background: #fff;
+            z-index: -1;
+            transform: rotate(1deg);
+            box-shadow: 3px 3px 10px rgba(0,0,0,0.1);
+        }
+
+        code.inline-code {
+            font-family: 'Courier New', monospace;
+            background: #2d3436;
+            color: #dfe6e9;
+            padding: 2px 8px;
+            border-radius: 4px;
+            font-size: 0.9em;
+        }
+
+        .paper-shadow {
+            box-shadow: 
+                0 1px 1px rgba(0,0,0,0.15), 
+                0 10px 0 -5px #eee, 
+                0 10px 1px -4px rgba(0,0,0,0.15), 
+                0 20px 0 -10px #eee, 
+                0 20px 1px -9px rgba(0,0,0,0.15);
+        }
+
+        .diagram-box {
+            border: 3px solid #2d3436;
+            border-radius: 15px;
+            position: relative;
+            background: white;
+        }
+
+        .diagram-box::before {
+            content: '';
+            position: absolute;
+            top: 5px;
+            left: 5px;
+            right: -5px;
+            bottom: -5px;
+            border: 2px solid #b2bec3;
+            border-radius: 15px;
+            z-index: -1;
+        }
+
+        .tape {
+            position: absolute;
+            top: -15px;
+            left: 50%;
+            transform: translateX(-50%) rotate(-2deg);
+            width: 100px;
+            height: 30px;
+            background: rgba(255,255,255,0.4);
+            box-shadow: 0 1px 3px rgba(0,0,0,0.2);
+        }
+
+        .step-badge {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            font-size: 1.2rem;
+            flex-shrink: 0;
+        }
+
+        .info-box-blue {
+            background: #ebf8ff;
+            border-left: 4px solid #4299e1;
+        }
+
+        .info-box-green {
+            background: #f0fff4;
+            border-left: 4px solid #48bb78;
+        }
+
+        .info-box-yellow {
+            background: #fffff0;
+            border-left: 4px solid #ecc94b;
+        }
+
+        .info-box-red {
+            background: #fff5f5;
+            border-left: 4px solid #f56565;
+        }
+
+        .info-box-purple {
+            background: #faf5ff;
+            border-left: 4px solid #9f7aea;
+        }
+
+        .card-good {
+            background: #f0fff4;
+            border: 2px solid #9ae6b4;
+        }
+
+        .card-bad {
+            background: #fff5f5;
+            border: 2px solid #feb2b2;
+        }
+
+        .tag-pill {
+            background: white;
+            padding: 4px 12px;
+            border-radius: 9999px;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+            font-size: 0.85rem;
+            display: inline-block;
+            margin: 2px;
+        }
+
+        .flow-arrow {
+            text-align: center;
+            font-size: 2rem;
+            color: #a0aec0;
+            margin: 8px 0;
+        }
+
+        .hero-dark {
+            background: #2d3748;
+            color: white;
+        }
+
+        .hero-dark .highlight {
+            color: #2d3748;
+        }
+
+        @keyframes float {
+            0%, 100% { transform: translateY(0px) rotate(0deg); }
+            50% { transform: translateY(-10px) rotate(2deg); }
+        }
+
+        .float-anim {
+            animation: float 3s ease-in-out infinite;
+        }
+
+        @keyframes bounce {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-10px); }
+        }
+
+        .emoji-big {
+            font-size: 2.5rem;
+            display: inline-block;
+            animation: bounce 2s infinite;
+        }
+
+        @media print {
+            body { background: white; }
+            .no-print { display: none; }
+            .page-break { page-break-before: always; }
+        }
+
+        @media (max-width: 768px) {
+            .emoji-big { font-size: 1.8rem; }
+        }
+    </style>
+</head>
+<body class="p-4 md:p-8 max-w-4xl mx-auto">
+
+    <!-- ═══════════════════════════════════════════════════════════════ -->
+    <!--                    TITLE SECTION                                -->
+    <!-- ═══════════════════════════════════════════════════════════════ -->
+    <div class="relative mb-12 text-center">
+        <div class="tape"></div>
+        <h1 class="text-5xl md:text-7xl font-bold text-gray-800 mb-4 handwritten transform -rotate-1">
+            HTTP Deep Dive
+        </h1>
+        <div class="text-2xl text-gray-600 handwritten">Complete Reference · 90% of what you'll ever need</div>
+        <div class="mt-4 text-6xl float-anim">🌐📡</div>
+    </div>
+
+    <!-- ═══════════════════════════════════════════════════════════════ -->
+    <!-- SECTION 1: CORE PHILOSOPHY — STATELESSNESS + CLIENT-SERVER     -->
+    <!-- ═══════════════════════════════════════════════════════════════ -->
+    <div class="bg-white p-6 rounded-lg paper-shadow mb-8 relative transform rotate-1">
+        <div class="absolute -top-3 -right-3 bg-red-500 text-white px-4 py-1 rounded-full text-sm font-bold transform rotate-12">START HERE</div>
+        <h2 class="text-3xl font-bold mb-4 text-gray-800">🎯 The HTTP Protocol: Foundation <span class="emoji-big">⚙️</span></h2>
+        <p class="text-lg mb-4 text-gray-700">The primary medium browsers use to talk to servers (send/receive data). <span class="highlight-blue">HTTP/HTTPS are treated as interchangeable</span> — HTTPS is just a more secure version (TLS encryption, certificates), but underlying principles are the same.</p>
+        
+        <div class="space-y-4 text-gray-700">
+            <div class="flex gap-3 items-start">
+                <span class="step-badge !w-8 !h-8 !text-sm">A</span>
+                <div><span class="font-bold text-xl">Statelessness</span>
+                <p class="mt-1"><span class="highlight">Definition:</span> No memory of past interactions. Each request is independent.</p>
+                <p class="mt-1"><span class="highlight-blue">Implication:</span> Each HTTP request must carry all necessary information (headers, URLs, methods, auth tokens, cookies, session info) for the server to process it.</p>
+                <p class="mt-1"><span class="highlight-pink">Example:</span> To access a user profile, credentials (cookies/tokens) must be sent on every request.</p>
+                <div class="mt-2 p-2 info-box-green rounded-lg text-sm">✅ Benefits: Simplicity (server architecture simpler) + Scalability (easy to distribute requests, no single server needs to track a session, if a server crashes, no client state is lost)</div>
+                <p class="mt-2"><span class="highlight-purple font-bold">Reality Check:</span> Because HTTP is stateless, developers implement state management techniques (cookies, sessions, tokens) for things like logins or shopping carts.</p>
+                </div>
+            </div>
+            <div class="flex gap-3 items-start mt-4">
+                <span class="step-badge !w-8 !h-8 !text-sm">B</span>
+                <div><span class="font-bold text-xl">Client-Server Model</span>
+                <p><span class="highlight">Client:</span> Browser or app. Initiates communication by sending a request. Provides all needed info (URL, headers).</p>
+                <p><span class="highlight-blue">Server:</span> Hosts resources (websites, APIs). Waits for requests, processes them, sends back responses (web page, data, error, JSON, text, etc.).</p>
+                <div class="mt-2 p-2 info-box-red rounded-lg text-sm">⚠️ Rule: Communication is always initiated by the client.</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- ═══════════════════════════════════════════════════════════════ -->
+    <!-- SECTION 2: TCP & HTTP VERSIONS (full details)                  -->
+    <!-- ═══════════════════════════════════════════════════════════════ -->
+    <div class="sticky-note p-6 mb-8 transform -rotate-1">
+        <h3 class="text-3xl font-bold mb-2 text-gray-800">🚂 Underlying Transport & HTTP Versions</h3>
+        <p class="text-xl"><span class="highlight">TCP:</span> HTTP uses TCP because it's reliable (doesn't lose messages). TCP is connection-based (uses a 3-way handshake).</p>
+        <p class="text-lg mt-2"><span class="highlight-blue">OSI Model:</span> Backend engineers primarily work at <span class="font-bold">Layer 7 (Application Layer)</span>. Network engineering concepts (TCP handshake, TLS) are lower layers (good to know but a rabbit hole).</p>
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-3 mt-3">
+            <div class="bg-white/70 p-2 rounded"><span class="font-bold">HTTP 1.0:</span> Each request opened a new connection → inefficient ❌</div>
+            <div class="bg-white/70 p-2 rounded"><span class="font-bold">HTTP 1.1:</span> Persistent connections (reuse same TCP connection) + chunk transfer encoding, better caching ✅</div>
+            <div class="bg-white/70 p-2 rounded"><span class="font-bold">HTTP 2.0:</span> Multiplexing (multiple requests/responses over single connection), binary framing, header compression (HPACK), server push 🚀</div>
+            <div class="bg-white/70 p-2 rounded"><span class="font-bold">HTTP 3.0:</span> Built on QUIC (over UDP, not TCP). Faster connection, less latency, better packet loss handling, no Head-of-Line blocking ⚡</div>
+        </div>
+    </div>
+
+    <!-- ═══════════════════════════════════════════════════════════════ -->
+    <!-- SECTION 3: MESSAGE STRUCTURE (Request + Response)               -->
+    <!-- ═══════════════════════════════════════════════════════════════ -->
+    <div class="bg-white p-6 rounded-lg paper-shadow mb-8">
+        <h2 class="text-3xl font-bold mb-4 text-gray-800">📨 HTTP Messages: Request & Response Structure</h2>
+        <div class="grid md:grid-cols-2 gap-4">
+            <div class="bg-gray-50 p-3 rounded-lg border-2 border-gray-300">
+                <h3 class="font-bold text-xl mb-2 text-blue-700">Request Components</h3>
+                <ul class="list-disc list-inside space-y-1 text-sm">
+                    <li>Request Method (e.g., GET, POST)</li>
+                    <li>Resource URL (e.g., /users/profile)</li>
+                    <li>HTTP Version (e.g., HTTP/1.1)</li>
+                    <li>Headers (e.g., Host, User-Agent)</li>
+                    <li>Blank Line (signifies end of headers)</li>
+                    <li>Request Body (optional data)</li>
+                </ul>
+                <div class="code-block p-2 mt-2 text-xs"><pre>GET /users/profile HTTP/1.1
+Host: api.example.com
+Authorization: Bearer token123
+
+{"userId": 42}</pre></div>
+            </div>
+            <div class="bg-gray-50 p-3 rounded-lg border-2 border-gray-300">
+                <h3 class="font-bold text-xl mb-2 text-green-700">Response Components</h3>
+                <ul class="list-disc list-inside space-y-1 text-sm">
+                    <li>HTTP Version</li>
+                    <li>Status Code (e.g., 200)</li>
+                    <li>Status Message (e.g., OK)</li>
+                    <li>Response Headers</li>
+                    <li>Blank Line</li>
+                    <li>Response Body</li>
+                </ul>
+                <div class="code-block p-2 mt-2 text-xs"><pre>HTTP/1.1 200 OK
+Content-Type: application/json
+Content-Length: 128
+
+{"name": "Alex", "id": 7}</pre></div>
+            </div>
+        </div>
+        <div class="mt-4 p-3 info-box-yellow rounded-lg text-center">📮 Analogy: Headers = address/phone number on the outside of a parcel. Carriers need metadata without opening the package.</div>
+    </div>
+
+    <!-- ═══════════════════════════════════════════════════════════════ -->
+    <!-- SECTION 4: HEADERS (full categories)                           -->
+    <!-- ═══════════════════════════════════════════════════════════════ -->
+    <div class="sticky-note-blue p-6 mb-8 transform rotate-1">
+        <h3 class="text-2xl font-bold mb-3 text-gray-800">📋 HTTP Headers (Key-Value Pairs) — The Remote Control</h3>
+        <p class="text-lg">Why Headers? Extensibility, remote control, content negotiation, security, caching.</p>
+        <div class="overflow-x-auto mt-3">
+            <table class="w-full text-sm bg-white/70 rounded">
+                <thead class="bg-gray-800 text-white">*
+                    <th class="p-2">Category</th><th class="p-2">Purpose</th><th class="p-2">Examples</th>
+                </tr></thead>
+                <tbody class="divide-y">
+                    <tr><td class="p-2 font-bold">Request Headers</td><td>Sent by client to provide info about the request itself</td><td><code class="inline-code text-xs">User-Agent</code>, <code>Authorization</code>, <code>Accept</code></td></tr>
+                    <tr><td class="p-2 font-bold">General Headers</td><td>Used in both requests & responses. Metadata about the message.</td><td><code>Date</code>, <code>Cache-Control</code>, <code>Connection</code></td></tr>
+                    <tr><td class="p-2 font-bold">Representation Headers</td><td>Describe the body (resource representation).</td><td><code>Content-Type</code>, <code>Content-Length</code>, <code>Content-Encoding</code>, <code>ETag</code></td></tr>
+                    <tr><td class="p-2 font-bold">Security Headers</td><td>Enhance security, control browser behavior.</td><td><code>HSTS</code>, <code>Content-Security-Policy</code>, <code>X-Frame-Options</code>, <code>Cookie flags (HttpOnly, Secure)</code></td></tr>
+                </tbody>
+            </table>
+        </div>
+        <div class="mt-3 p-2 bg-white/60 rounded"><span class="font-bold">💡 Key Idea — Headers as Remote Control:</span> Clients use headers to instruct the server (e.g., "send JSON, not HTML", "cache for 10 seconds", "authenticate this user").</div>
+    </div>
+
+    <!-- ═══════════════════════════════════════════════════════════════ -->
+    <!-- SECTION 5: CORS + OPTIONS (complete flow)                      -->
+    <!-- ═══════════════════════════════════════════════════════════════ -->
+    <div class="bg-white p-6 rounded-lg paper-shadow mb-8">
+        <div class="flex items-center gap-2 mb-4">
+            <span class="step-badge">🌍</span>
+            <h2 class="text-3xl font-bold text-gray-800">CORS & The OPTIONS Method</h2>
+        </div>
+        <p><span class="highlight">Same-Origin Policy:</span> Browsers restrict web pages from making requests to a different domain (origin) than the one serving the page.</p>
+        <p class="mt-2"><span class="highlight-blue">CORS:</span> A security mechanism that allows servers to specify who can access their resources and how.</p>
+        <p class="mt-2"><span class="highlight-pink">The OPTIONS Method:</span> Used in pre-flight requests to ask the server about its capabilities before sending the actual request. Developers rarely use it directly, but see it in network tabs.</p>
+        
+        <div class="mt-4 space-y-4">
+            <div class="info-box-green p-3 rounded-lg">
+                <h3 class="font-bold text-lg">✅ Simple Request Flow</h3>
+                <p class="text-sm">Conditions (all must be true): Method is GET, POST, or HEAD; only simple headers; Content-Type is simple (form, text/plain).</p>
+                <p class="text-sm mt-1">Flow: Browser sends request with <code>Origin</code> → Server checks → responds with <code>Access-Control-Allow-Origin</code> → Browser allows.</p>
+            </div>
+            <div class="info-box-yellow p-3 rounded-lg">
+                <h3 class="font-bold text-lg">⚠️ Pre-flighted Request Flow</h3>
+                <p class="text-sm">Conditions (any true): Method is PUT/DELETE, includes custom headers (Authorization), Content-Type is application/json.</p>
+                <p class="text-sm mt-1">Step 1: <span class="font-bold">OPTIONS preflight</span> with headers: <code>Origin, Access-Control-Request-Method, Access-Control-Request-Headers</code><br>
+                Step 2: Server responds with 204 + <code>Access-Control-Allow-Origin/Methods/Headers</code> + <code>Access-Control-Max-Age</code><br>
+                Step 3: Actual request (PUT with JSON body)</p>
+            </div>
+        </div>
+        <div class="mt-3 p-2 info-box-purple rounded-lg text-center font-mono text-sm">🔁 Pre-flight caching: <code>Access-Control-Max-Age: 86400</code> → caches results for 24 hours, saving bandwidth!</div>
+    </div>
+
+    <!-- ═══════════════════════════════════════════════════════════════ -->
+    <!-- SECTION 6: STATUS CODES (complete table with all codes)        -->
+    <!-- ═══════════════════════════════════════════════════════════════ -->
+    <div class="sticky-note-green p-6 mb-8 transform rotate-1">
+        <h3 class="text-2xl font-bold mb-3 text-gray-800">📊 HTTP Status Codes (3-digit numbers)</h3>
+        <p class="text-lg">Standardized way to communicate the result of a request. Universal language across all web services.</p>
+        <div class="grid grid-cols-4 gap-1 text-center text-sm mt-2">
+            <div class="bg-blue-200 p-1 rounded">1xx: Informational</div>
+            <div class="bg-green-200 p-1 rounded">2xx: Success</div>
+            <div class="bg-yellow-200 p-1 rounded">3xx: Redirection</div>
+            <div class="bg-red-200 p-1 rounded">4xx: Client Error</div>
+            <div class="bg-purple-200 p-1 rounded col-span-2">5xx: Server Error</div>
+        </div>
+        <div class="overflow-x-auto mt-3 max-h-96 overflow-y-auto bg-white/70 rounded">
+            <table class="w-full text-xs">
+                <thead class="bg-gray-800 text-white">*
+                    <th class="p-1">Code</th><th class="p-1">Meaning</th><th class="p-1">When to Use</th>
+                </tr></thead>
+                <tbody class="divide-y">
+                    <tr><td class="p-1 font-bold">200</td><td>OK</td><td>Successful GET request returning data</td></tr>
+                    <tr><td class="p-1 font-bold">201</td><td>Created</td><td>Successful POST creating a new resource</td></tr>
+                    <tr><td class="p-1 font-bold">204</td><td>No Content</td><td>Success, but no body (DELETE, OPTIONS preflight)</td></tr>
+                    <tr><td class="p-1 font-bold">301</td><td>Moved Permanently</td><td>Resource permanently moved. Future requests should use new URL</td></tr>
+                    <tr><td class="p-1 font-bold">302</td><td>Found (Temp Redirect)</td><td>Resource temporarily at different URL</td></tr>
+                    <tr><td class="p-1 font-bold">304</td><td>Not Modified</td><td>Resource hasn't changed since last request. Use cached version (ETag)</td></tr>
+                    <tr><td class="p-1 font-bold">400</td><td>Bad Request</td><td>Client sent invalid data (expecting number, got string)</td></tr>
+                    <tr><td class="p-1 font-bold">401</td><td>Unauthorized</td><td>Missing or invalid authentication (expired JWT, missing token)</td></tr>
+                    <tr><td class="p-1 font-bold">403</td><td>Forbidden</td><td>Authenticated but lacks permission</td></tr>
+                    <tr><td class="p-1 font-bold">404</td><td>Not Found</td><td>Requested URL/resource doesn't exist</td></tr>
+                    <tr><td class="p-1 font-bold">405</td><td>Method Not Allowed</td><td>Wrong HTTP method (PUT on GET-only endpoint)</td></tr>
+                    <tr><td class="p-1 font-bold">409</td><td>Conflict</td><td>Request conflicts with current state (duplicate folder name)</td></tr>
+                    <tr><td class="p-1 font-bold">429</td><td>Too Many Requests</td><td>Rate limiting triggered</td></tr>
+                    <tr><td class="p-1 font-bold">500</td><td>Internal Server Error</td><td>Unexpected condition or unhandled exception on server</td></tr>
+                    <tr><td class="p-1 font-bold">501</td><td>Not Implemented</td><td>Server doesn't support requested functionality</td></tr>
+                    <tr><td class="p-1 font-bold">502</td><td>Bad Gateway</td><td>Proxy received invalid response from upstream server</td></tr>
+                    <tr><td class="p-1 font-bold">503</td><td>Service Unavailable</td><td>Server temporarily unable to handle requests (maintenance, high traffic)</td></tr>
+                    <tr><td class="p-1 font-bold">504</td><td>Gateway Timeout</td><td>Proxy didn't receive response within timeout period</td></tr>
+                </tbody>
+            </table>
+        </div>
+        <p class="mt-2 text-center text-sm">⭐ <span class="font-bold">95% of use cases</span> — memorize these and you're golden!</p>
+    </div>
+
+    <!-- ═══════════════════════════════════════════════════════════════ -->
+    <!-- SECTION 7: HTTP CACHING (ETag, If-None-Match, Last-Modified)   -->
+    <!-- ═══════════════════════════════════════════════════════════════ -->
+    <div class="bg-white p-6 rounded-lg paper-shadow mb-8">
+        <h2 class="text-3xl font-bold mb-4 text-gray-800">💾 HTTP Caching</h2>
+        <p><span class="highlight">Definition:</span> Storing copies of responses for reuse to reduce repeated requests, improve load time, reduce bandwidth & server load.</p>
+        <div class="grid md:grid-cols-2 gap-4 mt-3">
+            <div><span class="font-bold">Key Headers:</span>
+                <ul class="list-disc list-inside"><li><code>Cache-Control: max-age=10</code></li><li><code>ETag: "abc123"</code> (hash of content)</li><li><code>Last-Modified: date</code></li></ul>
+            </div>
+            <div class="info-box-blue p-2 rounded-lg text-sm">
+                <span class="font-bold">How it works:</span><br>
+                1️⃣ Initial request: 200 + ETag + Cache-Control<br>
+                2️⃣ After expiry: request with <code>If-None-Match: "abc123"</code><br>
+                3️⃣ If unchanged → <span class="highlight-green">304 Not Modified</span> (no body)<br>
+                4️⃣ If changed → 200 with new data + new ETag
+            </div>
+        </div>
+        <div class="mt-3 p-2 info-box-purple rounded-lg">📌 Note: Modern client-side solutions (React Query, SWR) give more control, but HTTP caching is still invaluable for simple cases and CDNs.</div>
+    </div>
+
+    <!-- ═══════════════════════════════════════════════════════════════ -->
+    <!-- SECTION 8: Content Negotiation & Compression                    -->
+    <!-- ═══════════════════════════════════════════════════════════════ -->
+    <div class="sticky-note-purple p-6 mb-8 transform -rotate-1">
+        <h3 class="text-2xl font-bold mb-3 text-gray-800">🗜️ Content Negotiation & Compression</h3>
+        <p class="text-lg">Mechanism for client and server to agree on the best format to exchange data.</p>
+        <div class="space-y-2 mt-2">
+            <div><span class="font-bold">Media Type:</span> <code>Accept: application/json</code> → server responds with JSON</div>
+            <div><span class="font-bold">Language:</span> <code>Accept-Language: en</code> → server sends English version</div>
+            <div><span class="font-bold">Encoding (Compression):</span> <code>Accept-Encoding: gzip, deflate, br</code> → server compresses response, adds <code>Content-Encoding: gzip</code></div>
+        </div>
+        <div class="mt-3 p-2 bg-white/70 rounded text-center">
+            📊 <span class="font-bold">Real impact:</span> Without compression: 11,000 entries → 26 MB. With gzip: same file → <span class="highlight-green">3.8 MB</span> (85% savings!)
+        </div>
+        <div class="code-block p-2 mt-2 text-xs"><pre><span style="color:#fd79a8">GET</span> <span style="color:#74b9ff">/large-data.json</span> HTTP/1.1
+<span style="color:#55efc4">Host:</span> api.example.com
+<span style="color:#ffeaa7">Accept-Encoding:</span> gzip, br</pre></div>
+    </div>
+
+    <!-- ═══════════════════════════════════════════════════════════════ -->
+    <!-- SECTION 9: Persistent Connections + Keep-Alive                  -->
+    <!-- ═══════════════════════════════════════════════════════════════ -->
+    <div class="bg-white p-6 rounded-lg paper-shadow mb-8">
+        <h2 class="text-3xl font-bold mb-4 text-gray-800">🔌 Persistent Connections (Keep-Alive)</h2>
+        <div class="info-box-red p-3 rounded-lg mb-3"><span class="font-bold">Problem in HTTP 1.0:</span> Each request required a new TCP connection (slow, resource-intensive).</div>
+        <div class="info-box-green p-3 rounded-lg mb-3"><span class="font-bold">Solution in HTTP 1.1:</span> Persistent Connections (default). A single TCP connection is reused for multiple requests/responses.</div>
+        <p><code>Connection: keep-alive</code> Header: Explicitly asks to keep connection open (though default in HTTP 1.1). Can include timeout and max options.</p>
+        <p class="mt-2"><code>Connection: close</code> Header: Explicitly closes connection after response (default in HTTP 1.0, still possible in 1.1).</p>
+        <div class="mt-3 diagram-box p-3 text-center bg-blue-50">📡 One TCP pipe → many HTTP requests → faster page loads ⚡</div>
+    </div>
+
+    <!-- ═══════════════════════════════════════════════════════════════ -->
+    <!-- SECTION 10: Large Requests (Multipart) + Streaming             -->
+    <!-- ═══════════════════════════════════════════════════════════════ -->
+    <div class="sticky-note-orange p-6 mb-8 transform rotate-1">
+        <h3 class="text-2xl font-bold mb-3 text-gray-800">📦 Handling Large Requests & Responses</h3>
+        
+        <div class="mt-2"><span class="font-bold text-lg">A. Sending Large Data (Client → Server): Multipart Requests</span>
+        <p>Use case: Uploading files (images, videos, audio). Binary data is transferred in parts.</p>
+        <div class="code-block p-2 text-xs mt-1"><pre>Content-Type: multipart/form-data; boundary=----WebKitFormBoundaryxyz</pre></div>
+        <p class="text-sm mt-1"><span class="highlight">Boundary:</span> A delimiter string that separates the different parts of the data in the request body. Indicates where each part starts and ends.</p>
+        </div>
+        
+        <div class="mt-3"><span class="font-bold text-lg">B. Receiving Large Data (Server → Client): Streaming</span>
+        <p>Use case: Downloading large files, real-time data. Data is sent in chunks over a single persistent connection.</p>
+        <div class="bg-white/70 p-2 rounded text-sm font-mono">Content-Type: text/event-stream<br>Connection: keep-alive</div>
+        <p class="text-sm mt-1">Result: Client receives and appends chunks progressively until the complete file is constructed.</p>
+        </div>
+    </div>
+
+    <!-- ═══════════════════════════════════════════════════════════════ -->
+    <!-- SECTION 11: SSL/TLS/HTTPS                                       -->
+    <!-- ═══════════════════════════════════════════════════════════════ -->
+    <div class="bg-white p-6 rounded-lg paper-shadow mb-8 transform -rotate-1">
+        <h2 class="text-3xl font-bold mb-4 text-gray-800">🔒 SSL, TLS, HTTPS (Brief Overview)</h2>
+        <div class="space-y-2">
+            <p><span class="highlight">SSL (Secure Sockets Layer):</span> Original encryption protocol. Now deprecated (security vulnerabilities).</p>
+            <p><span class="highlight-blue">TLS (Transport Layer Security):</span> Modern, secure replacement for SSL. Encrypts data in transit, uses certificates to authenticate server, prevents eavesdropping and tampering. <span class="font-bold">Current recommended version: TLS 1.3</span>.</p>
+            <p><span class="highlight-pink">HTTPS:</span> HTTP + TLS (originally SSL). When you visit an https:// website, TLS encrypts communication between browser and server.</p>
+        </div>
+        <div class="mt-3 diagram-box p-3 text-center bg-green-100">🔐 Padlock icon in browser = TLS-encrypted session</div>
+    </div>
+
+    <!-- ═══════════════════════════════════════════════════════════════ -->
+    <!-- SECTION 12: Final Takeaway / Mental Model                       -->
+    <!-- ═══════════════════════════════════════════════════════════════ -->
+    <div class="hero-dark p-8 rounded-lg paper-shadow mb-8 text-center">
+        <h3 class="text-2xl font-bold mb-6 text-yellow-300">🎓 Final Takeaway</h3>
+        <p class="text-xl">Understanding these HTTP concepts — <span class="highlight">statelessness, headers, CORS, status codes, caching, content negotiation, compression, persistent connections, streaming</span> — is all you need to know to work on 90% of backend systems, debug issues, and visualize the flow of components.</p>
+        <div class="flex flex-wrap justify-center gap-2 mt-6">
+            <div class="bg-blue-600 px-3 py-2 rounded">GET / POST</div>
+            <span class="text-yellow-400">→</span>
+            <div class="bg-green-600 px-3 py-2 rounded">Headers</div>
+            <span class="text-yellow-400">→</span>
+            <div class="bg-purple-600 px-3 py-2 rounded">CORS Preflight</div>
+            <span class="text-yellow-400">→</span>
+            <div class="bg-orange-600 px-3 py-2 rounded">Status 200/304/404</div>
+            <span class="text-yellow-400">→</span>
+            <div class="bg-red-600 px-3 py-2 rounded">Cache + Compress</div>
+        </div>
+        <div class="mt-6 text-2xl font-bold text-white">
+            💪 Master HTTP → Master the Web
+        </div>
+    </div>
+
+    <!-- ═══════════════════════════════════════════════════════════════ -->
+    <!-- KEYWORDS TAGS + NEXT STEPS                                      -->
+    <!-- ═══════════════════════════════════════════════════════════════ -->
+    <div class="bg-white p-6 rounded-lg paper-shadow mb-8">
+        <h3 class="text-2xl font-bold mb-3 text-gray-800">🏷️ Keywords (Everything covered)</h3>
+        <div class="flex flex-wrap justify-center gap-2 text-sm">
+            <span class="tag-pill">Statelessness</span><span class="tag-pill">Client-Server</span><span class="tag-pill">TCP 3-way handshake</span><span class="tag-pill">HTTP/1.1</span>
+            <span class="tag-pill">HTTP/2 Multiplexing</span><span class="tag-pill">HTTP/3 QUIC</span><span class="tag-pill">Headers</span><span class="tag-pill">CORS</span>
+            <span class="tag-pill">OPTIONS Preflight</span><span class="tag-pill">2xx/3xx/4xx/5xx</span><span class="tag-pill">ETag</span><span class="tag-pill">Cache-Control</span>
+            <span class="tag-pill">If-None-Match</span><span class="tag-pill">304 Not Modified</span><span class="tag-pill">Content Negotiation</span><span class="tag-pill">Accept-Encoding</span>
+            <span class="tag-pill">gzip/brotli</span><span class="tag-pill">Keep-Alive</span><span class="tag-pill">Multipart/form-data</span><span class="tag-pill">Streaming</span>
+            <span class="tag-pill">TLS 1.3</span><span class="tag-pill">HTTPS</span><span class="tag-pill">401 vs 403</span><span class="tag-pill">429 Rate Limit</span>
+        </div>
+    </div>
+
+    <div class="bg-white p-6 rounded-lg paper-shadow mb-8">
+        <h3 class="text-2xl font-bold mb-4 text-gray-800">📚 Next Steps & Practice</h3>
+        <ul class="space-y-3">
+            <li class="flex items-center gap-3"><span class="text-2xl">👉</span><span class="bg-blue-100 px-3 py-1 rounded-lg">🌐 Open DevTools → Network tab. Inspect every request/response header</span></li>
+            <li class="flex items-center gap-3"><span class="text-2xl">👉</span><span class="bg-green-100 px-3 py-1 rounded-lg">🖥️ Run <code class="inline-code">curl -v https://api.github.com/users/octocat</code> to see raw HTTP</span></li>
+            <li class="flex items-center gap-3"><span class="text-2xl">👉</span><span class="bg-purple-100 px-3 py-1 rounded-lg">📖 Experiment with CORS by running a local frontend + different backend port</span></li>
+            <li class="flex items-center gap-3"><span class="text-2xl">👉</span><span class="bg-orange-100 px-3 py-1 rounded-lg">⚡ Implement ETag caching on a small Node.js/Go API</span></li>
+        </ul>
+        <div class="mt-4 p-3 info-box-yellow rounded-lg text-center text-lg">🎉 You now have the complete HTTP reference — go build amazing things!</div>
+    </div>
+
+    <!-- PRINT BUTTON -->
+    <div class="text-center no-print mb-8">
+        <button onclick="window.print()" class="bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 px-8 rounded-full text-xl shadow-lg transform transition hover:scale-105">
+            🖨️ Save as PDF / Print Complete Notes
+        </button>
+        <p class="mt-2 text-gray-600 text-sm">Your complete HTTP deep dive notebook — ready to keep and share</p>
+    </div>
+
+</body>
+</html>
