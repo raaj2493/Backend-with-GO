@@ -1,0 +1,948 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Phase 2: PostgreSQL + Docker + Database Design</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Caveat:wght@400;600;700&family=Patrick+Hand&family=Indie+Flower&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Patrick Hand', cursive;
+            background-color: #f4f1ea;
+            background-image: 
+                linear-gradient(#e1e1e1 1px, transparent 1px),
+                linear-gradient(90deg, #e1e1e1 1px, transparent 1px);
+            background-size: 20px 20px;
+        }
+        .handwritten { font-family: 'Caveat', cursive; }
+        .highlight {
+            background: linear-gradient(120deg, #ffeaa7 0%, #ffeaa7 100%);
+            background-repeat: no-repeat; background-size: 100% 40%;
+            background-position: 0 88%; padding: 0 4px;
+        }
+        .highlight-blue {
+            background: linear-gradient(120deg, #74b9ff 0%, #74b9ff 100%);
+            background-repeat: no-repeat; background-size: 100% 40%;
+            background-position: 0 88%; padding: 0 4px;
+        }
+        .highlight-pink {
+            background: linear-gradient(120deg, #fd79a8 0%, #fd79a8 100%);
+            background-repeat: no-repeat; background-size: 100% 40%;
+            background-position: 0 88%; padding: 0 4px;
+        }
+        .highlight-green {
+            background: linear-gradient(120deg, #55efc4 0%, #55efc4 100%);
+            background-repeat: no-repeat; background-size: 100% 40%;
+            background-position: 0 88%; padding: 0 4px;
+        }
+        .sticky-note {
+            background: #fff740; box-shadow: 2px 2px 10px rgba(0,0,0,0.1);
+            transform: rotate(-2deg);
+        }
+        .sticky-note-blue {
+            background: #7ee8fa; transform: rotate(2deg);
+            box-shadow: 2px 2px 10px rgba(0,0,0,0.1);
+        }
+        .sticky-note-pink {
+            background: #ff9999; transform: rotate(-1deg);
+            box-shadow: 2px 2px 10px rgba(0,0,0,0.1);
+        }
+        .sticky-note-green {
+            background: #55efc4; transform: rotate(1deg);
+            box-shadow: 2px 2px 10px rgba(0,0,0,0.1);
+        }
+        .sticky-note-purple {
+            background: #a29bfe; transform: rotate(-1.5deg);
+            box-shadow: 2px 2px 10px rgba(0,0,0,0.1);
+        }
+        .sticky-note-orange {
+            background: #fab1a0; transform: rotate(1.5deg);
+            box-shadow: 2px 2px 10px rgba(0,0,0,0.1);
+        }
+        .code-block {
+            font-family: 'Courier New', monospace;
+            background: #2d3436; color: #dfe6e9;
+            position: relative;
+        }
+        .code-block::before {
+            content: ''; position: absolute;
+            top: -5px; left: -5px; right: -5px; bottom: -5px;
+            background: #fff; z-index: -1;
+            transform: rotate(1deg);
+            box-shadow: 3px 3px 10px rgba(0,0,0,0.1);
+        }
+        code.inline-code {
+            font-family: 'Courier New', monospace;
+            background: #2d3436; color: #dfe6e9;
+            padding: 2px 8px; border-radius: 4px;
+            font-size: 0.9em;
+        }
+        @keyframes float {
+            0%, 100% { transform: translateY(0px) rotate(0deg); }
+            50% { transform: translateY(-10px) rotate(2deg); }
+        }
+        .float-anim { animation: float 3s ease-in-out infinite; }
+        @keyframes bounce {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-10px); }
+        }
+        .emoji-big {
+            font-size: 2.5rem; display: inline-block;
+            animation: bounce 2s infinite;
+        }
+        .paper-shadow {
+            box-shadow: 
+                0 1px 1px rgba(0,0,0,0.15), 
+                0 10px 0 -5px #eee, 
+                0 10px 1px -4px rgba(0,0,0,0.15), 
+                0 20px 0 -10px #eee, 
+                0 20px 1px -9px rgba(0,0,0,0.15);
+        }
+        .diagram-box {
+            border: 3px solid #2d3436; border-radius: 15px;
+            position: relative; background: white;
+        }
+        .diagram-box::before {
+            content: ''; position: absolute;
+            top: 5px; left: 5px; right: -5px; bottom: -5px;
+            border: 2px solid #b2bec3; border-radius: 15px; z-index: -1;
+        }
+        .tape {
+            position: absolute; top: -15px; left: 50%;
+            transform: translateX(-50%) rotate(-2deg);
+            width: 100px; height: 30px;
+            background: rgba(255,255,255,0.4);
+            box-shadow: 0 1px 3px rgba(0,0,0,0.2);
+        }
+        .step-badge {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white; width: 40px; height: 40px;
+            border-radius: 50%; display: flex;
+            align-items: center; justify-content: center;
+            font-weight: bold; font-size: 1.2rem; flex-shrink: 0;
+        }
+        .info-box-blue {
+            background: #ebf8ff; border-left: 4px solid #4299e1;
+        }
+        .info-box-green {
+            background: #f0fff4; border-left: 4px solid #48bb78;
+        }
+        .info-box-yellow {
+            background: #fffff0; border-left: 4px solid #ecc94b;
+        }
+        .info-box-red {
+            background: #fff5f5; border-left: 4px solid #f56565;
+        }
+        .info-box-purple {
+            background: #faf5ff; border-left: 4px solid #9f7aea;
+        }
+        .card-good {
+            background: #f0fff4; border: 2px solid #9ae6b4;
+        }
+        .card-bad {
+            background: #fff5f5; border: 2px solid #feb2b2;
+        }
+        .tag-pill {
+            background: white; padding: 4px 12px;
+            border-radius: 9999px;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+            font-size: 0.85rem; display: inline-block; margin: 2px;
+        }
+        .flow-arrow {
+            text-align: center; font-size: 2rem;
+            color: #a0aec0; margin: 8px 0;
+        }
+        .hero-dark {
+            background: #2d3748; color: white;
+        }
+        .hero-dark .highlight { color: #2d3748; }
+        @media print {
+            body { background: white; }
+            .no-print { display: none; }
+            .page-break { page-break-before: always; }
+        }
+        @media (max-width: 768px) {
+            .emoji-big { font-size: 1.8rem; }
+            .handwritten { font-size: 0.9em; }
+        }
+    </style>
+<base target="_blank">
+</head>
+<body class="p-4 md:p-8 max-w-4xl mx-auto">
+
+    <!-- TITLE SECTION -->
+    <div class="relative mb-12 text-center">
+        <div class="tape"></div>
+        <h1 class="text-5xl md:text-7xl font-bold text-gray-800 mb-4 handwritten transform -rotate-1">
+            PostgreSQL + Docker
+        </h1>
+        <div class="text-2xl text-gray-600 handwritten">Phase 2: Database Design &amp; Container Setup</div>
+        <div class="mt-4 text-6xl float-anim">🐳</div>
+    </div>
+
+    <!-- START HERE -->
+    <div class="bg-white p-6 rounded-lg paper-shadow mb-8 relative transform rotate-1">
+        <div class="absolute -top-3 -right-3 bg-red-500 text-white px-4 py-1 rounded-full text-sm font-bold transform rotate-12">START HERE</div>
+        <h2 class="text-3xl font-bold mb-4 text-gray-800">This Is Where the Project Actually Begins! <span class="emoji-big">🚀</span></h2>
+        <div class="space-y-2 text-xl text-gray-700">
+            <div class="flex items-center gap-2">
+                <span class="w-2 h-2 bg-green-500 rounded-full"></span>
+                <span>PostgreSQL running inside <span class="highlight">Docker</span></span>
+            </div>
+            <div class="flex items-center gap-2">
+                <span class="w-2 h-2 bg-blue-500 rounded-full"></span>
+                <span>A real <span class="highlight-blue">database</span> and <span class="highlight-blue">table</span> created</span>
+            </div>
+            <div class="flex items-center gap-2">
+                <span class="w-2 h-2 bg-yellow-500 rounded-full"></span>
+                <span>Understand <span class="highlight-pink">Images, Containers, Volumes, Networks, Port Mapping</span></span>
+            </div>
+        </div>
+        <div class="mt-4 p-4 info-box-green rounded-lg">
+            <p class="text-lg font-semibold text-green-900">
+                <span class="font-bold">No Go code yet.</span> First we build our <span class="highlight">database foundation</span> correctly! 🏗️
+            </p>
+        </div>
+    </div>
+
+    <!-- BIG PICTURE -->
+    <div class="sticky-note p-6 mb-8 text-center transform -rotate-1">
+        <h3 class="text-3xl font-bold mb-2 text-gray-800">🗺️ Big Picture</h3>
+        <p class="text-2xl text-gray-800">
+            After this phase, your machine will have a <span class="highlight">real PostgreSQL database</span> running in Docker!
+        </p>
+    </div>
+
+    <div class="bg-white p-6 rounded-lg paper-shadow mb-8 transform rotate-1">
+        <h3 class="text-2xl font-bold mb-6 text-center text-gray-800">Architecture After Phase 2</h3>
+        <div class="space-y-2">
+            <div class="diagram-box p-4 text-center bg-gray-50 mx-auto max-w-xs">
+                <div class="text-4xl mb-2">💻</div>
+                <div class="font-bold text-xl text-gray-800">Your Machine</div>
+            </div>
+            <div class="flow-arrow">⬇️</div>
+            <div class="diagram-box p-4 text-center bg-blue-50 mx-auto max-w-xs">
+                <div class="text-4xl mb-2">🐳</div>
+                <div class="font-bold text-xl text-gray-800">Docker Engine</div>
+            </div>
+            <div class="flow-arrow">⬇️</div>
+            <div class="diagram-box p-4 text-center bg-green-50 mx-auto max-w-xs">
+                <div class="text-4xl mb-2">📦</div>
+                <div class="font-bold text-xl text-gray-800">PostgreSQL Container</div>
+            </div>
+            <div class="flow-arrow">⬇️</div>
+            <div class="diagram-box p-4 text-center bg-yellow-50 mx-auto max-w-xs">
+                <div class="text-4xl mb-2">🗄️</div>
+                <div class="font-bold text-xl text-gray-800">superhero_db</div>
+            </div>
+            <div class="flow-arrow">⬇️</div>
+            <div class="diagram-box p-4 text-center bg-purple-50 mx-auto max-w-xs">
+                <div class="text-4xl mb-2">📊</div>
+                <div class="font-bold text-xl text-gray-800">superheroes table</div>
+            </div>
+        </div>
+    </div>
+
+    <!-- WHAT IS DOCKER -->
+    <div class="sticky-note-blue p-6 mb-8 transform rotate-1">
+        <h3 class="text-2xl font-bold mb-3 text-gray-800">🤔 What Is Docker?</h3>
+        <p class="text-lg">Imagine PostgreSQL is software. Traditionally, installing it is <span class="font-bold">painful</span>. Docker solves this by running PostgreSQL in an <span class="highlight">isolated box</span> called a <span class="highlight-pink">Container</span>.</p>
+    </div>
+
+    <!-- DOCKER TERMINOLOGY -->
+    <div class="page-break"></div>
+    <div class="bg-white p-6 rounded-lg paper-shadow mb-8 transform -rotate-1">
+        <div class="flex items-center gap-2 mb-4">
+            <span class="step-badge">1</span>
+            <h2 class="text-3xl font-bold text-gray-800">Docker Terminology</h2>
+        </div>
+        <div class="info-box-yellow p-4 rounded-lg mb-4">
+            <p class="text-xl">This is <span class="font-bold">extremely important</span> — these concepts are the foundation of everything!</p>
+        </div>
+        <div class="mb-6">
+            <h3 class="text-2xl font-bold text-gray-800 mb-2">📄 Image</h3>
+            <p class="text-lg text-gray-700 mb-3">Think: <span class="highlight">Cake Recipe</span>. A recipe is <span class="font-bold">not</span> cake. It only tells <em>how</em> to make cake.</p>
+            <div class="p-3 info-box-blue rounded-lg">
+                <p class="text-blue-900">Similarly, <code class="inline-code">postgres:17</code> is an <span class="font-bold">image</span>. It is <span class="font-bold">not running</span>. It is only a <span class="highlight-blue">blueprint</span>.</p>
+            </div>
+        </div>
+        <div class="mb-6">
+            <h3 class="text-2xl font-bold text-gray-800 mb-2">📦 Container</h3>
+            <p class="text-lg text-gray-700 mb-3">Think: <span class="highlight">Actual Cake</span>. Created from the recipe. Now it is real and edible!</p>
+            <div class="p-3 info-box-green rounded-lg">
+                <p class="text-green-900">Similarly, <code class="inline-code">superhero_postgres</code> is a <span class="font-bold">running PostgreSQL instance</span> — a container.</p>
+            </div>
+        </div>
+        <div class="overflow-hidden rounded-lg border-2 border-gray-800">
+            <table class="w-full text-lg">
+                <thead class="bg-gray-800 text-white">
+                    <tr>
+                        <th class="p-3 text-left">Real World</th>
+                        <th class="p-3 text-left">Docker World</th>
+                        <th class="p-3 text-left">Programming</th>
+                    </tr>
+                </thead>
+                <tbody class="divide-y-2 divide-gray-300">
+                    <tr class="bg-yellow-50">
+                        <td class="p-3 font-semibold">Cake Recipe</td>
+                        <td class="p-3">Image</td>
+                        <td class="p-3">Blueprint / Template</td>
+                    </tr>
+                    <tr class="bg-white">
+                        <td class="p-3 font-semibold">Actual Cake</td>
+                        <td class="p-3">Container</td>
+                        <td class="p-3">Object / Instance</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+        <div class="mt-4 p-4 info-box-purple rounded-lg">
+            <p class="text-purple-900"><span class="font-bold">💡 Programming Analogy:</span> <span class="highlight">Class</span> → Image, <span class="highlight-blue">Object</span> → Container</p>
+        </div>
+    </div>
+
+    <!-- WHAT HAPPENS INTERNALLY -->
+    <div class="sticky-note-purple p-6 mb-8 transform -rotate-1">
+        <h3 class="text-2xl font-bold mb-3 text-gray-800">⚙️ What Happens Internally?</h3>
+        <p class="text-lg">When you run <code class="inline-code">docker run postgres</code>, Docker does these steps automatically:</p>
+    </div>
+
+    <div class="bg-white p-6 rounded-lg paper-shadow mb-8 transform rotate-1">
+        <div class="space-y-4">
+            <div class="flex gap-4 items-start">
+                <div class="bg-blue-500 text-white w-8 h-8 rounded-full flex items-center justify-center font-bold flex-shrink-0">1</div>
+                <div>
+                    <span class="font-bold text-lg">Download Image</span>
+                    <p class="text-gray-700">Fetches <code class="inline-code">postgres:17</code> from Docker Hub if not already present.</p>
+                </div>
+            </div>
+            <div class="flex gap-4 items-start">
+                <div class="bg-green-500 text-white w-8 h-8 rounded-full flex items-center justify-center font-bold flex-shrink-0">2</div>
+                <div>
+                    <span class="font-bold text-lg">Create Filesystem</span>
+                    <p class="text-gray-700">Sets up an isolated file system for the container.</p>
+                </div>
+            </div>
+            <div class="flex gap-4 items-start">
+                <div class="bg-yellow-500 text-white w-8 h-8 rounded-full flex items-center justify-center font-bold flex-shrink-0">3</div>
+                <div>
+                    <span class="font-bold text-lg">Create Isolated Network</span>
+                    <p class="text-gray-700">Gives the container its own network interface.</p>
+                </div>
+            </div>
+            <div class="flex gap-4 items-start">
+                <div class="bg-purple-500 text-white w-8 h-8 rounded-full flex items-center justify-center font-bold flex-shrink-0">4</div>
+                <div>
+                    <span class="font-bold text-lg">Start PostgreSQL Process</span>
+                    <p class="text-gray-700">Launches the PostgreSQL server inside the container.</p>
+                </div>
+            </div>
+            <div class="flex gap-4 items-start">
+                <div class="bg-red-500 text-white w-8 h-8 rounded-full flex items-center justify-center font-bold flex-shrink-0">5</div>
+                <div>
+                    <span class="font-bold text-lg">Container Is Ready!</span>
+                    <p class="text-gray-700">PostgreSQL is now running and accepting connections.</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- CONTAINER PROBLEM -->
+    <div class="sticky-note-pink p-6 mb-8 transform rotate-1">
+        <h3 class="text-2xl font-bold mb-3 text-gray-800">⚠️ The Container Problem</h3>
+        <p class="text-lg">Containers are <span class="font-bold">temporary</span> by default. If you delete the container, <span class="highlight-pink">all data is gone</span>! 😱</p>
+    </div>
+
+    <div class="grid md:grid-cols-2 gap-4 mb-8">
+        <div class="card-bad p-4 rounded-lg">
+            <h4 class="font-bold text-xl mb-2 text-red-800">❌ Without Volume</h4>
+            <ul class="list-disc list-inside space-y-1 text-red-700">
+                <li>Container stores data internally</li>
+                <li><code class="inline-code">docker rm container</code></li>
+                <li>Container deleted</li>
+                <li><span class="font-bold">Data deleted</span></li>
+                <li>Everything gone! 💀</li>
+            </ul>
+        </div>
+        <div class="card-good p-4 rounded-lg">
+            <h4 class="font-bold text-xl mb-2 text-green-800">✅ With Volume</h4>
+            <ul class="list-disc list-inside space-y-1 text-green-700">
+                <li>Container stores data in a <span class="highlight">Volume</span></li>
+                <li><code class="inline-code">docker rm container</code></li>
+                <li>Container deleted</li>
+                <li><span class="font-bold">Volume survives!</span></li>
+                <li>Data is safe! 🎉</li>
+            </ul>
+        </div>
+    </div>
+
+    <!-- VOLUME ARCHITECTURE -->
+    <div class="bg-white p-6 rounded-lg paper-shadow mb-8 transform -rotate-1">
+        <h3 class="text-2xl font-bold mb-4 text-center text-gray-800">📦 Volume Architecture <span class="emoji-big">💾</span></h3>
+        <div class="space-y-2">
+            <div class="diagram-box p-4 text-center bg-blue-50 mx-auto max-w-xs">
+                <div class="text-4xl mb-2">📦</div>
+                <div class="font-bold text-xl text-gray-800">Container</div>
+            </div>
+            <div class="flow-arrow">⬇️</div>
+            <div class="diagram-box p-4 text-center bg-yellow-50 mx-auto max-w-xs">
+                <div class="text-4xl mb-2">💾</div>
+                <div class="font-bold text-xl text-gray-800">Volume</div>
+                <div class="text-sm text-gray-600">Persistent storage on your machine</div>
+            </div>
+            <div class="flow-arrow">⬇️</div>
+            <div class="diagram-box p-4 text-center bg-green-50 mx-auto max-w-xs">
+                <div class="text-4xl mb-2">🗄️</div>
+                <div class="font-bold text-xl text-gray-800">Database Files</div>
+                <div class="text-sm text-gray-600">Safe even if container dies!</div>
+            </div>
+        </div>
+        <div class="mt-4 p-4 info-box-green rounded-lg">
+            <p class="text-green-900"><span class="font-bold">💡 Think of it like this:</span> A volume is a <span class="highlight">USB drive</span> that lives on your machine. Even if you throw away the computer, the USB still has your files!</p>
+        </div>
+    </div>
+
+    <!-- PORT MAPPING -->
+    <div class="sticky-note-orange p-6 mb-8 transform -rotate-1">
+        <h3 class="text-2xl font-bold mb-3 text-gray-800">🔌 Port Mapping</h3>
+        <p class="text-lg">Inside the container, PostgreSQL listens on port <code class="inline-code">5432</code>. But your laptop cannot directly access container ports. So we <span class="highlight">expose</span> it!</p>
+    </div>
+
+    <div class="bg-white p-6 rounded-lg paper-shadow mb-8 transform rotate-1">
+        <h3 class="text-2xl font-bold mb-4 text-center text-gray-800">Port Mapping Explained</h3>
+        <div class="flex flex-wrap justify-center items-center gap-2 text-lg">
+            <div class="diagram-box p-3 bg-blue-100 text-center">
+                <div class="text-2xl">💻</div>
+                <div class="font-bold">Host Machine</div>
+                <div class="text-sm text-gray-600">localhost:5432</div>
+            </div>
+            <span class="text-2xl text-blue-500">↔️</span>
+            <div class="diagram-box p-3 bg-green-100 text-center">
+                <div class="text-2xl">🔌</div>
+                <div class="font-bold">Port Mapping</div>
+                <div class="text-sm text-gray-600">5432 → 5432</div>
+            </div>
+            <span class="text-2xl text-green-500">↔️</span>
+            <div class="diagram-box p-3 bg-purple-100 text-center">
+                <div class="text-2xl">📦</div>
+                <div class="font-bold">Container</div>
+                <div class="text-sm text-gray-600">Port 5432</div>
+            </div>
+        </div>
+        <div class="mt-4 p-4 info-box-blue rounded-lg">
+            <p class="text-blue-900"><code class="inline-code">5432:5432</code> means: <span class="font-bold">"When I visit localhost:5432 on my machine, send that to port 5432 inside the container."</span></p>
+        </div>
+    </div>
+
+    <!-- DOCKER COMPOSE -->
+    <div class="sticky-note-green p-6 mb-8 transform rotate-1">
+        <h3 class="text-2xl font-bold mb-3 text-gray-800">🐳 Docker Compose</h3>
+        <p class="text-lg">Instead of typing long <code class="inline-code">docker run ...</code> commands every day, we write a <code class="inline-code">docker-compose.yml</code> file. Then: <span class="font-bold">docker compose up</span> — everything starts!</p>
+    </div>
+
+    <!-- STEP 1 -->
+    <div class="page-break"></div>
+    <div class="bg-white p-6 rounded-lg paper-shadow mb-8 transform -rotate-1">
+        <div class="flex items-center gap-2 mb-4">
+            <span class="step-badge">1</span>
+            <h2 class="text-3xl font-bold text-gray-800">Create Project Folder</h2>
+        </div>
+        <div class="code-block p-4 rounded-lg overflow-x-auto text-sm md:text-base mb-4">
+<pre><span style="color:#fd79a8">mkdir</span> superhero-api
+
+<span style="color:#fd79a8">cd</span> superhero-api</pre>
+        </div>
+        <div class="p-4 info-box-green rounded-lg">
+            <p class="text-green-900">This creates our project home. Everything we build will live inside <code class="inline-code">superhero-api/</code>.</p>
+        </div>
+    </div>
+
+    <!-- STEP 2 -->
+    <div class="bg-white p-6 rounded-lg paper-shadow mb-8 transform rotate-1">
+        <div class="flex items-center gap-2 mb-4">
+            <span class="step-badge">2</span>
+            <h2 class="text-3xl font-bold text-gray-800">Create .env File</h2>
+        </div>
+        <div class="info-box-yellow p-4 rounded-lg mb-4">
+            <p class="text-xl"><span class="font-bold">Why?</span> Hardcoding values is bad! We store configuration <span class="highlight">separately</span>.</p>
+        </div>
+        <p class="text-lg text-gray-700 mb-3">Instead of <code class="inline-code">password = "admin123"</code> in our code, we put it in <code class="inline-code">.env</code>.</p>
+        <div class="code-block p-4 rounded-lg overflow-x-auto text-sm md:text-base mb-4">
+<pre><span style="color:#55efc4"># .env</span>
+<span style="color:#fd79a8">POSTGRES_USER</span>=postgres
+<span style="color:#fd79a8">POSTGRES_PASSWORD</span>=postgres
+<span style="color:#fd79a8">POSTGRES_DB</span>=superhero_db
+<span style="color:#fd79a8">POSTGRES_PORT</span>=5432</pre>
+        </div>
+        <div class="grid md:grid-cols-2 gap-4">
+            <div class="p-3 bg-blue-50 rounded-lg">
+                <span class="font-bold text-blue-800">POSTGRES_USER</span>
+                <p class="text-blue-700">Database username: <code class="inline-code">postgres</code></p>
+            </div>
+            <div class="p-3 bg-green-50 rounded-lg">
+                <span class="font-bold text-green-800">POSTGRES_PASSWORD</span>
+                <p class="text-green-700">Password: <code class="inline-code">postgres</code> (for learning only!)</p>
+            </div>
+            <div class="p-3 bg-yellow-50 rounded-lg">
+                <span class="font-bold text-yellow-800">POSTGRES_DB</span>
+                <p class="text-yellow-700">Database name: <code class="inline-code">superhero_db</code></p>
+            </div>
+            <div class="p-3 bg-purple-50 rounded-lg">
+                <span class="font-bold text-purple-800">POSTGRES_PORT</span>
+                <p class="text-purple-700">Exposed port: <code class="inline-code">5432</code></p>
+            </div>
+        </div>
+    </div>
+
+    <!-- STEP 3 -->
+    <div class="page-break"></div>
+    <div class="bg-white p-6 rounded-lg paper-shadow mb-8 transform -rotate-1">
+        <div class="flex items-center gap-2 mb-4">
+            <span class="step-badge">3</span>
+            <h2 class="text-3xl font-bold text-gray-800">Create docker-compose.yml</h2>
+        </div>
+        <div class="info-box-yellow p-4 rounded-lg mb-4">
+            <p class="text-xl">This file describes: <span class="highlight">which containers</span> to start, <span class="highlight-blue">how to configure</span> them, <span class="highlight-pink">how to network</span> them, and <span class="highlight-green">which volumes</span> to use.</p>
+        </div>
+        <div class="code-block p-4 rounded-lg overflow-x-auto text-sm md:text-base mb-4">
+<pre><span style="color:#fd79a8">services</span>:
+  <span style="color:#fd79a8">postgres</span>:
+    <span style="color:#fd79a8">image</span>: postgres:17
+    <span style="color:#fd79a8">container_name</span>: superhero_postgres
+    <span style="color:#fd79a8">environment</span>:
+      <span style="color:#fd79a8">POSTGRES_USER</span>: postgres
+      <span style="color:#fd79a8">POSTGRES_PASSWORD</span>: postgres
+      <span style="color:#fd79a8">POSTGRES_DB</span>: superhero_db
+    <span style="color:#fd79a8">ports</span>:
+      - <span style="color:#ffeaa7">"5432:5432"</span>
+    <span style="color:#fd79a8">volumes</span>:
+      - postgres_data:/var/lib/postgresql/data
+
+<span style="color:#fd79a8">volumes</span>:
+  <span style="color:#fd79a8">postgres_data</span>:</pre>
+        </div>
+    </div>
+
+    <!-- DOCKER COMPOSE BREAKDOWN -->
+    <div class="bg-white p-6 rounded-lg paper-shadow mb-8 transform rotate-1">
+        <h3 class="text-2xl font-bold mb-4 text-gray-800">🔍 docker-compose.yml Breakdown <span class="emoji-big">🔎</span></h3>
+        <div class="space-y-4">
+            <div class="flex gap-4 items-start">
+                <div class="bg-blue-500 text-white w-8 h-8 rounded-full flex items-center justify-center font-bold flex-shrink-0">1</div>
+                <div>
+                    <code class="inline-code">services:</code>
+                    <p class="text-gray-700">Defines <span class="highlight">containers</span>. Currently just <code class="inline-code">postgres</code>. Later we could add <code class="inline-code">go app</code>, <code class="inline-code">redis</code>, etc.</p>
+                </div>
+            </div>
+            <div class="flex gap-4 items-start">
+                <div class="bg-green-500 text-white w-8 h-8 rounded-full flex items-center justify-center font-bold flex-shrink-0">2</div>
+                <div>
+                    <code class="inline-code">image: postgres:17</code>
+                    <p class="text-gray-700">Tells Docker: <span class="highlight-blue">"Use PostgreSQL version 17"</span></p>
+                </div>
+            </div>
+            <div class="flex gap-4 items-start">
+                <div class="bg-yellow-500 text-white w-8 h-8 rounded-full flex items-center justify-center font-bold flex-shrink-0">3</div>
+                <div>
+                    <code class="inline-code">container_name: superhero_postgres</code>
+                    <p class="text-gray-700">Friendly name instead of a random generated one.</p>
+                </div>
+            </div>
+            <div class="flex gap-4 items-start">
+                <div class="bg-purple-500 text-white w-8 h-8 rounded-full flex items-center justify-center font-bold flex-shrink-0">4</div>
+                <div>
+                    <code class="inline-code">environment:</code>
+                    <p class="text-gray-700">Variables passed into PostgreSQL. PostgreSQL reads these <span class="highlight-pink">when starting</span>.</p>
+                </div>
+            </div>
+            <div class="flex gap-4 items-start">
+                <div class="bg-red-500 text-white w-8 h-8 rounded-full flex items-center justify-center font-bold flex-shrink-0">5</div>
+                <div>
+                    <code class="inline-code">ports: "5432:5432"</code>
+                    <p class="text-gray-700"><span class="highlight">Host 5432</span> → <span class="highlight-blue">Container 5432</span>. Your laptop can now connect!</p>
+                </div>
+            </div>
+            <div class="flex gap-4 items-start">
+                <div class="bg-orange-500 text-white w-8 h-8 rounded-full flex items-center justify-center font-bold flex-shrink-0">6</div>
+                <div>
+                    <code class="inline-code">volumes:</code>
+                    <p class="text-gray-700">PostgreSQL stores files in <code class="inline-code">/var/lib/postgresql/data</code>. We connect that to <code class="inline-code">postgres_data</code> volume. <span class="highlight-green">Data survives container deletion!</span></p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- STEP 4 -->
+    <div class="page-break"></div>
+    <div class="bg-white p-6 rounded-lg paper-shadow mb-8 transform -rotate-1">
+        <div class="flex items-center gap-2 mb-4">
+            <span class="step-badge">4</span>
+            <h2 class="text-3xl font-bold text-gray-800">Start PostgreSQL</h2>
+        </div>
+        <div class="code-block p-4 rounded-lg overflow-x-auto text-sm md:text-base mb-4">
+<pre><span style="color:#fd79a8">docker compose up</span> -d</pre>
+        </div>
+        <div class="info-box-yellow p-4 rounded-lg mb-4">
+            <p class="text-xl"><span class="font-bold">What does this command do?</span> The <code class="inline-code">-d</code> flag means <span class="highlight">"detached mode"</span> — runs in the background so your terminal stays free.</p>
+        </div>
+        <h3 class="text-xl font-bold text-gray-800 mb-3">Internally, Docker does this:</h3>
+        <div class="space-y-3">
+            <div class="flex items-center gap-3"><span class="text-2xl">1️⃣</span><span>Reads <code class="inline-code">docker-compose.yml</code></span></div>
+            <div class="flex items-center gap-3"><span class="text-2xl">2️⃣</span><span>Checks if <code class="inline-code">postgres:17</code> image exists</span></div>
+            <div class="flex items-center gap-3"><span class="text-2xl">3️⃣</span><span>Downloads image if needed</span></div>
+            <div class="flex items-center gap-3"><span class="text-2xl">4️⃣</span><span>Creates <code class="inline-code">postgres_data</code> volume</span></div>
+            <div class="flex items-center gap-3"><span class="text-2xl">5️⃣</span><span>Creates network</span></div>
+            <div class="flex items-center gap-3"><span class="text-2xl">6️⃣</span><span>Creates <code class="inline-code">superhero_postgres</code> container</span></div>
+            <div class="flex items-center gap-3"><span class="text-2xl">7️⃣</span><span>Starts PostgreSQL process — <span class="highlight-green font-bold">Done!</span></span></div>
+        </div>
+    </div>
+
+    <!-- VERIFY CONTAINER -->
+    <div class="bg-white p-6 rounded-lg paper-shadow mb-8 transform rotate-1">
+        <h3 class="text-2xl font-bold mb-4 text-gray-800">✅ Verify Container Is Running</h3>
+        <div class="code-block p-4 rounded-lg overflow-x-auto text-sm md:text-base mb-4">
+<pre><span style="color:#fd79a8">docker ps</span></pre>
+        </div>
+        <div class="p-4 info-box-green rounded-lg border-2 border-green-300">
+            <p class="font-bold text-green-800">Expected output:</p>
+            <p class="text-green-700 mt-2">You should see <code class="inline-code">superhero_postgres</code> with status <span class="font-bold">Up</span>. That means PostgreSQL is alive and ready!</p>
+        </div>
+    </div>
+
+    <!-- STEP 5 -->
+    <div class="page-break"></div>
+    <div class="bg-white p-6 rounded-lg paper-shadow mb-8 transform -rotate-1">
+        <div class="flex items-center gap-2 mb-4">
+            <span class="step-badge">5</span>
+            <h2 class="text-3xl font-bold text-gray-800">Enter the Container</h2>
+        </div>
+        <div class="code-block p-4 rounded-lg overflow-x-auto text-sm md:text-base mb-4">
+<pre><span style="color:#fd79a8">docker exec</span> -it superhero_postgres bash</pre>
+        </div>
+        <div class="info-box-blue p-4 rounded-lg mb-4">
+            <p class="text-blue-900"><code class="inline-code">docker exec</code> means: <span class="font-bold">"Run a command inside a running container"</span>. The <code class="inline-code">-it</code> flags give you an <span class="highlight">interactive terminal</span>.</p>
+        </div>
+        <div class="p-4 info-box-purple rounded-lg">
+            <p class="text-purple-900">You are now inside <span class="font-bold">Linux</span> running inside the container! Your prompt will change to something like <code class="inline-code">root@container:/#</code></p>
+        </div>
+    </div>
+
+    <!-- STEP 6 -->
+    <div class="bg-white p-6 rounded-lg paper-shadow mb-8 transform rotate-1">
+        <div class="flex items-center gap-2 mb-4">
+            <span class="step-badge">6</span>
+            <h2 class="text-3xl font-bold text-gray-800">Open PostgreSQL CLI</h2>
+        </div>
+        <p class="text-lg text-gray-700 mb-3">Inside the container, run:</p>
+        <div class="code-block p-4 rounded-lg overflow-x-auto text-sm md:text-base mb-4">
+<pre><span style="color:#fd79a8">psql</span> -U postgres</pre>
+        </div>
+        <div class="sticky-note p-6 mb-4 text-center transform -rotate-1">
+            <h3 class="text-2xl font-bold mb-2 text-gray-800">🤔 What Is psql?</h3>
+            <p class="text-xl text-gray-800">The official <span class="highlight">PostgreSQL terminal client</span>. It lets you run SQL commands directly!</p>
+        </div>
+        <div class="flex flex-wrap justify-center gap-2 text-sm mb-4">
+            <span class="tag-pill">CREATE DATABASE</span>
+            <span class="tag-pill">CREATE TABLE</span>
+            <span class="tag-pill">SELECT</span>
+            <span class="tag-pill">INSERT</span>
+            <span class="tag-pill">UPDATE</span>
+            <span class="tag-pill">DELETE</span>
+        </div>
+    </div>
+
+    <!-- SHOW DATABASES -->
+    <div class="bg-white p-6 rounded-lg paper-shadow mb-8 transform -rotate-1">
+        <h3 class="text-2xl font-bold mb-4 text-gray-800">📋 Show All Databases</h3>
+        <div class="code-block p-4 rounded-lg overflow-x-auto text-sm md:text-base mb-4">
+<pre><span style="color:#55efc4">\l</span></pre>
+        </div>
+        <div class="p-4 info-box-green rounded-lg border-2 border-green-300">
+            <p class="font-bold text-green-800">Expected output:</p>
+            <ul class="list-disc list-inside mt-2 text-green-700">
+                <li><code class="inline-code">postgres</code> (default)</li>
+                <li><code class="inline-code">template0</code> (system template)</li>
+                <li><code class="inline-code">template1</code> (system template)</li>
+                <li><code class="inline-code">superhero_db</code> <span class="font-bold">← Our database!</span></li>
+            </ul>
+        </div>
+    </div>
+
+    <!-- CONNECT DATABASE -->
+    <div class="bg-white p-6 rounded-lg paper-shadow mb-8 transform rotate-1">
+        <h3 class="text-2xl font-bold mb-4 text-gray-800">🔗 Connect to Our Database</h3>
+        <div class="code-block p-4 rounded-lg overflow-x-auto text-sm md:text-base mb-4">
+<pre><span style="color:#55efc4">\c</span> superhero_db</pre>
+        </div>
+        <div class="p-4 info-box-blue rounded-lg">
+            <p class="text-blue-900"><code class="inline-code">\c</code> means <span class="font-bold">"connect"</span>. Now you are inside <code class="inline-code">superhero_db</code> and ready to create tables!</p>
+        </div>
+    </div>
+
+    <!-- DATABASE DESIGN -->
+    <div class="page-break"></div>
+    <div class="sticky-note-purple p-6 mb-8 transform -rotate-1">
+        <h3 class="text-2xl font-bold mb-3 text-gray-800">🗄️ Database Design</h3>
+        <p class="text-lg">We need a <code class="inline-code">superheroes</code> table. Let us create it with all the right columns and constraints!</p>
+    </div>
+
+    <div class="bg-white p-6 rounded-lg paper-shadow mb-8 transform rotate-1">
+        <h3 class="text-2xl font-bold mb-4 text-gray-800">Create the <code class="inline-code">superheroes</code> Table <span class="emoji-big">📊</span></h3>
+        <div class="code-block p-4 rounded-lg overflow-x-auto text-sm md:text-base mb-4">
+<pre><span style="color:#fd79a8">CREATE TABLE</span> superheroes (
+    id <span style="color:#55efc4">SERIAL PRIMARY KEY</span>,
+    name <span style="color:#55efc4">VARCHAR</span>(100) <span style="color:#55efc4">NOT NULL</span>,
+    real_name <span style="color:#55efc4">VARCHAR</span>(100) <span style="color:#55efc4">NOT NULL</span>,
+    universe <span style="color:#55efc4">VARCHAR</span>(50) <span style="color:#55efc4">NOT NULL</span>,
+    power_level <span style="color:#55efc4">INTEGER NOT NULL</span>,
+    created_at <span style="color:#55efc4">TIMESTAMP DEFAULT CURRENT_TIMESTAMP</span>
+);</pre>
+        </div>
+    </div>
+
+    <!-- DEEP EXPLANATION -->
+    <div class="bg-white p-6 rounded-lg paper-shadow mb-8 transform -rotate-1">
+        <h3 class="text-2xl font-bold mb-4 text-gray-800">🔍 Deep Explanation of Each Column <span class="emoji-big">🔎</span></h3>
+        <div class="space-y-4">
+            <div class="flex gap-4 items-start">
+                <div class="bg-blue-500 text-white w-8 h-8 rounded-full flex items-center justify-center font-bold flex-shrink-0">1</div>
+                <div>
+                    <code class="inline-code">id SERIAL</code>
+                    <p class="text-gray-700">PostgreSQL <span class="highlight">auto-increments</span> this. Insert Iron Man → ID becomes <code class="inline-code">1</code>. Insert Batman → ID becomes <code class="inline-code">2</code>. Automatically!</p>
+                </div>
+            </div>
+            <div class="flex gap-4 items-start">
+                <div class="bg-green-500 text-white w-8 h-8 rounded-full flex items-center justify-center font-bold flex-shrink-0">2</div>
+                <div>
+                    <code class="inline-code">PRIMARY KEY</code>
+                    <p class="text-gray-700">Guarantees <span class="highlight-blue">uniqueness</span>. You cannot have two rows with <code class="inline-code">id = 1</code>. Ever.</p>
+                </div>
+            </div>
+            <div class="flex gap-4 items-start">
+                <div class="bg-yellow-500 text-white w-8 h-8 rounded-full flex items-center justify-center font-bold flex-shrink-0">3</div>
+                <div>
+                    <code class="inline-code">VARCHAR(100)</code>
+                    <p class="text-gray-700">Variable length string. Stores text up to 100 characters. Example: <code class="inline-code">"Iron Man"</code></p>
+                </div>
+            </div>
+            <div class="flex gap-4 items-start">
+                <div class="bg-purple-500 text-white w-8 h-8 rounded-full flex items-center justify-center font-bold flex-shrink-0">4</div>
+                <div>
+                    <code class="inline-code">NOT NULL</code>
+                    <p class="text-gray-700">Required field. <span class="highlight-pink">Cannot be empty</span>. Every superhero MUST have a name!</p>
+                </div>
+            </div>
+            <div class="flex gap-4 items-start">
+                <div class="bg-red-500 text-white w-8 h-8 rounded-full flex items-center justify-center font-bold flex-shrink-0">5</div>
+                <div>
+                    <code class="inline-code">INTEGER</code>
+                    <p class="text-gray-700">Stores whole numbers. Example: <code class="inline-code">95</code>, <code class="inline-code">88</code>, <code class="inline-code">70</code></p>
+                </div>
+            </div>
+            <div class="flex gap-4 items-start">
+                <div class="bg-orange-500 text-white w-8 h-8 rounded-full flex items-center justify-center font-bold flex-shrink-0">6</div>
+                <div>
+                    <code class="inline-code">TIMESTAMP DEFAULT CURRENT_TIMESTAMP</code>
+                    <p class="text-gray-700">Stores date and time. <span class="highlight-green">Automatically sets</span> to the current time when a row is created. Example: <code class="inline-code">2026-06-03 16:30:00</code></p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- VERIFY TABLE -->
+    <div class="bg-white p-6 rounded-lg paper-shadow mb-8 transform rotate-1">
+        <h3 class="text-2xl font-bold mb-4 text-gray-800">✅ Verify Table Exists</h3>
+        <div class="code-block p-4 rounded-lg overflow-x-auto text-sm md:text-base mb-4">
+<pre><span style="color:#55efc4">\dt</span></pre>
+        </div>
+        <div class="p-4 info-box-green rounded-lg border-2 border-green-300">
+            <p class="font-bold text-green-800">Expected output:</p>
+            <p class="text-green-700 mt-2">You should see <code class="inline-code">superheroes</code> listed. That means your table was created successfully!</p>
+        </div>
+    </div>
+
+    <!-- SEE SCHEMA -->
+    <div class="bg-white p-6 rounded-lg paper-shadow mb-8 transform -rotate-1">
+        <h3 class="text-2xl font-bold mb-4 text-gray-800">📋 See Full Schema</h3>
+        <div class="code-block p-4 rounded-lg overflow-x-auto text-sm md:text-base mb-4">
+<pre><span style="color:#55efc4">\d</span> superheroes</pre>
+        </div>
+        <div class="p-4 info-box-purple rounded-lg">
+            <p class="text-purple-900">PostgreSQL shows you: <span class="font-bold">Columns, Types, Constraints, and Indexes</span> — everything about your table!</p>
+        </div>
+    </div>
+
+    <!-- INSERT FIRST SUPERHERO -->
+    <div class="page-break"></div>
+    <div class="sticky-note-green p-6 mb-8 transform rotate-1">
+        <h3 class="text-2xl font-bold mb-3 text-gray-800">🦸‍♂️ Insert Our First Superhero!</h3>
+        <p class="text-lg">Let us add Iron Man to our database. This is the moment of truth! 🎉</p>
+    </div>
+
+    <div class="bg-white p-6 rounded-lg paper-shadow mb-8 transform -rotate-1">
+        <h3 class="text-2xl font-bold mb-4 text-gray-800">INSERT Statement</h3>
+        <div class="code-block p-4 rounded-lg overflow-x-auto text-sm md:text-base mb-4">
+<pre><span style="color:#fd79a8">INSERT INTO</span> superheroes
+(name, real_name, universe, power_level)
+<span style="color:#fd79a8">VALUES</span>
+(<span style="color:#ffeaa7">'Iron Man'</span>, <span style="color:#ffeaa7">'Tony Stark'</span>, <span style="color:#ffeaa7">'Marvel'</span>, <span style="color:#ffeaa7">95</span>);</pre>
+        </div>
+    </div>
+
+    <!-- WHAT HAPPENS INTERNALLY -->
+    <div class="bg-white p-6 rounded-lg paper-shadow mb-8 transform rotate-1">
+        <h3 class="text-2xl font-bold mb-4 text-gray-800">⚙️ What Happens Internally? <span class="emoji-big">🔧</span></h3>
+        <div class="space-y-3">
+            <div class="flex items-center gap-3"><span class="text-2xl">1️⃣</span><span>PostgreSQL <span class="highlight">receives</span> the SQL</span></div>
+            <div class="flex items-center gap-3"><span class="text-2xl">2️⃣</span><span><span class="highlight-blue">Validates</span> syntax</span></div>
+            <div class="flex items-center gap-3"><span class="text-2xl">3️⃣</span><span>Finds the <code class="inline-code">superheroes</code> table</span></div>
+            <div class="flex items-center gap-3"><span class="text-2xl">4️⃣</span><span>Creates a new <span class="highlight-pink">row</span></span></div>
+            <div class="flex items-center gap-3"><span class="text-2xl">5️⃣</span><span>Auto-generates <code class="inline-code">id = 1</code></span></div>
+            <div class="flex items-center gap-3"><span class="text-2xl">6️⃣</span><span>Stores row on <span class="highlight-green">disk</span> (via volume!)</span></div>
+            <div class="flex items-center gap-3"><span class="text-2xl">7️⃣</span><span>Returns <span class="font-bold">success</span> ✅</span></div>
+        </div>
+    </div>
+
+    <!-- VERIFY DATA -->
+    <div class="bg-white p-6 rounded-lg paper-shadow mb-8 transform -rotate-1">
+        <h3 class="text-2xl font-bold mb-4 text-gray-800">🔍 Verify the Data</h3>
+        <div class="code-block p-4 rounded-lg overflow-x-auto text-sm md:text-base mb-4">
+<pre><span style="color:#fd79a8">SELECT</span> * <span style="color:#fd79a8">FROM</span> superheroes;</pre>
+        </div>
+        <div class="p-4 info-box-green rounded-lg border-2 border-green-300">
+            <p class="font-bold text-green-800">Expected output:</p>
+            <div class="mt-2 text-green-700">
+                <div class="grid grid-cols-5 gap-2 text-center text-sm font-bold border-b-2 border-green-300 pb-2 mb-2">
+                    <div>id</div><div>name</div><div>real_name</div><div>universe</div><div>power_level</div>
+                </div>
+                <div class="grid grid-cols-5 gap-2 text-center text-sm">
+                    <div>1</div><div>Iron Man</div><div>Tony Stark</div><div>Marvel</div><div>95</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- PHASE 2 CHECKLIST -->
+    <div class="page-break"></div>
+    <div class="hero-dark p-8 rounded-lg paper-shadow mb-8 text-center">
+        <h3 class="text-2xl font-bold mb-6 text-yellow-300">✅ Phase 2 Checklist</h3>
+        <div class="grid md:grid-cols-2 gap-6 text-left">
+            <div>
+                <h4 class="font-bold text-xl text-green-300 mb-3">🏗️ Built</h4>
+                <div class="space-y-2">
+                    <div class="flex items-center gap-2"><span class="text-green-400 text-xl">✅</span><span>Docker environment</span></div>
+                    <div class="flex items-center gap-2"><span class="text-green-400 text-xl">✅</span><span>PostgreSQL container</span></div>
+                    <div class="flex items-center gap-2"><span class="text-green-400 text-xl">✅</span><span>Persistent volume</span></div>
+                    <div class="flex items-center gap-2"><span class="text-green-400 text-xl">✅</span><span>Database (<code class="inline-code">superhero_db</code>)</span></div>
+                    <div class="flex items-center gap-2"><span class="text-green-400 text-xl">✅</span><span>Table (<code class="inline-code">superheroes</code>)</span></div>
+                    <div class="flex items-center gap-2"><span class="text-green-400 text-xl">✅</span><span>First row (Iron Man!)</span></div>
+                </div>
+            </div>
+            <div>
+                <h4 class="font-bold text-xl text-blue-300 mb-3">🧠 Learned</h4>
+                <div class="space-y-2">
+                    <div class="flex items-center gap-2"><span class="text-blue-400 text-xl">📘</span><span>Images vs Containers</span></div>
+                    <div class="flex items-center gap-2"><span class="text-blue-400 text-xl">📘</span><span>Volumes (persistent storage)</span></div>
+                    <div class="flex items-center gap-2"><span class="text-blue-400 text-xl">📘</span><span>Port Mapping</span></div>
+                    <div class="flex items-center gap-2"><span class="text-blue-400 text-xl">📘</span><span>Docker Compose</span></div>
+                    <div class="flex items-center gap-2"><span class="text-blue-400 text-xl">📘</span><span>PostgreSQL Basics</span></div>
+                    <div class="flex items-center gap-2"><span class="text-blue-400 text-xl">📘</span><span>CREATE TABLE, INSERT, SELECT</span></div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- END OF PHASE 2 -->
+    <div class="sticky-note p-6 mb-8 text-center transform -rotate-1">
+        <h3 class="text-3xl font-bold mb-2 text-gray-800">🎉 End of Phase 2</h3>
+        <p class="text-2xl text-gray-800">You now have a <span class="highlight">real PostgreSQL database</span> running inside Docker!</p>
+    </div>
+
+    <!-- WHAT WE BUILT -->
+    <div class="bg-white p-6 rounded-lg paper-shadow mb-8 transform rotate-1">
+        <h3 class="text-2xl font-bold mb-4 text-gray-800">📦 What We Built <span class="emoji-big">🏗️</span></h3>
+        <div class="space-y-2">
+            <div class="flex items-center gap-2"><span class="w-2 h-2 bg-green-500 rounded-full"></span><span>A real PostgreSQL database running inside Docker</span></div>
+            <div class="flex items-center gap-2"><span class="w-2 h-2 bg-blue-500 rounded-full"></span><span>A <code class="inline-code">superheroes</code> table with proper columns and constraints</span></div>
+            <div class="flex items-center gap-2"><span class="w-2 h-2 bg-yellow-500 rounded-full"></span><span>Our first superhero: <span class="font-bold">Iron Man</span>!</span></div>
+        </div>
+    </div>
+
+    <!-- FILES CREATED -->
+    <div class="bg-white p-6 rounded-lg paper-shadow mb-8 transform -rotate-1">
+        <h3 class="text-2xl font-bold mb-4 text-gray-800">📁 Files Created</h3>
+        <div class="space-y-2 text-lg">
+            <div class="flex items-center gap-2"><span class="text-2xl">📄</span><code class="inline-code">.env</code> — Environment variables</div>
+            <div class="flex items-center gap-2"><span class="text-2xl">📄</span><code class="inline-code">docker-compose.yml</code> — Container definition</div>
+        </div>
+    </div>
+
+    <!-- COMMANDS USED -->
+    <div class="bg-white p-6 rounded-lg paper-shadow mb-8 transform rotate-1">
+        <h3 class="text-2xl font-bold mb-4 text-gray-800">⌨️ Commands Used</h3>
+        <div class="code-block p-4 rounded-lg overflow-x-auto text-sm md:text-base">
+<pre><span style="color:#fd79a8">docker compose up</span> -d
+<span style="color:#fd79a8">docker ps</span>
+<span style="color:#fd79a8">docker exec</span> -it superhero_postgres bash
+<span style="color:#fd79a8">psql</span> -U postgres
+<span style="color:#55efc4">\l</span>
+<span style="color:#55efc4">\c</span> superhero_db
+<span style="color:#55efc4">\dt</span>
+<span style="color:#55efc4">\d</span> superheroes
+<span style="color:#fd79a8">SELECT</span> * <span style="color:#fd79a8">FROM</span> superheroes;</pre>
+        </div>
+    </div>
+
+    <!-- ARCHITECTURE RECAP -->
+    <div class="hero-dark p-8 rounded-lg paper-shadow mb-8 text-center">
+        <h3 class="text-2xl font-bold mb-6 text-yellow-300">🏛️ Architecture Recap</h3>
+        <div class="space-y-2">
+            <div class="bg-blue-600 px-4 py-2 rounded inline-block">Your Machine</div>
+            <div class="text-yellow-400 text-2xl">⬇️</div>
+            <div class="bg-green-600 px-4 py-2 rounded inline-block">Docker Engine</div>
+            <div class="text-yellow-400 text-2xl">⬇️</div>
+            <div class="bg-purple-600 px-4 py-2 rounded inline-block">PostgreSQL Container</div>
+            <div class="text-yellow-400 text-2xl">⬇️</div>
+            <div class="bg-orange-600 px-4 py-2 rounded inline-block">superhero_db</div>
+            <div class="text-yellow-400 text-2xl">⬇️</div>
+            <div class="bg-red-600 px-4 py-2 rounded inline-block">superheroes table</div>
+        </div>
+        <div class="mt-6 text-2xl font-bold text-white">Database Ready! ✅</div>
+    </div>
+
+    <!-- BACKEND FLOW RECAP -->
+    <div class="sticky-note-blue p-6 mb-8 transform rotate-1">
+        <h3 class="text-2xl font-bold mb-3 text-gray-800">🔄 Backend Flow Recap</h3>
+        <p class="text-lg">Current state: <span class="font-bold">No Go Yet</span> — but Database Ready, Docker Ready, Table Ready! Next: we connect Go to PostgreSQL.</p>
+    </div>
+
+    <!-- NEXT STEPS -->
+    <div class="bg-white p-6 rounded-lg paper-shadow mb-8 transform -rotate-1">
+        <h3 class="text-2xl font-bold mb-4 text-gray-800">📚 Next Up: Phase 3 <span class="emoji-big">🐹</span></h3>
+        <p class="mb-4 text-lg">Phase 3: <span class="font-bold">Go + PostgreSQL Connection + database/sql + Repository Layer</span></p>
+        <p class="text-gray-700">This is where the <span class="highlight">most important part</span> of the learning journey begins!</p>
+    </div>
+
+    <!-- PRINT BUTTON -->
+    <div class="text-center no-print mb-8">
+        <button onclick="window.print()" class="bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 px-8 rounded-full text-xl shadow-lg transform transition hover:scale-105">
+            🖨️ Save as PDF / Print
+        </button>
+        <p class="mt-2 text-gray-600 text-sm">Use your browser's print dialog to save as PDF</p>
+    </div>
+
+    <!-- CONTINUE TO PHASE 3 BUTTON -->
+    <div class="text-center no-print mb-12">
+        <div class="inline-block sticky-note-green p-8 transform rotate-1">
+            <h3 class="text-2xl font-bold mb-4 text-gray-800 handwritten">Ready for the next adventure?</h3>
+            <p class="text-lg mb-4 text-gray-700">Phase 3: Go + PostgreSQL Connection + Repository Layer</p>
+            <button onclick="alert('🚀 Phase 3 coming up next! Let us connect Go to PostgreSQL and build our Repository Layer!')" class="bg-green-600 hover:bg-green-700 text-white font-bold py-4 px-10 rounded-full text-2xl shadow-lg transform transition hover:scale-110 hover:rotate-1">
+                🚀 Continue to Phase 3
+            </button>
+            <p class="mt-3 text-sm text-gray-600">Click to begin connecting Go to PostgreSQL!</p>
+        </div>
+    </div>
+
+</body>
+</html>

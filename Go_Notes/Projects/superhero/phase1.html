@@ -1,0 +1,1050 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Phase 1: Superhero API — Planning & Architecture</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Caveat:wght@400;600;700&family=Patrick+Hand&family=Indie+Flower&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Patrick Hand', cursive;
+            background-color: #f4f1ea;
+            background-image: 
+                linear-gradient(#e1e1e1 1px, transparent 1px),
+                linear-gradient(90deg, #e1e1e1 1px, transparent 1px);
+            background-size: 20px 20px;
+        }
+        .handwritten { font-family: 'Caveat', cursive; }
+        .highlight {
+            background: linear-gradient(120deg, #ffeaa7 0%, #ffeaa7 100%);
+            background-repeat: no-repeat; background-size: 100% 40%;
+            background-position: 0 88%; padding: 0 4px;
+        }
+        .highlight-blue {
+            background: linear-gradient(120deg, #74b9ff 0%, #74b9ff 100%);
+            background-repeat: no-repeat; background-size: 100% 40%;
+            background-position: 0 88%; padding: 0 4px;
+        }
+        .highlight-pink {
+            background: linear-gradient(120deg, #fd79a8 0%, #fd79a8 100%);
+            background-repeat: no-repeat; background-size: 100% 40%;
+            background-position: 0 88%; padding: 0 4px;
+        }
+        .highlight-green {
+            background: linear-gradient(120deg, #55efc4 0%, #55efc4 100%);
+            background-repeat: no-repeat; background-size: 100% 40%;
+            background-position: 0 88%; padding: 0 4px;
+        }
+        .sticky-note {
+            background: #fff740; box-shadow: 2px 2px 10px rgba(0,0,0,0.1);
+            transform: rotate(-2deg);
+        }
+        .sticky-note-blue {
+            background: #7ee8fa; transform: rotate(2deg);
+            box-shadow: 2px 2px 10px rgba(0,0,0,0.1);
+        }
+        .sticky-note-pink {
+            background: #ff9999; transform: rotate(-1deg);
+            box-shadow: 2px 2px 10px rgba(0,0,0,0.1);
+        }
+        .sticky-note-green {
+            background: #55efc4; transform: rotate(1deg);
+            box-shadow: 2px 2px 10px rgba(0,0,0,0.1);
+        }
+        .sticky-note-purple {
+            background: #a29bfe; transform: rotate(-1.5deg);
+            box-shadow: 2px 2px 10px rgba(0,0,0,0.1);
+        }
+        .sticky-note-orange {
+            background: #fab1a0; transform: rotate(1.5deg);
+            box-shadow: 2px 2px 10px rgba(0,0,0,0.1);
+        }
+        .code-block {
+            font-family: 'Courier New', monospace;
+            background: #2d3436; color: #dfe6e9;
+            position: relative;
+        }
+        .code-block::before {
+            content: ''; position: absolute;
+            top: -5px; left: -5px; right: -5px; bottom: -5px;
+            background: #fff; z-index: -1;
+            transform: rotate(1deg);
+            box-shadow: 3px 3px 10px rgba(0,0,0,0.1);
+        }
+        code.inline-code {
+            font-family: 'Courier New', monospace;
+            background: #2d3436; color: #dfe6e9;
+            padding: 2px 8px; border-radius: 4px;
+            font-size: 0.9em;
+        }
+        @keyframes float {
+            0%, 100% { transform: translateY(0px) rotate(0deg); }
+            50% { transform: translateY(-10px) rotate(2deg); }
+        }
+        .float-anim { animation: float 3s ease-in-out infinite; }
+        @keyframes bounce {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-10px); }
+        }
+        .emoji-big {
+            font-size: 2.5rem; display: inline-block;
+            animation: bounce 2s infinite;
+        }
+        .paper-shadow {
+            box-shadow: 
+                0 1px 1px rgba(0,0,0,0.15), 
+                0 10px 0 -5px #eee, 
+                0 10px 1px -4px rgba(0,0,0,0.15), 
+                0 20px 0 -10px #eee, 
+                0 20px 1px -9px rgba(0,0,0,0.15);
+        }
+        .diagram-box {
+            border: 3px solid #2d3436; border-radius: 15px;
+            position: relative; background: white;
+        }
+        .diagram-box::before {
+            content: ''; position: absolute;
+            top: 5px; left: 5px; right: -5px; bottom: -5px;
+            border: 2px solid #b2bec3; border-radius: 15px; z-index: -1;
+        }
+        .tape {
+            position: absolute; top: -15px; left: 50%;
+            transform: translateX(-50%) rotate(-2deg);
+            width: 100px; height: 30px;
+            background: rgba(255,255,255,0.4);
+            box-shadow: 0 1px 3px rgba(0,0,0,0.2);
+        }
+        .step-badge {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white; width: 40px; height: 40px;
+            border-radius: 50%; display: flex;
+            align-items: center; justify-content: center;
+            font-weight: bold; font-size: 1.2rem; flex-shrink: 0;
+        }
+        .info-box-blue {
+            background: #ebf8ff; border-left: 4px solid #4299e1;
+        }
+        .info-box-green {
+            background: #f0fff4; border-left: 4px solid #48bb78;
+        }
+        .info-box-yellow {
+            background: #fffff0; border-left: 4px solid #ecc94b;
+        }
+        .info-box-red {
+            background: #fff5f5; border-left: 4px solid #f56565;
+        }
+        .info-box-purple {
+            background: #faf5ff; border-left: 4px solid #9f7aea;
+        }
+        .card-good {
+            background: #f0fff4; border: 2px solid #9ae6b4;
+        }
+        .card-bad {
+            background: #fff5f5; border: 2px solid #feb2b2;
+        }
+        .card-neutral {
+            background: #f7fafc; border: 2px solid #e2e8f0;
+        }
+        .tag-pill {
+            background: white; padding: 4px 12px;
+            border-radius: 9999px;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+            font-size: 0.85rem; display: inline-block; margin: 2px;
+        }
+        .flow-arrow {
+            text-align: center; font-size: 2rem;
+            color: #a0aec0; margin: 8px 0;
+        }
+        .hero-dark {
+            background: #2d3748; color: white;
+        }
+        .hero-dark .highlight { color: #2d3748; }
+        @media print {
+            body { background: white; }
+            .no-print { display: none; }
+            .page-break { page-break-before: always; }
+        }
+        @media (max-width: 768px) {
+            .emoji-big { font-size: 1.8rem; }
+            .handwritten { font-size: 0.9em; }
+        }
+    </style>
+<base target="_blank">
+</head>
+<body class="p-4 md:p-8 max-w-4xl mx-auto">
+
+    <!-- ═══════════════════════════════════════════════════════════════ -->
+    <!--                         TITLE SECTION                           -->
+    <!-- ═══════════════════════════════════════════════════════════════ -->
+    <div class="relative mb-12 text-center">
+        <div class="tape"></div>
+        <h1 class="text-5xl md:text-7xl font-bold text-gray-800 mb-4 handwritten transform -rotate-1">
+            Superhero API
+        </h1>
+        <div class="text-2xl text-gray-600 handwritten">Phase 1: Project Planning & Architecture Blueprint</div>
+        <div class="mt-4 text-6xl float-anim">🦸‍♂️</div>
+    </div>
+
+    <!-- ═══════════════════════════════════════════════════════════════ -->
+    <!--                    START HERE SECTION                           -->
+    <!-- ═══════════════════════════════════════════════════════════════ -->
+    <div class="bg-white p-6 rounded-lg paper-shadow mb-8 relative transform rotate-1">
+        <div class="absolute -top-3 -right-3 bg-red-500 text-white px-4 py-1 rounded-full text-sm font-bold transform rotate-12">START HERE</div>
+        <h2 class="text-3xl font-bold mb-4 text-gray-800">What Are We Building? <span class="emoji-big">🚀</span></h2>
+        <div class="space-y-2 text-xl text-gray-700">
+            <div class="flex items-center gap-2">
+                <span class="w-2 h-2 bg-blue-500 rounded-full"></span>
+                <span>A full <span class="highlight">Superhero CRUD API</span> in Go with Gin</span>
+            </div>
+            <div class="flex items-center gap-2">
+                <span class="w-2 h-2 bg-green-500 rounded-full"></span>
+                <span>PostgreSQL database running inside <span class="highlight-blue">Docker</span></span>
+            </div>
+            <div class="flex items-center gap-2">
+                <span class="w-2 h-2 bg-yellow-500 rounded-full"></span>
+                <span>Clean <span class="highlight-pink">layered architecture</span> with separation of concerns</span>
+            </div>
+        </div>
+        <div class="mt-4 p-4 info-box-blue rounded-lg">
+            <p class="text-lg font-semibold text-blue-900">
+                Think of this phase like an <span class="highlight">architect creating a blueprint</span> of a house. If the blueprint is solid, building becomes much easier!
+            </p>
+        </div>
+    </div>
+
+    <!-- ═══════════════════════════════════════════════════════════════ -->
+    <!--                    SUPERHERO DATA MODEL                         -->
+    <!-- ═══════════════════════════════════════════════════════════════ -->
+    <div class="sticky-note p-6 mb-8 text-center transform -rotate-1">
+        <h3 class="text-3xl font-bold mb-2 text-gray-800">📦 Our Superhero Data</h3>
+        <p class="text-2xl text-gray-800">
+            Every superhero has: <span class="highlight">name</span>, <span class="highlight-blue">real_name</span>, <span class="highlight-pink">universe</span>, <span class="highlight-green">power_level</span>
+        </p>
+    </div>
+
+    <div class="bg-white p-6 rounded-lg paper-shadow mb-8 transform rotate-1">
+        <h3 class="text-2xl font-bold mb-4 text-gray-800">Example JSON Response</h3>
+        <div class="code-block p-4 rounded-lg overflow-x-auto text-sm md:text-base">
+<pre>{
+  <span style="color:#fd79a8">"id"</span>: <span style="color:#ffeaa7">1</span>,
+  <span style="color:#fd79a8">"name"</span>: <span style="color:#ffeaa7">"Iron Man"</span>,
+  <span style="color:#fd79a8">"real_name"</span>: <span style="color:#ffeaa7">"Tony Stark"</span>,
+  <span style="color:#fd79a8">"universe"</span>: <span style="color:#ffeaa7">"Marvel"</span>,
+  <span style="color:#fd79a8">"power_level"</span>: <span style="color:#ffeaa7">95</span>
+}</pre>
+        </div>
+        <div class="mt-4 p-4 info-box-green rounded-lg border-2 border-green-300">
+            <p class="font-bold text-green-800">✅ This is the shape of data our API will send and receive!</p>
+        </div>
+    </div>
+
+    <!-- ═══════════════════════════════════════════════════════════════ -->
+    <!--                    API ENDPOINTS                                -->
+    <!-- ═══════════════════════════════════════════════════════════════ -->
+    <div class="page-break"></div>
+    <div class="bg-white p-6 rounded-lg paper-shadow mb-8 transform -rotate-1">
+        <div class="flex items-center gap-2 mb-4">
+            <span class="step-badge">1</span>
+            <h2 class="text-3xl font-bold text-gray-800">API Endpoints We'll Build</h2>
+        </div>
+
+        <div class="info-box-yellow p-4 rounded-lg mb-4">
+            <p class="text-xl">Five core operations every backend needs: <span class="font-bold">Create, Read, Update, Delete</span></p>
+        </div>
+
+        <div class="overflow-hidden rounded-lg border-2 border-gray-800 mb-4">
+            <table class="w-full text-lg">
+                <thead class="bg-gray-800 text-white">
+                    <tr>
+                        <th class="p-3 text-left">Method</th>
+                        <th class="p-3 text-left">Endpoint</th>
+                        <th class="p-3 text-left">What It Does</th>
+                    </tr>
+                </thead>
+                <tbody class="divide-y-2 divide-gray-300">
+                    <tr class="bg-green-50">
+                        <td class="p-3 font-bold text-green-700">POST</td>
+                        <td class="p-3 font-mono">/superheroes</td>
+                        <td class="p-3">Create a new superhero</td>
+                    </tr>
+                    <tr class="bg-white">
+                        <td class="p-3 font-bold text-blue-700">GET</td>
+                        <td class="p-3 font-mono">/superheroes</td>
+                        <td class="p-3">Get ALL superheroes</td>
+                    </tr>
+                    <tr class="bg-yellow-50">
+                        <td class="p-3 font-bold text-blue-700">GET</td>
+                        <td class="p-3 font-mono">/superheroes/:id</td>
+                        <td class="p-3">Get ONE superhero by ID</td>
+                    </tr>
+                    <tr class="bg-white">
+                        <td class="p-3 font-bold text-yellow-700">PUT</td>
+                        <td class="p-3 font-mono">/superheroes/:id</td>
+                        <td class="p-3">Update a superhero</td>
+                    </tr>
+                    <tr class="bg-red-50">
+                        <td class="p-3 font-bold text-red-700">DELETE</td>
+                        <td class="p-3 font-mono">/superheroes/:id</td>
+                        <td class="p-3">Remove a superhero</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+
+        <div class="p-4 info-box-purple rounded-lg">
+            <p class="text-lg text-purple-900">
+                <span class="font-bold">💡 Remember:</span> <code class="inline-code">:id</code> is a <span class="highlight">URL parameter</span>. When you visit <code class="inline-code">/superheroes/5</code>, the handler sees <code class="inline-code">id = 5</code>.
+            </p>
+        </div>
+    </div>
+
+    <!-- ═══════════════════════════════════════════════════════════════ -->
+    <!--                    WHY THIS PROJECT?                            -->
+    <!-- ═══════════════════════════════════════════════════════════════ -->
+    <div class="sticky-note-blue p-6 mb-8 transform rotate-1">
+        <h3 class="text-2xl font-bold mb-3 text-gray-800">🤔 Why This Project?</h3>
+        <p class="text-lg">This project teaches <span class="font-bold">nearly every fundamental backend concept</span> — making it the perfect beginner project!</p>
+    </div>
+
+    <div class="bg-white p-6 rounded-lg paper-shadow mb-8 transform rotate-1">
+        <h3 class="text-2xl font-bold mb-4 text-center text-gray-800">What You'll Learn <span class="emoji-big">🎓</span></h3>
+        <div class="flex flex-wrap justify-center gap-2 text-sm">
+            <span class="tag-pill">Go Packages</span>
+            <span class="tag-pill">Structs</span>
+            <span class="tag-pill">Interfaces</span>
+            <span class="tag-pill">Error Handling</span>
+            <span class="tag-pill">PostgreSQL</span>
+            <span class="tag-pill">SQL Queries</span>
+            <span class="tag-pill">Docker Images</span>
+            <span class="tag-pill">Containers</span>
+            <span class="tag-pill">Volumes</span>
+            <span class="tag-pill">Networking</span>
+            <span class="tag-pill">database/sql</span>
+            <span class="tag-pill">Gin Router</span>
+            <span class="tag-pill">Handlers</span>
+            <span class="tag-pill">Repositories</span>
+            <span class="tag-pill">Validation</span>
+        </div>
+    </div>
+
+    <!-- ═══════════════════════════════════════════════════════════════ -->
+    <!--                    ARCHITECTURE DIAGRAM                         -->
+    <!-- ═══════════════════════════════════════════════════════════════ -->
+    <div class="page-break"></div>
+    <div class="bg-white p-6 rounded-lg paper-shadow mb-8 transform -rotate-1">
+        <h3 class="text-2xl font-bold mb-6 text-center text-gray-800">🏗️ Final Architecture</h3>
+
+        <div class="flex flex-wrap justify-center items-center gap-2 text-lg">
+            <div class="diagram-box p-3 bg-blue-100 text-center">
+                <div class="text-2xl">👤</div>
+                <div class="font-bold">Client</div>
+                <div class="text-sm text-gray-600">Postman / Browser</div>
+            </div>
+            <span class="text-2xl text-blue-500">→</span>
+            <div class="diagram-box p-3 bg-yellow-100 text-center">
+                <div class="text-2xl">🌐</div>
+                <div class="font-bold">Gin Router</div>
+                <div class="text-sm text-gray-600">Routes requests</div>
+            </div>
+            <span class="text-2xl text-yellow-500">→</span>
+            <div class="diagram-box p-3 bg-green-100 text-center">
+                <div class="text-2xl">⚙️</div>
+                <div class="font-bold">Handler Layer</div>
+                <div class="text-sm text-gray-600">HTTP + JSON logic</div>
+            </div>
+            <span class="text-2xl text-green-500">→</span>
+            <div class="diagram-box p-3 bg-purple-100 text-center">
+                <div class="text-2xl">📂</div>
+                <div class="font-bold">Repository</div>
+                <div class="text-sm text-gray-600">SQL queries</div>
+            </div>
+            <span class="text-2xl text-purple-500">→</span>
+            <div class="diagram-box p-3 bg-orange-100 text-center">
+                <div class="text-2xl">🔗</div>
+                <div class="font-bold">database/sql</div>
+                <div class="text-sm text-gray-600">Go's DB package</div>
+            </div>
+            <span class="text-2xl text-orange-500">→</span>
+            <div class="diagram-box p-3 bg-red-100 text-center">
+                <div class="text-2xl">🐘</div>
+                <div class="font-bold">PostgreSQL</div>
+                <div class="text-sm text-gray-600">Data storage</div>
+            </div>
+        </div>
+    </div>
+
+    <!-- ═══════════════════════════════════════════════════════════════ -->
+    <!--                    WHAT IS EACH LAYER?                          -->
+    <!-- ═══════════════════════════════════════════════════════════════ -->
+    <div class="sticky-note p-6 mb-8 text-center transform -rotate-1">
+        <h3 class="text-3xl font-bold mb-2 text-gray-800">🧩 What Is Each Layer?</h3>
+        <p class="text-2xl text-gray-800">
+            Think of it like a <span class="highlight">restaurant kitchen</span> — everyone has a job!
+        </p>
+    </div>
+
+    <!-- Client -->
+    <div class="bg-white p-6 rounded-lg paper-shadow mb-6 transform rotate-1">
+        <div class="flex items-center gap-3 mb-3">
+            <span class="text-3xl">👤</span>
+            <h3 class="text-2xl font-bold text-gray-800">Client</h3>
+        </div>
+        <p class="text-lg text-gray-700 mb-3">
+            Examples: <span class="highlight">Postman</span>, Browser, Frontend App, Mobile App
+        </p>
+        <div class="p-3 info-box-blue rounded-lg">
+            <p class="text-blue-900">The client <span class="font-bold">sends HTTP requests</span>. Example: <code class="inline-code">GET /superheroes</code></p>
+        </div>
+    </div>
+
+    <!-- Gin Router -->
+    <div class="bg-white p-6 rounded-lg paper-shadow mb-6 transform -rotate-1">
+        <div class="flex items-center gap-3 mb-3">
+            <span class="text-3xl">🌐</span>
+            <h3 class="text-2xl font-bold text-gray-800">Gin Router</h3>
+        </div>
+        <p class="text-lg text-gray-700 mb-3">
+            Receives incoming requests and <span class="highlight-blue">decides where they go</span>.
+        </p>
+        <div class="p-3 info-box-yellow rounded-lg">
+            <p class="text-yellow-900">Example: <code class="inline-code">GET /superheroes</code> → Router decides → <code class="inline-code">GetAllSuperheroesHandler</code></p>
+        </div>
+    </div>
+
+    <!-- Handler Layer -->
+    <div class="bg-white p-6 rounded-lg paper-shadow mb-6 transform rotate-1">
+        <div class="flex items-center gap-3 mb-3">
+            <span class="text-3xl">⚙️</span>
+            <h3 class="text-2xl font-bold text-gray-800">Handler Layer</h3>
+        </div>
+        <p class="text-lg text-gray-700 mb-3">
+            Handlers understand <span class="highlight">HTTP Requests</span>, <span class="highlight-blue">JSON</span>, <span class="highlight-pink">Status Codes</span>, and <span class="highlight-green">URL Parameters</span>.
+        </p>
+        <div class="p-3 info-box-green rounded-lg">
+            <p class="text-green-900">Example: <code class="inline-code">GET /superheroes/5</code> → Handler extracts <code class="inline-code">id = 5</code> → Asks Repository: "Please fetch superhero 5"</p>
+        </div>
+    </div>
+
+    <!-- Repository Layer -->
+    <div class="bg-white p-6 rounded-lg paper-shadow mb-6 transform -rotate-1">
+        <div class="flex items-center gap-3 mb-3">
+            <span class="text-3xl">📂</span>
+            <h3 class="text-2xl font-bold text-gray-800">Repository Layer</h3>
+        </div>
+        <p class="text-lg text-gray-700 mb-3">
+            Contains <span class="highlight">all database logic</span> and SQL queries.
+        </p>
+        <div class="code-block p-3 rounded-lg overflow-x-auto text-sm mb-3">
+<pre><span style="color:#fd79a8">SELECT</span> * <span style="color:#fd79a8">FROM</span> superheroes
+<span style="color:#fd79a8">WHERE</span> id = <span style="color:#ffeaa7">5</span>;</pre>
+        </div>
+        <div class="p-3 info-box-purple rounded-lg">
+            <p class="text-purple-900"><span class="font-bold">Key Rule:</span> The handler should <span class="font-bold">NOT</span> know SQL. The repository should. This separation is called <span class="highlight">Separation of Concerns</span>.</p>
+        </div>
+    </div>
+
+    <!-- database/sql -->
+    <div class="bg-white p-6 rounded-lg paper-shadow mb-6 transform rotate-1">
+        <div class="flex items-center gap-3 mb-3">
+            <span class="text-3xl">🔗</span>
+            <h3 class="text-2xl font-bold text-gray-800">database/sql</h3>
+        </div>
+        <p class="text-lg text-gray-700 mb-3">
+            Go's standard database package. Provides <span class="highlight-blue">db.Query()</span>, <span class="highlight-blue">db.QueryRow()</span>, <span class="highlight-blue">db.Exec()</span>.
+        </p>
+        <div class="p-3 info-box-yellow rounded-lg">
+            <p class="text-yellow-900">It does <span class="font-bold">NOT</span> understand PostgreSQL itself. It needs a <span class="highlight">driver</span> to speak PostgreSQL.</p>
+        </div>
+    </div>
+
+    <!-- PostgreSQL -->
+    <div class="bg-white p-6 rounded-lg paper-shadow mb-8 transform -rotate-1">
+        <div class="flex items-center gap-3 mb-3">
+            <span class="text-3xl">🐘</span>
+            <h3 class="text-2xl font-bold text-gray-800">PostgreSQL</h3>
+        </div>
+        <p class="text-lg text-gray-700 mb-3">
+            Stores data <span class="highlight">permanently</span>. This is our <span class="highlight-pink">source of truth</span>.
+        </p>
+        <div class="grid grid-cols-4 gap-2 text-center text-sm mb-3">
+            <div class="bg-gray-100 p-2 rounded font-bold">id</div>
+            <div class="bg-gray-100 p-2 rounded font-bold">name</div>
+            <div class="bg-gray-100 p-2 rounded font-bold">universe</div>
+            <div class="bg-gray-100 p-2 rounded font-bold">power_level</div>
+            <div class="bg-white p-2 rounded border">1</div>
+            <div class="bg-white p-2 rounded border">Iron Man</div>
+            <div class="bg-white p-2 rounded border">Marvel</div>
+            <div class="bg-white p-2 rounded border">95</div>
+            <div class="bg-white p-2 rounded border">2</div>
+            <div class="bg-white p-2 rounded border">Batman</div>
+            <div class="bg-white p-2 rounded border">DC</div>
+            <div class="bg-white p-2 rounded border">80</div>
+        </div>
+        <div class="p-3 info-box-green rounded-lg">
+            <p class="text-green-900">PostgreSQL is the <span class="font-bold">final destination</span> where all our superhero data lives safely.</p>
+        </div>
+    </div>
+
+    <!-- ═══════════════════════════════════════════════════════════════ -->
+    <!--                    FULL REQUEST FLOW                            -->
+    <!-- ═══════════════════════════════════════════════════════════════ -->
+    <div class="page-break"></div>
+    <div class="hero-dark p-8 rounded-lg paper-shadow mb-8 text-center">
+        <h3 class="text-2xl font-bold mb-6 text-yellow-300">🔄 Full Request Flow</h3>
+        <p class="mb-4 text-gray-300">Imagine: <code class="inline-code">GET /superheroes/1</code></p>
+
+        <div class="space-y-2">
+            <div class="diagram-box p-4 text-center bg-green-50 mx-auto max-w-xs">
+                <div class="text-4xl mb-2">👤</div>
+                <div class="font-bold text-xl text-gray-800">Client</div>
+                <div class="text-sm text-gray-600">"Need superhero #1"</div>
+            </div>
+            <div class="flow-arrow">⬇️</div>
+            <div class="diagram-box p-4 text-center bg-yellow-50 mx-auto max-w-xs">
+                <div class="text-4xl mb-2">🌐</div>
+                <div class="font-bold text-xl text-gray-800">Gin Router</div>
+                <div class="text-sm text-gray-600">"Route matched!"</div>
+            </div>
+            <div class="flow-arrow">⬇️</div>
+            <div class="diagram-box p-4 text-center bg-blue-50 mx-auto max-w-xs">
+                <div class="text-4xl mb-2">⚙️</div>
+                <div class="font-bold text-xl text-gray-800">Handler</div>
+                <div class="text-sm text-gray-600">"Extract ID = 1"</div>
+            </div>
+            <div class="flow-arrow">⬇️</div>
+            <div class="diagram-box p-4 text-center bg-purple-50 mx-auto max-w-xs">
+                <div class="text-4xl mb-2">📂</div>
+                <div class="font-bold text-xl text-gray-800">Repository</div>
+                <div class="text-sm text-gray-600">"SELECT * WHERE id = 1"</div>
+            </div>
+            <div class="flow-arrow">⬇️</div>
+            <div class="diagram-box p-4 text-center bg-orange-50 mx-auto max-w-xs">
+                <div class="text-4xl mb-2">🔗</div>
+                <div class="font-bold text-xl text-gray-800">database/sql</div>
+                <div class="text-sm text-gray-600">"Talks to PostgreSQL"</div>
+            </div>
+            <div class="flow-arrow">⬇️</div>
+            <div class="diagram-box p-4 text-center bg-red-50 mx-auto max-w-xs">
+                <div class="text-4xl mb-2">🐘</div>
+                <div class="font-bold text-xl text-gray-800">PostgreSQL</div>
+                <div class="text-sm text-gray-600">"Row found!"</div>
+            </div>
+            <div class="flow-arrow">⬇️</div>
+            <div class="diagram-box p-4 text-center bg-gray-100 mx-auto max-w-xs">
+                <div class="text-4xl mb-2">📄</div>
+                <div class="font-bold text-xl text-gray-800">JSON Response</div>
+                <div class="text-sm text-gray-600">{"id":1, "name":"Iron Man"}</div>
+            </div>
+            <div class="flow-arrow">⬇️</div>
+            <div class="diagram-box p-4 text-center bg-green-50 mx-auto max-w-xs">
+                <div class="text-4xl mb-2">👤</div>
+                <div class="font-bold text-xl text-gray-800">Client</div>
+                <div class="text-sm text-gray-600">"Done! ✅"</div>
+            </div>
+        </div>
+    </div>
+
+    <!-- ═══════════════════════════════════════════════════════════════ -->
+    <!--                    DOCKER STRATEGY                              -->
+    <!-- ═══════════════════════════════════════════════════════════════ -->
+    <div class="sticky-note-blue p-6 mb-8 transform rotate-1">
+        <h3 class="text-2xl font-bold mb-3 text-gray-800">🐳 Docker Strategy</h3>
+        <p class="text-lg">Instead of installing PostgreSQL directly on your machine, we'll run it inside Docker. One command: <span class="font-bold">docker compose up</span> — everything starts!</p>
+    </div>
+
+    <div class="grid md:grid-cols-2 gap-4 mb-8">
+        <div class="card-bad p-4 rounded-lg">
+            <h4 class="font-bold text-xl mb-2 text-red-800">❌ Without Docker</h4>
+            <ul class="list-disc list-inside space-y-1 text-red-700">
+                <li>Install PostgreSQL manually</li>
+                <li>Configure PostgreSQL</li>
+                <li>Manage versions</li>
+                <li>Fix environment issues</li>
+                <li>Lots of pain 😫</li>
+            </ul>
+        </div>
+
+        <div class="card-good p-4 rounded-lg">
+            <h4 class="font-bold text-xl mb-2 text-green-800">✅ With Docker</h4>
+            <ul class="list-disc list-inside space-y-1 text-green-700">
+                <li><code class="inline-code">docker compose up</code></li>
+                <li>Everything starts automatically</li>
+                <li>Same environment everywhere</li>
+                <li>Easy to clean up</li>
+                <li>Simple! 😊</li>
+            </ul>
+        </div>
+    </div>
+
+    <!-- Docker Concepts -->
+    <div class="bg-white p-6 rounded-lg paper-shadow mb-8 transform rotate-1">
+        <h3 class="text-2xl font-bold mb-4 text-gray-800">📦 Key Docker Concepts <span class="emoji-big">🐳</span></h3>
+
+        <div class="space-y-4">
+            <div class="flex gap-4 items-start">
+                <div class="bg-blue-500 text-white w-8 h-8 rounded-full flex items-center justify-center font-bold flex-shrink-0">1</div>
+                <div>
+                    <span class="font-bold text-lg">Image</span>
+                    <p class="text-gray-700">A <span class="highlight">blueprint</span>. Example: <code class="inline-code">postgres:17</code>. Like a recipe — not running yet.</p>
+                </div>
+            </div>
+            <div class="flex gap-4 items-start">
+                <div class="bg-green-500 text-white w-8 h-8 rounded-full flex items-center justify-center font-bold flex-shrink-0">2</div>
+                <div>
+                    <span class="font-bold text-lg">Container</span>
+                    <p class="text-gray-700">A <span class="highlight-blue">running image</span>. Like: <span class="italic">Image = Class, Container = Object</span></p>
+                </div>
+            </div>
+            <div class="flex gap-4 items-start">
+                <div class="bg-yellow-500 text-white w-8 h-8 rounded-full flex items-center justify-center font-bold flex-shrink-0">3</div>
+                <div>
+                    <span class="font-bold text-lg">Volume</span>
+                    <p class="text-gray-700"><span class="highlight-pink">Persistent storage</span>. Without it: container deleted = database deleted. Bad!</p>
+                </div>
+            </div>
+            <div class="flex gap-4 items-start">
+                <div class="bg-purple-500 text-white w-8 h-8 rounded-full flex items-center justify-center font-bold flex-shrink-0">4</div>
+                <div>
+                    <span class="font-bold text-lg">Port Mapping</span>
+                    <p class="text-gray-700">PostgreSQL inside container runs on <code class="inline-code">5432</code>. We expose it as <code class="inline-code">localhost:5432</code> so Go can connect.</p>
+                </div>
+            </div>
+            <div class="flex gap-4 items-start">
+                <div class="bg-red-500 text-white w-8 h-8 rounded-full flex items-center justify-center font-bold flex-shrink-0">5</div>
+                <div>
+                    <span class="font-bold text-lg">Docker Compose</span>
+                    <p class="text-gray-700">Instead of long <code class="inline-code">docker run ...</code> commands, we create a <code class="inline-code">docker-compose.yml</code> file and run <code class="inline-code">docker compose up</code>.</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- ═══════════════════════════════════════════════════════════════ -->
+    <!--                    DATABASE DESIGN                              -->
+    <!-- ═══════════════════════════════════════════════════════════════ -->
+    <div class="page-break"></div>
+    <div class="sticky-note p-6 mb-8 text-center transform -rotate-1">
+        <h3 class="text-3xl font-bold mb-2 text-gray-800">🗄️ Database Design</h3>
+        <p class="text-2xl text-gray-800">
+            We need <span class="highlight">one table</span>: <code class="inline-code">superheroes</code>
+        </p>
+    </div>
+
+    <div class="bg-white p-6 rounded-lg paper-shadow mb-8 transform -rotate-1">
+        <h3 class="text-2xl font-bold mb-4 text-center text-gray-800">Table: <code class="inline-code">superheroes</code></h3>
+
+        <div class="overflow-hidden rounded-lg border-2 border-gray-800">
+            <table class="w-full text-lg">
+                <thead class="bg-gray-800 text-white">
+                    <tr>
+                        <th class="p-3 text-left">Column</th>
+                        <th class="p-3 text-left">Type</th>
+                        <th class="p-3 text-left">Why?</th>
+                    </tr>
+                </thead>
+                <tbody class="divide-y-2 divide-gray-300">
+                    <tr class="bg-blue-50">
+                        <td class="p-3 font-mono font-bold">id</td>
+                        <td class="p-3 font-mono">SERIAL</td>
+                        <td class="p-3">Unique identifier, auto-increments (1, 2, 3...)</td>
+                    </tr>
+                    <tr class="bg-white">
+                        <td class="p-3 font-mono font-bold">name</td>
+                        <td class="p-3 font-mono">VARCHAR</td>
+                        <td class="p-3">Hero name: "Iron Man", "Batman"</td>
+                    </tr>
+                    <tr class="bg-yellow-50">
+                        <td class="p-3 font-mono font-bold">real_name</td>
+                        <td class="p-3 font-mono">VARCHAR</td>
+                        <td class="p-3">Secret identity: "Tony Stark", "Bruce Wayne"</td>
+                    </tr>
+                    <tr class="bg-white">
+                        <td class="p-3 font-mono font-bold">universe</td>
+                        <td class="p-3 font-mono">VARCHAR</td>
+                        <td class="p-3">"Marvel" or "DC"</td>
+                    </tr>
+                    <tr class="bg-green-50">
+                        <td class="p-3 font-mono font-bold">power_level</td>
+                        <td class="p-3 font-mono">INTEGER</td>
+                        <td class="p-3">Simple numeric ranking: 95, 80, 70</td>
+                    </tr>
+                    <tr class="bg-white">
+                        <td class="p-3 font-mono font-bold">created_at</td>
+                        <td class="p-3 font-mono">TIMESTAMP</td>
+                        <td class="p-3">When the hero was added to the database</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+
+        <div class="mt-4 p-4 info-box-green rounded-lg">
+            <p class="text-green-900"><span class="font-bold">💡 Tip:</span> <code class="inline-code">id</code> is our <span class="highlight">Primary Key</span> — it uniquely identifies each row. No two heroes can have the same ID!</p>
+        </div>
+    </div>
+
+    <!-- PostgreSQL Topics -->
+    <div class="bg-white p-6 rounded-lg paper-shadow mb-8 transform rotate-1">
+        <h3 class="text-2xl font-bold mb-4 text-gray-800">📚 PostgreSQL Topics We'll Learn <span class="emoji-big">🐘</span></h3>
+        <div class="flex flex-wrap justify-center gap-2 text-sm">
+            <span class="tag-pill">CREATE DATABASE</span>
+            <span class="tag-pill">CREATE TABLE</span>
+            <span class="tag-pill">INSERT</span>
+            <span class="tag-pill">SELECT</span>
+            <span class="tag-pill">UPDATE</span>
+            <span class="tag-pill">DELETE</span>
+            <span class="tag-pill">WHERE</span>
+            <span class="tag-pill">ORDER BY</span>
+            <span class="tag-pill">LIMIT</span>
+            <span class="tag-pill">Primary Keys</span>
+            <span class="tag-pill">Constraints</span>
+        </div>
+        <div class="mt-4 p-4 info-box-purple rounded-lg">
+            <p class="text-purple-900">Not through theory lectures — through <span class="font-bold">our superhero data</span>! 🦸‍♂️</p>
+        </div>
+    </div>
+
+    <!-- ═══════════════════════════════════════════════════════════════ -->
+    <!--                    GO STRATEGY                                  -->
+    <!-- ═══════════════════════════════════════════════════════════════ -->
+    <div class="sticky-note-green p-6 mb-8 transform rotate-1">
+        <h3 class="text-2xl font-bold mb-3 text-gray-800">🐹 Go Strategy</h3>
+        <p class="text-lg">We'll build this API using Go's best tools and patterns. Here's our tech stack:</p>
+    </div>
+
+    <div class="bg-white p-6 rounded-lg paper-shadow mb-8 transform -rotate-1">
+        <div class="space-y-4">
+            <div class="flex gap-4 items-start">
+                <div class="bg-blue-500 text-white w-8 h-8 rounded-full flex items-center justify-center font-bold flex-shrink-0">1</div>
+                <div>
+                    <span class="font-bold text-lg">Gin</span>
+                    <p class="text-gray-700">For the <span class="highlight">HTTP API</span> and routing. Fast and beginner-friendly!</p>
+                </div>
+            </div>
+            <div class="flex gap-4 items-start">
+                <div class="bg-green-500 text-white w-8 h-8 rounded-full flex items-center justify-center font-bold flex-shrink-0">2</div>
+                <div>
+                    <span class="font-bold text-lg">database/sql</span>
+                    <p class="text-gray-700">Go's standard package for <span class="highlight-blue">database communication</span>.</p>
+                </div>
+            </div>
+            <div class="flex gap-4 items-start">
+                <div class="bg-yellow-500 text-white w-8 h-8 rounded-full flex items-center justify-center font-bold flex-shrink-0">3</div>
+                <div>
+                    <span class="font-bold text-lg">PostgreSQL Driver</span>
+                    <p class="text-gray-700">Allows Go to <span class="highlight-pink">speak PostgreSQL</span> (like a translator).</p>
+                </div>
+            </div>
+            <div class="flex gap-4 items-start">
+                <div class="bg-purple-500 text-white w-8 h-8 rounded-full flex items-center justify-center font-bold flex-shrink-0">4</div>
+                <div>
+                    <span class="font-bold text-lg">Environment Variables</span>
+                    <p class="text-gray-700">For <span class="highlight-green">configuration</span> (DB host, port, password) — no hardcoded secrets!</p>
+                </div>
+            </div>
+            <div class="flex gap-4 items-start">
+                <div class="bg-red-500 text-white w-8 h-8 rounded-full flex items-center justify-center font-bold flex-shrink-0">5</div>
+                <div>
+                    <span class="font-bold text-lg">Repository Pattern</span>
+                    <p class="text-gray-700">For <span class="font-bold">clean architecture</span> — keeping database logic separate from HTTP logic.</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- ═══════════════════════════════════════════════════════════════ -->
+    <!--                    PROJECT STRUCTURE                            -->
+    <!-- ═══════════════════════════════════════════════════════════════ -->
+    <div class="page-break"></div>
+    <div class="sticky-note-purple p-6 mb-8 transform -rotate-1">
+        <h3 class="text-2xl font-bold mb-3 text-gray-800">📁 Project Structure Roadmap</h3>
+        <p class="text-lg">A well-organized folder structure makes your code easy to navigate and maintain!</p>
+    </div>
+
+    <div class="bg-white p-6 rounded-lg paper-shadow mb-8 transform rotate-1">
+        <h3 class="text-2xl font-bold mb-4 text-gray-800">Final Folder Tree <span class="emoji-big">🌳</span></h3>
+
+        <div class="code-block p-4 rounded-lg overflow-x-auto text-sm md:text-base">
+<pre>superhero-api/
+│
+├── <span style="color:#74b9ff">cmd/</span>
+│   └── <span style="color:#74b9ff">server/</span>
+│       └── <span style="color:#ffeaa7">main.go</span>              <span style="color:#55efc4">// Application entrypoint</span>
+│
+├── <span style="color:#74b9ff">internal/</span>
+│   ├── <span style="color:#74b9ff">config/</span>
+│   │   └── <span style="color:#ffeaa7">config.go</span>            <span style="color:#55efc4">// Reads env variables</span>
+│   ├── <span style="color:#74b9ff">database/</span>
+│   │   └── <span style="color:#ffeaa7">postgres.go</span>          <span style="color:#55efc4">// DB connection</span>
+│   ├── <span style="color:#74b9ff">models/</span>
+│   │   └── <span style="color:#ffeaa7">superhero.go</span>         <span style="color:#55efc4">// Structs</span>
+│   ├── <span style="color:#74b9ff">repository/</span>
+│   │   └── <span style="color:#ffeaa7">superhero_repository.go</span>  <span style="color:#55efc4">// SQL lives here</span>
+│   ├── <span style="color:#74b9ff">handlers/</span>
+│   │   └── <span style="color:#ffeaa7">superhero_handler.go</span> <span style="color:#55efc4">// HTTP logic</span>
+│   ├── <span style="color:#74b9ff">routes/</span>
+│   │   └── <span style="color:#ffeaa7">routes.go</span>            <span style="color:#55efc4">// API endpoints</span>
+│   └── <span style="color:#74b9ff">validation/</span>
+│       └── <span style="color:#ffeaa7">validator.go</span>         <span style="color:#55efc4">// Input validation</span>
+│
+├── <span style="color:#74b9ff">migrations/</span>                  <span style="color:#55efc4">// Database schema files</span>
+├── <span style="color:#ffeaa7">.env</span>                           <span style="color:#55efc4">// Environment variables</span>
+├── <span style="color:#ffeaa7">Dockerfile</span>                     <span style="color:#55efc4">// Go app container</span>
+├── <span style="color:#ffeaa7">docker-compose.yml</span>             <span style="color:#55efc4">// Multi-container setup</span>
+├── <span style="color:#ffeaa7">go.mod</span>                         <span style="color:#55efc4">// Go dependencies</span>
+└── <span style="color:#ffeaa7">README.md</span>                    <span style="color:#55efc4">// Documentation</span></pre>
+        </div>
+
+        <div class="mt-4 p-4 info-box-blue rounded-lg">
+            <p class="text-blue-900"><span class="font-bold">🧠 Remember:</span> <code class="inline-code">cmd/server/main.go</code> is where <code class="inline-code">func main()</code> lives. Everything else is in <code class="inline-code">internal/</code> — Go's convention for private application code.</p>
+        </div>
+    </div>
+
+    <!-- Why This Structure -->
+    <div class="bg-white p-6 rounded-lg paper-shadow mb-8 transform -rotate-1">
+        <h3 class="text-2xl font-bold mb-4 text-gray-800">Why This Structure? <span class="emoji-big">🤔</span></h3>
+        <div class="space-y-3">
+            <div class="flex items-start gap-3">
+                <span class="text-2xl">📂</span>
+                <div><span class="font-bold">cmd/</span> — Application entrypoint. Contains <code class="inline-code">func main()</code></div>
+            </div>
+            <div class="flex items-start gap-3">
+                <span class="text-2xl">⚙️</span>
+                <div><span class="font-bold">config/</span> — Reads environment variables like <code class="inline-code">DB_HOST=localhost</code></div>
+            </div>
+            <div class="flex items-start gap-3">
+                <span class="text-2xl">🔗</span>
+                <div><span class="font-bold">database/</span> — Creates the PostgreSQL connection pool</div>
+            </div>
+            <div class="flex items-start gap-3">
+                <span class="text-2xl">📦</span>
+                <div><span class="font-bold">models/</span> — Contains structs like <code class="inline-code">type Superhero struct {}</code></div>
+            </div>
+            <div class="flex items-start gap-3">
+                <span class="text-2xl">🗄️</span>
+                <div><span class="font-bold">repository/</span> — SQL lives here: INSERT, SELECT, UPDATE, DELETE</div>
+            </div>
+            <div class="flex items-start gap-3">
+                <span class="text-2xl">🌐</span>
+                <div><span class="font-bold">handlers/</span> — HTTP logic: POST /superheroes, GET /superheroes</div>
+            </div>
+            <div class="flex items-start gap-3">
+                <span class="text-2xl">🛣️</span>
+                <div><span class="font-bold">routes/</span> — Registers all API endpoints with Gin</div>
+            </div>
+            <div class="flex items-start gap-3">
+                <span class="text-2xl">📜</span>
+                <div><span class="font-bold">migrations/</span> — Database schema files like <code class="inline-code">CREATE TABLE superheroes</code></div>
+            </div>
+        </div>
+    </div>
+
+    <!-- ═══════════════════════════════════════════════════════════════ -->
+    <!--                    COMPLETE ROADMAP                             -->
+    <!-- ═══════════════════════════════════════════════════════════════ -->
+    <div class="page-break"></div>
+    <div class="hero-dark p-8 rounded-lg paper-shadow mb-8 text-center">
+        <h3 class="text-2xl font-bold mb-6 text-yellow-300">🗺️ Complete 5-Phase Roadmap</h3>
+
+        <div class="space-y-4 text-left max-w-lg mx-auto">
+            <div class="bg-blue-600 p-4 rounded-lg">
+                <div class="font-bold text-white text-xl">Phase 1: Project Planning ✅</div>
+                <div class="text-blue-100">Architecture, Database Design, Roadmap (You are here!)</div>
+            </div>
+            <div class="flow-arrow">⬇️</div>
+            <div class="bg-green-600 p-4 rounded-lg">
+                <div class="font-bold text-white text-xl">Phase 2: PostgreSQL + Docker</div>
+                <div class="text-green-100">Docker Compose, PostgreSQL Container, Volume, Table</div>
+            </div>
+            <div class="flow-arrow">⬇️</div>
+            <div class="bg-purple-600 p-4 rounded-lg">
+                <div class="font-bold text-white text-xl">Phase 3: Go + PostgreSQL Connection</div>
+                <div class="text-purple-100">database/sql, Driver, Connection Pool, Repository Layer</div>
+            </div>
+            <div class="flow-arrow">⬇️</div>
+            <div class="bg-orange-600 p-4 rounded-lg">
+                <div class="font-bold text-white text-xl">Phase 4: Complete CRUD API</div>
+                <div class="text-orange-100">POST, GET ALL, GET BY ID, PUT, DELETE</div>
+            </div>
+            <div class="flow-arrow">⬇️</div>
+            <div class="bg-red-600 p-4 rounded-lg">
+                <div class="font-bold text-white text-xl">Phase 5: Production Improvements</div>
+                <div class="text-red-100">Validation, Config, Logging, Migrations, Best Practices</div>
+            </div>
+        </div>
+    </div>
+
+    <!-- ═══════════════════════════════════════════════════════════════ -->
+    <!--                    PHASE 1 CHECKLIST                            -->
+    <!-- ═══════════════════════════════════════════════════════════════ -->
+    <div class="sticky-note-green p-6 mb-8 transform rotate-1">
+        <h3 class="text-2xl font-bold mb-3 text-gray-800">✅ Phase 1 Checklist</h3>
+        <p class="text-lg">Here's what we've planned and what comes next!</p>
+    </div>
+
+    <div class="bg-white p-6 rounded-lg paper-shadow mb-8 transform -rotate-1">
+        <h3 class="text-2xl font-bold mb-4 text-gray-800">What We Planned <span class="emoji-big">📋</span></h3>
+        <div class="grid md:grid-cols-2 gap-4">
+            <div class="space-y-2">
+                <div class="flex items-center gap-2">
+                    <span class="text-green-500 text-xl">✅</span>
+                    <span>Superhero CRUD API architecture</span>
+                </div>
+                <div class="flex items-center gap-2">
+                    <span class="text-green-500 text-xl">✅</span>
+                    <span>Database design</span>
+                </div>
+                <div class="flex items-center gap-2">
+                    <span class="text-green-500 text-xl">✅</span>
+                    <span>Docker strategy</span>
+                </div>
+                <div class="flex items-center gap-2">
+                    <span class="text-green-500 text-xl">✅</span>
+                    <span>PostgreSQL strategy</span>
+                </div>
+                <div class="flex items-center gap-2">
+                    <span class="text-green-500 text-xl">✅</span>
+                    <span>Go backend strategy</span>
+                </div>
+                <div class="flex items-center gap-2">
+                    <span class="text-green-500 text-xl">✅</span>
+                    <span>Folder structure roadmap</span>
+                </div>
+            </div>
+            <div class="space-y-2">
+                <div class="flex items-center gap-2">
+                    <span class="text-blue-500 text-xl">📦</span>
+                    <span><code class="inline-code">docker-compose.yml</code> (Phase 2)</span>
+                </div>
+                <div class="flex items-center gap-2">
+                    <span class="text-blue-500 text-xl">📦</span>
+                    <span><code class="inline-code">.env</code> (Phase 2)</span>
+                </div>
+                <div class="flex items-center gap-2">
+                    <span class="text-blue-500 text-xl">📦</span>
+                    <span>SQL migration files (Phase 2)</span>
+                </div>
+                <div class="flex items-center gap-2">
+                    <span class="text-purple-500 text-xl">🚀</span>
+                    <span><code class="inline-code">docker compose up</code> (Phase 2)</span>
+                </div>
+                <div class="flex items-center gap-2">
+                    <span class="text-purple-500 text-xl">🚀</span>
+                    <span><code class="inline-code">docker ps</code>, <code class="inline-code">docker exec</code> (Phase 2)</span>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- ═══════════════════════════════════════════════════════════════ -->
+    <!--                    NEW CONCEPTS LEARNED                         -->
+    <!-- ═══════════════════════════════════════════════════════════════ -->
+    <div class="sticky-note-orange p-6 mb-8 transform -rotate-1">
+        <h3 class="text-2xl font-bold mb-3 text-gray-800">🧠 New Concepts Learned in Phase 1</h3>
+        <p class="text-lg">You now understand these backend fundamentals!</p>
+    </div>
+
+    <div class="bg-white p-6 rounded-lg paper-shadow mb-8 transform rotate-1">
+        <div class="flex flex-wrap justify-center gap-2 text-sm">
+            <span class="tag-pill">Handler Layer</span>
+            <span class="tag-pill">Repository Layer</span>
+            <span class="tag-pill">database/sql Layer</span>
+            <span class="tag-pill">Docker Images</span>
+            <span class="tag-pill">Docker Containers</span>
+            <span class="tag-pill">Volumes</span>
+            <span class="tag-pill">Port Mapping</span>
+            <span class="tag-pill">Backend Layering</span>
+            <span class="tag-pill">Separation of Concerns</span>
+            <span class="tag-pill">Primary Keys</span>
+            <span class="tag-pill">CRUD Operations</span>
+            <span class="tag-pill">REST API</span>
+        </div>
+    </div>
+
+    <!-- ═══════════════════════════════════════════════════════════════ -->
+    <!--                    ARCHITECTURE RECAP                           -->
+    <!-- ═══════════════════════════════════════════════════════════════ -->
+    <div class="hero-dark p-8 rounded-lg paper-shadow mb-8 text-center">
+        <h3 class="text-2xl font-bold mb-6 text-yellow-300">🏛️ Architecture Recap</h3>
+
+        <div class="flex flex-wrap justify-center items-center gap-2 text-base md:text-lg font-mono">
+            <div class="bg-blue-600 px-3 py-2 rounded">Client</div>
+            <span class="text-yellow-400">→</span>
+            <div class="bg-green-600 px-3 py-2 rounded">Gin Router</div>
+            <span class="text-yellow-400">→</span>
+            <div class="bg-purple-600 px-3 py-2 rounded">Handler</div>
+            <span class="text-yellow-400">→</span>
+            <div class="bg-orange-600 px-3 py-2 rounded">Repository</div>
+            <span class="text-yellow-400">→</span>
+            <div class="bg-red-600 px-3 py-2 rounded">database/sql</div>
+            <span class="text-yellow-400">→</span>
+            <div class="bg-pink-600 px-3 py-2 rounded">PostgreSQL</div>
+        </div>
+
+        <div class="mt-6 text-2xl font-bold text-white">
+            Request → Gin → Handler → Repository → database/sql → PostgreSQL → JSON Response
+        </div>
+    </div>
+
+    <!-- ═══════════════════════════════════════════════════════════════ -->
+    <!--                    NEXT STEPS                                   -->
+    <!-- ═══════════════════════════════════════════════════════════════ -->
+    <div class="sticky-note-pink p-6 mb-8 transform rotate-1">
+        <h3 class="text-2xl font-bold mb-3 text-gray-800">🚀 Ready for Phase 2?</h3>
+        <p class="text-lg">Phase 1 is complete! Next up: <span class="font-bold">PostgreSQL + Docker + Database Design</span></p>
+    </div>
+
+    <div class="bg-white p-6 rounded-lg paper-shadow mb-8 transform -rotate-1">
+        <h3 class="text-2xl font-bold mb-4 text-gray-800">📚 What We'll Build in Phase 2 <span class="emoji-big">🐳</span></h3>
+        <p class="mb-4 text-lg">We'll create our first real files and run PostgreSQL inside Docker!</p>
+
+        <ul class="space-y-3">
+            <li class="flex items-center gap-3">
+                <span class="text-2xl">👉</span>
+                <span class="bg-blue-100 px-3 py-1 rounded-lg"><code class="inline-code">docker-compose.yml</code> — Define our PostgreSQL container</span>
+            </li>
+            <li class="flex items-center gap-3">
+                <span class="text-2xl">👉</span>
+                <span class="bg-green-100 px-3 py-1 rounded-lg"><code class="inline-code">.env</code> — Store database credentials safely</span>
+            </li>
+            <li class="flex items-center gap-3">
+                <span class="text-2xl">👉</span>
+                <span class="bg-purple-100 px-3 py-1 rounded-lg">SQL files — Create the <code class="inline-code">superheroes</code> table</span>
+            </li>
+            <li class="flex items-center gap-3">
+                <span class="text-2xl">👉</span>
+                <span class="bg-yellow-100 px-3 py-1 rounded-lg"><code class="inline-code">docker compose up</code> — Start everything!</span>
+            </li>
+        </ul>
+
+        <div class="mt-6 p-4 info-box-green rounded-lg border-2 border-green-300">
+            <p class="font-bold text-green-800 text-xl text-center">Reply with "Continue" and we'll start Phase 2! 🎉</p>
+        </div>
+    </div>
+
+    <!-- ═══════════════════════════════════════════════════════════════ -->
+    <!--                    PRINT BUTTON                                 -->
+    <!-- ═══════════════════════════════════════════════════════════════ -->
+    <div class="text-center no-print mb-8">
+        <button onclick="window.print()" class="bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 px-8 rounded-full text-xl shadow-lg transform transition hover:scale-105">
+            🖨️ Save as PDF / Print
+        </button>
+        <p class="mt-2 text-gray-600 text-sm">Use your browser's print dialog to save as PDF</p>
+    </div>
+
+    <!-- ═══════════════════════════════════════════════════════════════ -->
+    <!--                    CONTINUE TO PHASE 2 BUTTON                   -->
+    <!-- ═══════════════════════════════════════════════════════════════ -->
+    <div class="text-center no-print mb-12">
+        <div class="inline-block sticky-note-green p-8 transform rotate-1">
+            <h3 class="text-2xl font-bold mb-4 text-gray-800 handwritten">Ready for the next adventure?</h3>
+            <p class="text-lg mb-4 text-gray-700">Phase 2: PostgreSQL + Docker + Database Design</p>
+            <button onclick="alert('🚀 Phase 2 coming up next! Let\'s build our Docker container and create the superheroes table!')" class="bg-green-600 hover:bg-green-700 text-white font-bold py-4 px-10 rounded-full text-2xl shadow-lg transform transition hover:scale-110 hover:rotate-1">
+                🚀 Continue to Phase 2
+            </button>
+            <p class="mt-3 text-sm text-gray-600">Click to begin building with Docker & PostgreSQL!</p>
+        </div>
+    </div>
+
+</body>
+</html>

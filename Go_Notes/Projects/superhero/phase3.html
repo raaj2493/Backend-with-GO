@@ -1,0 +1,900 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Phase 3: Go + PostgreSQL Connection</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Caveat:wght@400;600;700&family=Patrick+Hand&family=Indie+Flower&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Patrick Hand', cursive;
+            background-color: #f4f1ea;
+            background-image: 
+                linear-gradient(#e1e1e1 1px, transparent 1px),
+                linear-gradient(90deg, #e1e1e1 1px, transparent 1px);
+            background-size: 20px 20px;
+        }
+        .handwritten { font-family: 'Caveat', cursive; }
+        .highlight {
+            background: linear-gradient(120deg, #ffeaa7 0%, #ffeaa7 100%);
+            background-repeat: no-repeat; background-size: 100% 40%;
+            background-position: 0 88%; padding: 0 4px;
+        }
+        .highlight-blue {
+            background: linear-gradient(120deg, #74b9ff 0%, #74b9ff 100%);
+            background-repeat: no-repeat; background-size: 100% 40%;
+            background-position: 0 88%; padding: 0 4px;
+        }
+        .highlight-pink {
+            background: linear-gradient(120deg, #fd79a8 0%, #fd79a8 100%);
+            background-repeat: no-repeat; background-size: 100% 40%;
+            background-position: 0 88%; padding: 0 4px;
+        }
+        .highlight-green {
+            background: linear-gradient(120deg, #55efc4 0%, #55efc4 100%);
+            background-repeat: no-repeat; background-size: 100% 40%;
+            background-position: 0 88%; padding: 0 4px;
+        }
+        .sticky-note {
+            background: #fff740; box-shadow: 2px 2px 10px rgba(0,0,0,0.1);
+            transform: rotate(-2deg);
+        }
+        .sticky-note-blue {
+            background: #7ee8fa; transform: rotate(2deg);
+            box-shadow: 2px 2px 10px rgba(0,0,0,0.1);
+        }
+        .sticky-note-pink {
+            background: #ff9999; transform: rotate(-1deg);
+            box-shadow: 2px 2px 10px rgba(0,0,0,0.1);
+        }
+        .sticky-note-green {
+            background: #55efc4; transform: rotate(1deg);
+            box-shadow: 2px 2px 10px rgba(0,0,0,0.1);
+        }
+        .sticky-note-purple {
+            background: #a29bfe; transform: rotate(-1.5deg);
+            box-shadow: 2px 2px 10px rgba(0,0,0,0.1);
+        }
+        .sticky-note-orange {
+            background: #fab1a0; transform: rotate(1.5deg);
+            box-shadow: 2px 2px 10px rgba(0,0,0,0.1);
+        }
+        .code-block {
+            font-family: 'Courier New', monospace;
+            background: #2d3436; color: #dfe6e9;
+            position: relative;
+        }
+        .code-block::before {
+            content: ''; position: absolute;
+            top: -5px; left: -5px; right: -5px; bottom: -5px;
+            background: #fff; z-index: -1;
+            transform: rotate(1deg);
+            box-shadow: 3px 3px 10px rgba(0,0,0,0.1);
+        }
+        code.inline-code {
+            font-family: 'Courier New', monospace;
+            background: #2d3436; color: #dfe6e9;
+            padding: 2px 8px; border-radius: 4px;
+            font-size: 0.9em;
+        }
+        @keyframes float {
+            0%, 100% { transform: translateY(0px) rotate(0deg); }
+            50% { transform: translateY(-10px) rotate(2deg); }
+        }
+        .float-anim { animation: float 3s ease-in-out infinite; }
+        @keyframes bounce {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-10px); }
+        }
+        .emoji-big {
+            font-size: 2.5rem; display: inline-block;
+            animation: bounce 2s infinite;
+        }
+        .paper-shadow {
+            box-shadow: 
+                0 1px 1px rgba(0,0,0,0.15), 
+                0 10px 0 -5px #eee, 
+                0 10px 1px -4px rgba(0,0,0,0.15), 
+                0 20px 0 -10px #eee, 
+                0 20px 1px -9px rgba(0,0,0,0.15);
+        }
+        .diagram-box {
+            border: 3px solid #2d3436; border-radius: 15px;
+            position: relative; background: white;
+        }
+        .diagram-box::before {
+            content: ''; position: absolute;
+            top: 5px; left: 5px; right: -5px; bottom: -5px;
+            border: 2px solid #b2bec3; border-radius: 15px; z-index: -1;
+        }
+        .tape {
+            position: absolute; top: -15px; left: 50%;
+            transform: translateX(-50%) rotate(-2deg);
+            width: 100px; height: 30px;
+            background: rgba(255,255,255,0.4);
+            box-shadow: 0 1px 3px rgba(0,0,0,0.2);
+        }
+        .step-badge {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white; width: 40px; height: 40px;
+            border-radius: 50%; display: flex;
+            align-items: center; justify-content: center;
+            font-weight: bold; font-size: 1.2rem; flex-shrink: 0;
+        }
+        .info-box-blue {
+            background: #ebf8ff; border-left: 4px solid #4299e1;
+        }
+        .info-box-green {
+            background: #f0fff4; border-left: 4px solid #48bb78;
+        }
+        .info-box-yellow {
+            background: #fffff0; border-left: 4px solid #ecc94b;
+        }
+        .info-box-red {
+            background: #fff5f5; border-left: 4px solid #f56565;
+        }
+        .info-box-purple {
+            background: #faf5ff; border-left: 4px solid #9f7aea;
+        }
+        .card-good {
+            background: #f0fff4; border: 2px solid #9ae6b4;
+        }
+        .card-bad {
+            background: #fff5f5; border: 2px solid #feb2b2;
+        }
+        .tag-pill {
+            background: white; padding: 4px 12px;
+            border-radius: 9999px;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+            font-size: 0.85rem; display: inline-block; margin: 2px;
+        }
+        .flow-arrow {
+            text-align: center; font-size: 2rem;
+            color: #a0aec0; margin: 8px 0;
+        }
+        .hero-dark {
+            background: #2d3748; color: white;
+        }
+        .hero-dark .highlight { color: #2d3748; }
+        @media print {
+            body { background: white; }
+            .no-print { display: none; }
+            .page-break { page-break-before: always; }
+        }
+        @media (max-width: 768px) {
+            .emoji-big { font-size: 1.8rem; }
+            .handwritten { font-size: 0.9em; }
+        }
+    </style>
+<base target="_blank">
+</head>
+<body class="p-4 md:p-8 max-w-4xl mx-auto">
+
+    <!-- TITLE SECTION -->
+    <div class="relative mb-12 text-center">
+        <div class="tape"></div>
+        <h1 class="text-5xl md:text-7xl font-bold text-gray-800 mb-4 handwritten transform -rotate-1">
+            Go + PostgreSQL
+        </h1>
+        <div class="text-2xl text-gray-600 handwritten">Phase 3: Connection, database/sql, Repository Layer</div>
+        <div class="mt-4 text-6xl float-anim">🐹</div>
+    </div>
+
+    <!-- START HERE -->
+    <div class="bg-white p-6 rounded-lg paper-shadow mb-8 relative transform rotate-1">
+        <div class="absolute -top-3 -right-3 bg-red-500 text-white px-4 py-1 rounded-full text-sm font-bold transform rotate-12">START HERE</div>
+        <h2 class="text-3xl font-bold mb-4 text-gray-800">Backend Development Truly Starts Here! <span class="emoji-big">🚀</span></h2>
+        <div class="space-y-2 text-xl text-gray-700">
+            <div class="flex items-center gap-2">
+                <span class="w-2 h-2 bg-green-500 rounded-full"></span>
+                <span>Docker ✅ PostgreSQL ✅ Table ✅ Data ✅</span>
+            </div>
+            <div class="flex items-center gap-2">
+                <span class="w-2 h-2 bg-blue-500 rounded-full"></span>
+                <span>Now we build the <span class="highlight">bridge</span> between <span class="highlight-blue">Go</span> and <span class="highlight-pink">PostgreSQL</span></span>
+            </div>
+            <div class="flex items-center gap-2">
+                <span class="w-2 h-2 bg-yellow-500 rounded-full"></span>
+                <span>Learn: <span class="highlight-green">drivers, connection pools, query execution, struct mapping</span></span>
+            </div>
+        </div>
+        <div class="mt-4 p-4 info-box-green rounded-lg">
+            <p class="text-lg font-semibold text-green-900">
+                <span class="font-bold">No HTTP endpoints yet.</span> First we learn how to <span class="highlight">talk to the database correctly</span> from Go! 🗣️
+            </p>
+        </div>
+    </div>
+
+    <!-- BIG PICTURE -->
+    <div class="sticky-note p-6 mb-8 text-center transform -rotate-1">
+        <h3 class="text-3xl font-bold mb-2 text-gray-800">🗺️ Big Picture</h3>
+        <p class="text-2xl text-gray-800">
+            After this phase, Go will be able to <span class="highlight">query PostgreSQL</span> and map results to structs!
+        </p>
+    </div>
+
+    <div class="bg-white p-6 rounded-lg paper-shadow mb-8 transform rotate-1">
+        <h3 class="text-2xl font-bold mb-6 text-center text-gray-800">Architecture After Phase 3</h3>
+        <div class="space-y-2">
+            <div class="diagram-box p-4 text-center bg-blue-50 mx-auto max-w-xs">
+                <div class="text-4xl mb-2">🐹</div>
+                <div class="font-bold text-xl text-gray-800">Go Application</div>
+            </div>
+            <div class="flow-arrow">⬇️</div>
+            <div class="diagram-box p-4 text-center bg-purple-50 mx-auto max-w-xs">
+                <div class="text-4xl mb-2">📂</div>
+                <div class="font-bold text-xl text-gray-800">Repository</div>
+            </div>
+            <div class="flow-arrow">⬇️</div>
+            <div class="diagram-box p-4 text-center bg-yellow-50 mx-auto max-w-xs">
+                <div class="text-4xl mb-2">🔗</div>
+                <div class="font-bold text-xl text-gray-800">database/sql</div>
+            </div>
+            <div class="flow-arrow">⬇️</div>
+            <div class="diagram-box p-4 text-center bg-orange-50 mx-auto max-w-xs">
+                <div class="text-4xl mb-2">⚡</div>
+                <div class="font-bold text-xl text-gray-800">pgx Driver</div>
+            </div>
+            <div class="flow-arrow">⬇️</div>
+            <div class="diagram-box p-4 text-center bg-red-50 mx-auto max-w-xs">
+                <div class="text-4xl mb-2">🐘</div>
+                <div class="font-bold text-xl text-gray-800">PostgreSQL</div>
+            </div>
+        </div>
+    </div>
+
+    <!-- CAN GO SPEAK POSTGRESQL? -->
+    <div class="sticky-note-pink p-6 mb-8 transform rotate-1">
+        <h3 class="text-2xl font-bold mb-3 text-gray-800">🤔 Can Go Speak PostgreSQL?</h3>
+        <p class="text-lg"><span class="font-bold">No.</span> Go only knows <code class="inline-code">database/sql</code> — a <span class="highlight">generic database API</span>. Think of it like a <span class="highlight-pink">Universal Remote Control</span> — it knows "Turn On" and "Volume Up" but does not know how to talk to a specific TV.</p>
+    </div>
+
+    <!-- WHY DRIVERS EXIST -->
+    <div class="bg-white p-6 rounded-lg paper-shadow mb-8 transform -rotate-1">
+        <h3 class="text-2xl font-bold mb-4 text-gray-800">🔌 Why Drivers Exist <span class="emoji-big">⚡</span></h3>
+        <div class="info-box-yellow p-4 rounded-lg mb-4">
+            <p class="text-xl">When <code class="inline-code">database/sql</code> says <code class="inline-code">db.Query(...)</code>, who converts that into <span class="highlight">PostgreSQL protocol packets</span>?</p>
+        </div>
+        <div class="p-4 info-box-green rounded-lg">
+            <p class="text-green-900"><span class="font-bold">Answer:</span> The <span class="highlight-green">Driver</span>! It sits between <code class="inline-code">database/sql</code> and PostgreSQL, translating Go function calls into database-specific language.</p>
+        </div>
+        <div class="mt-4 flex flex-wrap justify-center items-center gap-2 text-lg">
+            <div class="diagram-box p-3 bg-blue-100 text-center"><div class="font-bold">Go Code</div></div>
+            <span class="text-2xl text-blue-500">→</span>
+            <div class="diagram-box p-3 bg-yellow-100 text-center"><div class="font-bold">database/sql</div></div>
+            <span class="text-2xl text-yellow-500">→</span>
+            <div class="diagram-box p-3 bg-green-100 text-center"><div class="font-bold">Driver</div></div>
+            <span class="text-2xl text-green-500">→</span>
+            <div class="diagram-box p-3 bg-purple-100 text-center"><div class="font-bold">PostgreSQL</div></div>
+        </div>
+    </div>
+
+    <!-- DRIVER WE WILL USE -->
+    <div class="sticky-note-green p-6 mb-8 transform rotate-1">
+        <h3 class="text-2xl font-bold mb-3 text-gray-800">⚡ Driver We Will Use: pgx</h3>
+        <p class="text-lg">We will use <code class="inline-code">github.com/jackc/pgx/v5</code> — <span class="highlight">Modern, Fast, Widely used, Production-ready</span>.</p>
+    </div>
+
+    <!-- WHAT IS sql.DB? -->
+    <div class="page-break"></div>
+    <div class="bg-white p-6 rounded-lg paper-shadow mb-8 transform -rotate-1">
+        <div class="flex items-center gap-2 mb-4">
+            <span class="step-badge">!</span>
+            <h2 class="text-3xl font-bold text-gray-800">What Is sql.DB? (Big Misconception!)</h2>
+        </div>
+        <div class="info-box-red p-4 rounded-lg mb-4">
+            <p class="text-xl text-red-900"><span class="font-bold">❌ Many beginners think:</span> <code class="inline-code">db *sql.DB</code> means "One Database Connection"</p>
+        </div>
+        <div class="p-4 info-box-green rounded-lg border-2 border-green-300">
+            <p class="text-xl text-green-900"><span class="font-bold">✅ The truth:</span> <code class="inline-code">db *sql.DB</code> is actually a <span class="highlight">Connection Pool Manager</span>!</p>
+        </div>
+        <div class="mt-4">
+            <h3 class="text-xl font-bold text-gray-800 mb-3">Internal Architecture:</h3>
+            <div class="code-block p-4 rounded-lg overflow-x-auto text-sm md:text-base mb-4">
+<pre><span style="color:#55efc4">sql.DB</span>
+ ├── <span style="color:#74b9ff">Connection #1</span>
+ ├── <span style="color:#74b9ff">Connection #2</span>
+ ├── <span style="color:#74b9ff">Connection #3</span>
+ ├── <span style="color:#74b9ff">Connection #4</span>
+ └── <span style="color:#74b9ff">Connection #5</span></pre>
+            </div>
+            <p class="text-lg text-gray-700">It <span class="highlight">manages many connections</span>. Not one.</p>
+        </div>
+    </div>
+
+    <!-- WHY CONNECTION POOLS EXIST -->
+    <div class="grid md:grid-cols-2 gap-4 mb-8">
+        <div class="card-bad p-4 rounded-lg">
+            <h4 class="font-bold text-xl mb-2 text-red-800">❌ Without Pooling</h4>
+            <ul class="list-disc list-inside space-y-1 text-red-700">
+                <li>100 requests arrive</li>
+                <li>Open Connection → Run Query → Close Connection</li>
+                <li>100 times!</li>
+                <li><span class="font-bold">Slow. Very slow.</span></li>
+            </ul>
+        </div>
+        <div class="card-good p-4 rounded-lg">
+            <h4 class="font-bold text-xl mb-2 text-green-800">✅ With Pooling</h4>
+            <ul class="list-disc list-inside space-y-1 text-green-700">
+                <li>100 requests arrive</li>
+                <li><span class="highlight">Reuse Existing Connections</span></li>
+                <li>No opening/closing overhead</li>
+                <li><span class="font-bold">Fast. Efficient. Professional.</span></li>
+            </ul>
+        </div>
+    </div>
+
+    <!-- PROJECT STRUCTURE -->
+    <div class="sticky-note-purple p-6 mb-8 transform -rotate-1">
+        <h3 class="text-2xl font-bold mb-3 text-gray-800">📁 Updated Project Structure</h3>
+        <p class="text-lg">We now create the actual Go project files. Here is our updated folder tree:</p>
+    </div>
+
+    <div class="bg-white p-6 rounded-lg paper-shadow mb-8 transform rotate-1">
+        <div class="code-block p-4 rounded-lg overflow-x-auto text-sm md:text-base">
+<pre>superhero-api/
+├── <span style="color:#74b9ff">cmd/</span>
+│   └── <span style="color:#74b9ff">server/</span>
+│       └── <span style="color:#ffeaa7">main.go</span>
+├── <span style="color:#74b9ff">internal/</span>
+│   ├── <span style="color:#74b9ff">config/</span>
+│   │   └── <span style="color:#ffeaa7">config.go</span>
+│   ├── <span style="color:#74b9ff">database/</span>
+│   │   └── <span style="color:#ffeaa7">postgres.go</span>
+│   ├── <span style="color:#74b9ff">models/</span>
+│   │   └── <span style="color:#ffeaa7">superhero.go</span>
+│   └── <span style="color:#74b9ff">repository/</span>
+│       └── <span style="color:#ffeaa7">superhero_repository.go</span>
+├── <span style="color:#ffeaa7">.env</span>
+├── <span style="color:#ffeaa7">docker-compose.yml</span>
+├── <span style="color:#ffeaa7">go.mod</span>
+└── <span style="color:#ffeaa7">go.sum</span></pre>
+        </div>
+    </div>
+
+    <!-- STEP 1 -->
+    <div class="page-break"></div>
+    <div class="bg-white p-6 rounded-lg paper-shadow mb-8 transform -rotate-1">
+        <div class="flex items-center gap-2 mb-4">
+            <span class="step-badge">1</span>
+            <h2 class="text-3xl font-bold text-gray-800">Initialize Go Module</h2>
+        </div>
+        <div class="info-box-yellow p-4 rounded-lg mb-4">
+            <p class="text-xl"><span class="font-bold">Why?</span> Go modules manage dependencies. Without modules: no dependency management. With modules: <span class="highlight">versioned dependencies</span>.</p>
+        </div>
+        <div class="code-block p-4 rounded-lg overflow-x-auto text-sm md:text-base mb-4">
+<pre><span style="color:#fd79a8">go mod init</span> superhero-api</pre>
+        </div>
+        <div class="p-4 info-box-blue rounded-lg">
+            <p class="text-blue-900">This creates <code class="inline-code">go.mod</code>. Initially it looks like:</p>
+            <div class="code-block p-3 rounded-lg mt-2 text-sm">
+<pre><span style="color:#fd79a8">module</span> superhero-api
+
+<span style="color:#fd79a8">go</span> 1.25</pre>
+            </div>
+        </div>
+    </div>
+
+    <!-- STEP 2 -->
+    <div class="bg-white p-6 rounded-lg paper-shadow mb-8 transform rotate-1">
+        <div class="flex items-center gap-2 mb-4">
+            <span class="step-badge">2</span>
+            <h2 class="text-3xl font-bold text-gray-800">Install Dependencies</h2>
+        </div>
+        <div class="space-y-4">
+            <div>
+                <h3 class="text-xl font-bold text-gray-800 mb-2">Gin (HTTP Framework)</h3>
+                <div class="code-block p-4 rounded-lg overflow-x-auto text-sm md:text-base mb-2">
+<pre><span style="color:#fd79a8">go get</span> github.com/gin-gonic/gin</pre>
+                </div>
+            </div>
+            <div>
+                <h3 class="text-xl font-bold text-gray-800 mb-2">pgx Driver</h3>
+                <div class="code-block p-4 rounded-lg overflow-x-auto text-sm md:text-base mb-2">
+<pre><span style="color:#fd79a8">go get</span> github.com/jackc/pgx/v5</pre>
+                </div>
+            </div>
+            <div>
+                <h3 class="text-xl font-bold text-gray-800 mb-2">pgx database/sql Adapter</h3>
+                <div class="code-block p-4 rounded-lg overflow-x-auto text-sm md:text-base mb-2">
+<pre><span style="color:#fd79a8">go get</span> github.com/jackc/pgx/v5/stdlib</pre>
+                </div>
+                <div class="p-3 info-box-purple rounded-lg">
+                    <p class="text-purple-900"><span class="font-bold">Why stdlib?</span> Remember: <code class="inline-code">database/sql</code> <span class="highlight">expects drivers</span>. The adapter registers <code class="inline-code">pgx</code> as a valid driver for <code class="inline-code">sql.Open()</code>.</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- STEP 3 -->
+    <div class="page-break"></div>
+    <div class="bg-white p-6 rounded-lg paper-shadow mb-8 transform -rotate-1">
+        <div class="flex items-center gap-2 mb-4">
+            <span class="step-badge">3</span>
+            <h2 class="text-3xl font-bold text-gray-800">Create Model</h2>
+        </div>
+        <div class="info-box-yellow p-4 rounded-lg mb-4">
+            <p class="text-xl"><span class="font-bold">Why Models?</span> A database row <code class="inline-code">id=1, name=Iron Man</code> should become a <code class="inline-code">Superhero{}</code> struct in Go. Models define that structure.</p>
+        </div>
+        <p class="text-lg text-gray-700 mb-3">Create: <code class="inline-code">internal/models/superhero.go</code></p>
+        <div class="code-block p-4 rounded-lg overflow-x-auto text-sm md:text-base mb-4">
+<pre><span style="color:#fd79a8">package</span> models
+
+<span style="color:#fd79a8">import</span> <span style="color:#ffeaa7">"time"</span>
+
+<span style="color:#fd79a8">type</span> <span style="color:#55efc4">Superhero</span> <span style="color:#fd79a8">struct</span> {
+    ID         <span style="color:#55efc4">int</span>       <span style="color:#ffeaa7">`json:"id"`</span>
+    Name       <span style="color:#55efc4">string</span>    <span style="color:#ffeaa7">`json:"name"`</span>
+    RealName   <span style="color:#55efc4">string</span>    <span style="color:#ffeaa7">`json:"real_name"`</span>
+    Universe   <span style="color:#55efc4">string</span>    <span style="color:#ffeaa7">`json:"universe"`</span>
+    PowerLevel <span style="color:#55efc4">int</span>       <span style="color:#ffeaa7">`json:"power_level"`</span>
+    CreatedAt  <span style="color:#55efc4">time.Time</span> <span style="color:#ffeaa7">`json:"created_at"`</span>
+}</pre>
+        </div>
+        <div class="grid md:grid-cols-2 gap-4">
+            <div class="p-3 bg-blue-50 rounded-lg">
+                <span class="font-bold text-blue-800">package models</span>
+                <p class="text-blue-700">Places this file in the <code class="inline-code">models</code> package</p>
+            </div>
+            <div class="p-3 bg-green-50 rounded-lg">
+                <span class="font-bold text-green-800">import "time"</span>
+                <p class="text-green-700">Needed because <code class="inline-code">CreatedAt time.Time</code> uses Go's time type</p>
+            </div>
+            <div class="p-3 bg-yellow-50 rounded-lg">
+                <span class="font-bold text-yellow-800">type Superhero struct</span>
+                <p class="text-yellow-700">Blueprint for superhero data</p>
+            </div>
+            <div class="p-3 bg-purple-50 rounded-lg">
+                <span class="font-bold text-purple-800">json tags</span>
+                <p class="text-purple-700">Gin uses these when producing JSON responses</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- STEP 4 -->
+    <div class="bg-white p-6 rounded-lg paper-shadow mb-8 transform rotate-1">
+        <div class="flex items-center gap-2 mb-4">
+            <span class="step-badge">4</span>
+            <h2 class="text-3xl font-bold text-gray-800">Create Config Package</h2>
+        </div>
+        <div class="info-box-yellow p-4 rounded-lg mb-4">
+            <p class="text-xl"><span class="font-bold">Why?</span> Never hardcode <code class="inline-code">localhost</code>, <code class="inline-code">5432</code>, <code class="inline-code">postgres</code> inside code. Configuration should live <span class="highlight">separately</span>.</p>
+        </div>
+        <p class="text-lg text-gray-700 mb-3">Create: <code class="inline-code">internal/config/config.go</code></p>
+        <div class="code-block p-4 rounded-lg overflow-x-auto text-sm md:text-base mb-4">
+<pre><span style="color:#fd79a8">package</span> config
+
+<span style="color:#fd79a8">import</span> <span style="color:#ffeaa7">"os"</span>
+
+<span style="color:#fd79a8">type</span> <span style="color:#55efc4">Config</span> <span style="color:#fd79a8">struct</span> {
+    DBHost     <span style="color:#55efc4">string</span>
+    DBPort     <span style="color:#55efc4">string</span>
+    DBUser     <span style="color:#55efc4">string</span>
+    DBPassword <span style="color:#55efc4">string</span>
+    DBName     <span style="color:#55efc4">string</span>
+}
+
+<span style="color:#fd79a8">func</span> <span style="color:#74b9ff">Load</span>() <span style="color:#55efc4">Config</span> {
+    <span style="color:#fd79a8">return</span> <span style="color:#55efc4">Config</span>{
+        DBHost:     <span style="color:#74b9ff">getEnv</span>(<span style="color:#ffeaa7">"DB_HOST"</span>, <span style="color:#ffeaa7">"localhost"</span>),
+        DBPort:     <span style="color:#74b9ff">getEnv</span>(<span style="color:#ffeaa7">"DB_PORT"</span>, <span style="color:#ffeaa7">"5432"</span>),
+        DBUser:     <span style="color:#74b9ff">getEnv</span>(<span style="color:#ffeaa7">"DB_USER"</span>, <span style="color:#ffeaa7">"postgres"</span>),
+        DBPassword: <span style="color:#74b9ff">getEnv</span>(<span style="color:#ffeaa7">"DB_PASSWORD"</span>, <span style="color:#ffeaa7">"postgres"</span>),
+        DBName:     <span style="color:#74b9ff">getEnv</span>(<span style="color:#ffeaa7">"DB_NAME"</span>, <span style="color:#ffeaa7">"superhero_db"</span>),
+    }
+}
+
+<span style="color:#fd79a8">func</span> <span style="color:#74b9ff">getEnv</span>(key <span style="color:#55efc4">string</span>, fallback <span style="color:#55efc4">string</span>) <span style="color:#55efc4">string</span> {
+    value := os.<span style="color:#74b9ff">Getenv</span>(key)
+    <span style="color:#fd79a8">if</span> value == <span style="color:#ffeaa7">""</span> {
+        <span style="color:#fd79a8">return</span> fallback
+    }
+    <span style="color:#fd79a8">return</span> value
+}</pre>
+        </div>
+        <div class="p-4 info-box-green rounded-lg">
+            <p class="text-green-900"><span class="font-bold">💡 Why getEnv exists:</span> If <code class="inline-code">DB_HOST</code> does not exist, instead of crashing, the <span class="highlight">fallback</span> is used. Safe and reliable!</p>
+        </div>
+    </div>
+
+    <!-- STEP 5 -->
+    <div class="page-break"></div>
+    <div class="bg-white p-6 rounded-lg paper-shadow mb-8 transform -rotate-1">
+        <div class="flex items-center gap-2 mb-4">
+            <span class="step-badge">5</span>
+            <h2 class="text-3xl font-bold text-gray-800">Create Database Package</h2>
+        </div>
+        <div class="info-box-yellow p-4 rounded-lg mb-4">
+            <p class="text-xl"><span class="font-bold">This is the most important file of the phase!</span> It creates the connection between Go and PostgreSQL.</p>
+        </div>
+        <p class="text-lg text-gray-700 mb-3">Create: <code class="inline-code">internal/database/postgres.go</code></p>
+        <div class="code-block p-4 rounded-lg overflow-x-auto text-sm md:text-base mb-4">
+<pre><span style="color:#fd79a8">package</span> database
+
+<span style="color:#fd79a8">import</span> (
+    <span style="color:#ffeaa7">"database/sql"</span>
+    <span style="color:#ffeaa7">"fmt"</span>
+    _ <span style="color:#ffeaa7">"github.com/jackc/pgx/v5/stdlib"</span>
+    <span style="color:#ffeaa7">"superhero-api/internal/config"</span>
+)
+
+<span style="color:#fd79a8">func</span> <span style="color:#74b9ff">NewPostgresDB</span>(cfg config.<span style="color:#55efc4">Config</span>) (*sql.<span style="color:#55efc4">DB</span>, <span style="color:#55efc4">error</span>) {
+    dsn := fmt.<span style="color:#74b9ff">Sprintf</span>(
+        <span style="color:#ffeaa7">"host=%s port=%s user=%s password=%s dbname=%s sslmode=disable"</span>,
+        cfg.DBHost, cfg.DBPort, cfg.DBUser, cfg.DBPassword, cfg.DBName,
+    )
+    db, err := sql.<span style="color:#74b9ff">Open</span>(<span style="color:#ffeaa7">"pgx"</span>, dsn)
+    <span style="color:#fd79a8">if</span> err != <span style="color:#fd79a8">nil</span> {
+        <span style="color:#fd79a8">return</span> <span style="color:#fd79a8">nil</span>, err
+    }
+    err = db.<span style="color:#74b9ff">Ping</span>()
+    <span style="color:#fd79a8">if</span> err != <span style="color:#fd79a8">nil</span> {
+        <span style="color:#fd79a8">return</span> <span style="color:#fd79a8">nil</span>, err
+    }
+    <span style="color:#fd79a8">return</span> db, <span style="color:#fd79a8">nil</span>
+}</pre>
+        </div>
+    </div>
+
+    <!-- DEEP DIVE: sql.Open() -->
+    <div class="sticky-note-orange p-6 mb-8 transform -rotate-1">
+        <h3 class="text-2xl font-bold mb-3 text-gray-800">⚠️ Deep Dive: sql.Open()</h3>
+        <p class="text-lg">Most beginners think <code class="inline-code">sql.Open()</code> creates a database connection. <span class="font-bold">Not exactly!</span></p>
+    </div>
+
+    <div class="bg-white p-6 rounded-lg paper-shadow mb-8 transform rotate-1">
+        <h3 class="text-2xl font-bold mb-4 text-gray-800">What sql.Open() Really Does</h3>
+        <div class="space-y-3">
+            <div class="flex items-center gap-3"><span class="text-2xl">1️⃣</span><span>Creates a <span class="highlight">Connection Pool Manager</span> (<code class="inline-code">sql.DB</code>)</span></div>
+            <div class="flex items-center gap-3"><span class="text-2xl">2️⃣</span><span>Stores the <span class="highlight-blue">Driver</span> (pgx)</span></div>
+            <div class="flex items-center gap-3"><span class="text-2xl">3️⃣</span><span>Stores <span class="highlight-pink">Connection Info</span> (DSN string)</span></div>
+        </div>
+        <div class="mt-4 p-4 info-box-yellow rounded-lg">
+            <p class="text-yellow-900"><span class="font-bold">Important:</span> <span class="font-bold">No actual connection is made yet!</span> Just the manager is created.</p>
+        </div>
+    </div>
+
+    <!-- WHY PING EXISTS -->
+    <div class="bg-white p-6 rounded-lg paper-shadow mb-8 transform -rotate-1">
+        <h3 class="text-2xl font-bold mb-4 text-gray-800">🔍 Why Ping Exists</h3>
+        <div class="code-block p-4 rounded-lg overflow-x-auto text-sm md:text-base mb-4">
+<pre>err = db.<span style="color:#74b9ff">Ping</span>()</pre>
+        </div>
+        <div class="p-4 info-box-green rounded-lg">
+            <p class="text-green-900"><code class="inline-code">db.Ping()</code> <span class="highlight">forces</span> Go to verify: <span class="font-bold">"Can I actually reach PostgreSQL?"</span></p>
+        </div>
+        <div class="mt-4 p-4 info-box-red rounded-lg">
+            <p class="text-red-900"><span class="font-bold">Without Ping:</span> <code class="inline-code">sql.Open()</code> may <span class="font-bold">succeed even if PostgreSQL is down</span>! It only validates the DSN string format, not the actual connection.</p>
+        </div>
+    </div>
+
+    <!-- STEP 6 -->
+    <div class="page-break"></div>
+    <div class="bg-white p-6 rounded-lg paper-shadow mb-8 transform -rotate-1">
+        <div class="flex items-center gap-2 mb-4">
+            <span class="step-badge">6</span>
+            <h2 class="text-3xl font-bold text-gray-800">Repository Pattern</h2>
+        </div>
+        <div class="grid md:grid-cols-2 gap-4 mb-4">
+            <div class="card-bad p-4 rounded-lg">
+                <h4 class="font-bold text-xl mb-2 text-red-800">❌ Bad Approach</h4>
+                <p class="text-red-700">Handler → Raw SQL everywhere. Messy and unmaintainable!</p>
+            </div>
+            <div class="card-good p-4 rounded-lg">
+                <h4 class="font-bold text-xl mb-2 text-green-800">✅ Good Approach</h4>
+                <p class="text-green-700">Handler → Repository → Database. SQL stays in <span class="highlight">one place</span>!</p>
+            </div>
+        </div>
+        <p class="text-lg text-gray-700 mb-3">Create: <code class="inline-code">internal/repository/superhero_repository.go</code></p>
+        <div class="code-block p-4 rounded-lg overflow-x-auto text-sm md:text-base mb-4">
+<pre><span style="color:#fd79a8">package</span> repository
+
+<span style="color:#fd79a8">import</span> (
+    <span style="color:#ffeaa7">"database/sql"</span>
+    <span style="color:#ffeaa7">"superhero-api/internal/models"</span>
+)
+
+<span style="color:#fd79a8">type</span> <span style="color:#55efc4">SuperheroRepository</span> <span style="color:#fd79a8">struct</span> {
+    DB *sql.<span style="color:#55efc4">DB</span>
+}
+
+<span style="color:#fd79a8">func</span> <span style="color:#74b9ff">NewSuperheroRepository</span>(db *sql.<span style="color:#55efc4">DB</span>) *<span style="color:#55efc4">SuperheroRepository</span> {
+    <span style="color:#fd79a8">return</span> &amp;<span style="color:#55efc4">SuperheroRepository</span>{DB: db}
+}
+
+<span style="color:#fd79a8">func</span> (r *<span style="color:#55efc4">SuperheroRepository</span>) <span style="color:#74b9ff">GetAll</span>() ([]models.<span style="color:#55efc4">Superhero</span>, <span style="color:#55efc4">error</span>) {
+    rows, err := r.DB.<span style="color:#74b9ff">Query</span>(<span style="color:#ffeaa7">`SELECT id, name, real_name, universe, power_level, created_at FROM superheroes`</span>)
+    <span style="color:#fd79a8">if</span> err != <span style="color:#fd79a8">nil</span> {
+        <span style="color:#fd79a8">return</span> <span style="color:#fd79a8">nil</span>, err
+    }
+    <span style="color:#fd79a8">defer</span> rows.<span style="color:#74b9ff">Close</span>()
+    <span style="color:#fd79a8">var</span> superheroes []models.<span style="color:#55efc4">Superhero</span>
+    <span style="color:#fd79a8">for</span> rows.<span style="color:#74b9ff">Next</span>() {
+        <span style="color:#fd79a8">var</span> hero models.<span style="color:#55efc4">Superhero</span>
+        err := rows.<span style="color:#74b9ff">Scan</span>(&amp;hero.ID, &amp;hero.Name, &amp;hero.RealName, &amp;hero.Universe, &amp;hero.PowerLevel, &amp;hero.CreatedAt)
+        <span style="color:#fd79a8">if</span> err != <span style="color:#fd79a8">nil</span> {
+            <span style="color:#fd79a8">return</span> <span style="color:#fd79a8">nil</span>, err
+        }
+        superheroes = <span style="color:#74b9ff">append</span>(superheroes, hero)
+    }
+    <span style="color:#fd79a8">return</span> superheroes, <span style="color:#fd79a8">nil</span>
+}</pre>
+        </div>
+    </div>
+
+    <!-- DEEP DIVE: Query() -->
+    <div class="bg-white p-6 rounded-lg paper-shadow mb-8 transform rotate-1">
+        <h3 class="text-2xl font-bold mb-4 text-gray-800">🔍 Deep Dive: Query()</h3>
+        <div class="code-block p-4 rounded-lg overflow-x-auto text-sm md:text-base mb-4">
+<pre>rows, err := db.<span style="color:#74b9ff">Query</span>(...)</pre>
+        </div>
+        <div class="p-4 info-box-blue rounded-lg">
+            <p class="text-blue-900">Used when <span class="highlight">multiple rows</span> are expected. Example: <code class="inline-code">SELECT * FROM superheroes</code></p>
+        </div>
+        <div class="mt-4 p-4 info-box-purple rounded-lg">
+            <p class="text-purple-900">Returns <code class="inline-code">*sql.Rows</code> — think of it as a <span class="highlight">cursor</span> over results. You iterate through it row by row.</p>
+        </div>
+    </div>
+
+    <!-- DEEP DIVE: rows.Next() -->
+    <div class="bg-white p-6 rounded-lg paper-shadow mb-8 transform -rotate-1">
+        <h3 class="text-2xl font-bold mb-4 text-gray-800">🔍 Deep Dive: rows.Next()</h3>
+        <div class="p-4 info-box-yellow rounded-lg mb-4">
+            <p class="text-yellow-900">Moves the <span class="highlight">current row</span> to the next row. Each call advances through the results.</p>
+        </div>
+        <div class="flex items-center justify-center gap-2 text-lg">
+            <div class="diagram-box p-3 bg-blue-100 text-center"><div class="font-bold">Row 1</div><div class="text-sm">Iron Man</div></div>
+            <span class="text-2xl text-blue-500">→</span>
+            <div class="diagram-box p-3 bg-green-100 text-center"><div class="font-bold">Row 2</div><div class="text-sm">Batman</div></div>
+            <span class="text-2xl text-green-500">→</span>
+            <div class="diagram-box p-3 bg-purple-100 text-center"><div class="font-bold">Row 3</div><div class="text-sm">Thor</div></div>
+        </div>
+    </div>
+
+    <!-- DEEP DIVE: Scan() -->
+    <div class="bg-white p-6 rounded-lg paper-shadow mb-8 transform rotate-1">
+        <h3 class="text-2xl font-bold mb-4 text-gray-800">🔍 Deep Dive: Scan() — This Is Extremely Important!</h3>
+        <div class="info-box-yellow p-4 rounded-lg mb-4">
+            <p class="text-xl">Database row: <code class="inline-code">1 | Iron Man | Tony Stark | Marvel | 95</code></p>
+            <p class="text-xl mt-2">Scan copies column values into <span class="highlight">Go variables</span>:</p>
+        </div>
+        <div class="code-block p-4 rounded-lg overflow-x-auto text-sm md:text-base mb-4">
+<pre>rows.<span style="color:#74b9ff">Scan</span>(&amp;hero.ID, &amp;hero.Name, &amp;hero.RealName, &amp;hero.Universe, &amp;hero.PowerLevel, &amp;hero.CreatedAt)</pre>
+        </div>
+        <div class="flex flex-wrap justify-center items-center gap-2 text-lg mb-4">
+            <div class="diagram-box p-3 bg-red-100 text-center"><div class="font-bold">PostgreSQL Row</div></div>
+            <span class="text-2xl text-red-500">→</span>
+            <div class="diagram-box p-3 bg-yellow-100 text-center"><div class="font-bold">database/sql</div></div>
+            <span class="text-2xl text-yellow-500">→</span>
+            <div class="diagram-box p-3 bg-green-100 text-center"><div class="font-bold">Scan()</div></div>
+            <span class="text-2xl text-green-500">→</span>
+            <div class="diagram-box p-3 bg-blue-100 text-center"><div class="font-bold">Go Struct</div></div>
+        </div>
+        <div class="p-4 info-box-green rounded-lg">
+            <p class="text-green-900">This process is called <span class="highlight">Struct Mapping</span> — converting database rows into Go structs!</p>
+        </div>
+    </div>
+
+    <!-- STEP 7 -->
+    <div class="page-break"></div>
+    <div class="bg-white p-6 rounded-lg paper-shadow mb-8 transform -rotate-1">
+        <div class="flex items-center gap-2 mb-4">
+            <span class="step-badge">7</span>
+            <h2 class="text-3xl font-bold text-gray-800">Create Main File</h2>
+        </div>
+        <p class="text-lg text-gray-700 mb-3">Create: <code class="inline-code">cmd/server/main.go</code></p>
+        <div class="code-block p-4 rounded-lg overflow-x-auto text-sm md:text-base mb-4">
+<pre><span style="color:#fd79a8">package</span> main
+
+<span style="color:#fd79a8">import</span> (
+    <span style="color:#ffeaa7">"fmt"</span>
+    <span style="color:#ffeaa7">"log"</span>
+    <span style="color:#ffeaa7">"superhero-api/internal/config"</span>
+    <span style="color:#ffeaa7">"superhero-api/internal/database"</span>
+    <span style="color:#ffeaa7">"superhero-api/internal/repository"</span>
+)
+
+<span style="color:#fd79a8">func</span> <span style="color:#74b9ff">main</span>() {
+    cfg := config.<span style="color:#74b9ff">Load</span>()
+    db, err := database.<span style="color:#74b9ff">NewPostgresDB</span>(cfg)
+    <span style="color:#fd79a8">if</span> err != <span style="color:#fd79a8">nil</span> {
+        log.<span style="color:#74b9ff">Fatal</span>(err)
+    }
+    repo := repository.<span style="color:#74b9ff">NewSuperheroRepository</span>(db)
+    heroes, err := repo.<span style="color:#74b9ff">GetAll</span>()
+    <span style="color:#fd79a8">if</span> err != <span style="color:#fd79a8">nil</span> {
+        log.<span style="color:#74b9ff">Fatal</span>(err)
+    }
+    fmt.<span style="color:#74b9ff">Println</span>(<span style="color:#ffeaa7">"Superheroes:"</span>)
+    <span style="color:#fd79a8">for</span> _, hero := <span style="color:#fd79a8">range</span> heroes {
+        fmt.<span style="color:#74b9ff">Println</span>(hero)
+    }
+}</pre>
+        </div>
+    </div>
+
+    <!-- ENVIRONMENT VARIABLES -->
+    <div class="bg-white p-6 rounded-lg paper-shadow mb-8 transform rotate-1">
+        <h3 class="text-2xl font-bold mb-4 text-gray-800">⚙️ Environment Variables</h3>
+        <p class="text-lg text-gray-700 mb-3">Update your <code class="inline-code">.env</code>:</p>
+        <div class="code-block p-4 rounded-lg overflow-x-auto text-sm md:text-base mb-4">
+<pre>DB_HOST=localhost
+DB_PORT=5432
+DB_USER=postgres
+DB_PASSWORD=postgres
+DB_NAME=superhero_db</pre>
+        </div>
+        <div class="p-4 info-box-yellow rounded-lg">
+            <p class="text-yellow-900"><span class="font-bold">Important Note:</span> Our current <code class="inline-code">config.Load()</code> uses <code class="inline-code">os.Getenv()</code>. You must either export variables manually or in Phase 5 we will add automatic <code class="inline-code">.env</code> loading with <code class="inline-code">godotenv</code>. For now, exporting manually is fine for learning!</p>
+        </div>
+    </div>
+
+    <!-- WHAT HAPPENS WHEN WE RUN -->
+    <div class="sticky-note-purple p-6 mb-8 transform -rotate-1">
+        <h3 class="text-2xl font-bold mb-3 text-gray-800">🔄 What Happens When We Run?</h3>
+        <p class="text-lg">Run: <code class="inline-code">go run cmd/server/main.go</code></p>
+    </div>
+
+    <div class="bg-white p-6 rounded-lg paper-shadow mb-8 transform rotate-1">
+        <h3 class="text-2xl font-bold mb-4 text-center text-gray-800">Execution Flow</h3>
+        <div class="space-y-2">
+            <div class="diagram-box p-4 text-center bg-blue-50 mx-auto max-w-xs"><div class="font-bold text-xl">main()</div></div>
+            <div class="flow-arrow">⬇️</div>
+            <div class="diagram-box p-4 text-center bg-green-50 mx-auto max-w-xs"><div class="font-bold text-xl">Load Config</div></div>
+            <div class="flow-arrow">⬇️</div>
+            <div class="diagram-box p-4 text-center bg-yellow-50 mx-auto max-w-xs"><div class="font-bold text-xl">Create sql.DB Pool</div></div>
+            <div class="flow-arrow">⬇️</div>
+            <div class="diagram-box p-4 text-center bg-purple-50 mx-auto max-w-xs"><div class="font-bold text-xl">Ping PostgreSQL</div></div>
+            <div class="flow-arrow">⬇️</div>
+            <div class="diagram-box p-4 text-center bg-orange-50 mx-auto max-w-xs"><div class="font-bold text-xl">Create Repository</div></div>
+            <div class="flow-arrow">⬇️</div>
+            <div class="diagram-box p-4 text-center bg-red-50 mx-auto max-w-xs"><div class="font-bold text-xl">Run Query()</div></div>
+            <div class="flow-arrow">⬇️</div>
+            <div class="diagram-box p-4 text-center bg-blue-50 mx-auto max-w-xs"><div class="font-bold text-xl">Receive Rows</div></div>
+            <div class="flow-arrow">⬇️</div>
+            <div class="diagram-box p-4 text-center bg-green-50 mx-auto max-w-xs"><div class="font-bold text-xl">Scan()</div></div>
+            <div class="flow-arrow">⬇️</div>
+            <div class="diagram-box p-4 text-center bg-yellow-50 mx-auto max-w-xs"><div class="font-bold text-xl">Build []Superhero</div></div>
+            <div class="flow-arrow">⬇️</div>
+            <div class="diagram-box p-4 text-center bg-purple-50 mx-auto max-w-xs"><div class="font-bold text-xl">Print Heroes</div></div>
+        </div>
+    </div>
+
+    <!-- EXPECTED OUTPUT -->
+    <div class="bg-white p-6 rounded-lg paper-shadow mb-8 transform -rotate-1">
+        <h3 class="text-2xl font-bold mb-4 text-gray-800">✅ Expected Output</h3>
+        <div class="code-block p-4 rounded-lg overflow-x-auto text-sm md:text-base mb-4">
+<pre>Superheroes:
+{1 Iron Man Tony Stark Marvel 95 ...}</pre>
+        </div>
+        <div class="p-4 info-box-green rounded-lg border-2 border-green-300">
+            <p class="font-bold text-green-800">If you inserted more heroes, you will see more rows!</p>
+        </div>
+    </div>
+
+    <!-- PHASE 3 CHECKLIST -->
+    <div class="page-break"></div>
+    <div class="hero-dark p-8 rounded-lg paper-shadow mb-8 text-center">
+        <h3 class="text-2xl font-bold mb-6 text-yellow-300">✅ Phase 3 Checklist</h3>
+        <div class="grid md:grid-cols-2 gap-6 text-left">
+            <div>
+                <h4 class="font-bold text-xl text-green-300 mb-3">🏗️ Built</h4>
+                <div class="space-y-2">
+                    <div class="flex items-center gap-2"><span class="text-green-400 text-xl">✅</span><span>Go module</span></div>
+                    <div class="flex items-center gap-2"><span class="text-green-400 text-xl">✅</span><span>Model layer</span></div>
+                    <div class="flex items-center gap-2"><span class="text-green-400 text-xl">✅</span><span>Config layer</span></div>
+                    <div class="flex items-center gap-2"><span class="text-green-400 text-xl">✅</span><span>Database layer</span></div>
+                    <div class="flex items-center gap-2"><span class="text-green-400 text-xl">✅</span><span>Repository layer</span></div>
+                    <div class="flex items-center gap-2"><span class="text-green-400 text-xl">✅</span><span>PostgreSQL connection</span></div>
+                    <div class="flex items-center gap-2"><span class="text-green-400 text-xl">✅</span><span>Query execution</span></div>
+                    <div class="flex items-center gap-2"><span class="text-green-400 text-xl">✅</span><span>Struct mapping</span></div>
+                </div>
+            </div>
+            <div>
+                <h4 class="font-bold text-xl text-blue-300 mb-3">🧠 Learned</h4>
+                <div class="space-y-2">
+                    <div class="flex items-center gap-2"><span class="text-blue-400 text-xl">📘</span><span>Drivers (pgx)</span></div>
+                    <div class="flex items-center gap-2"><span class="text-blue-400 text-xl">📘</span><span>database/sql</span></div>
+                    <div class="flex items-center gap-2"><span class="text-blue-400 text-xl">📘</span><span>sql.DB (Connection Pool)</span></div>
+                    <div class="flex items-center gap-2"><span class="text-blue-400 text-xl">📘</span><span>Query()</span></div>
+                    <div class="flex items-center gap-2"><span class="text-blue-400 text-xl">📘</span><span>Rows</span></div>
+                    <div class="flex items-center gap-2"><span class="text-blue-400 text-xl">📘</span><span>Scan()</span></div>
+                    <div class="flex items-center gap-2"><span class="text-blue-400 text-xl">📘</span><span>Repository Pattern</span></div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- END OF PHASE 3 -->
+    <div class="sticky-note p-6 mb-8 text-center transform -rotate-1">
+        <h3 class="text-3xl font-bold mb-2 text-gray-800">🎉 End of Phase 3</h3>
+        <p class="text-2xl text-gray-800">Go can now <span class="highlight">talk to PostgreSQL</span>! 🐹 ↔️ 🐘</p>
+    </div>
+
+    <!-- WHAT WE BUILT -->
+    <div class="bg-white p-6 rounded-lg paper-shadow mb-8 transform rotate-1">
+        <h3 class="text-2xl font-bold mb-4 text-gray-800">📦 What We Built <span class="emoji-big">🏗️</span></h3>
+        <div class="space-y-2">
+            <div class="flex items-center gap-2"><span class="w-2 h-2 bg-green-500 rounded-full"></span><span>A Go application that <span class="highlight">connects to PostgreSQL</span></span></div>
+            <div class="flex items-center gap-2"><span class="w-2 h-2 bg-blue-500 rounded-full"></span><span>Runs SQL queries through the <span class="highlight-blue">Repository pattern</span></span></div>
+            <div class="flex items-center gap-2"><span class="w-2 h-2 bg-yellow-500 rounded-full"></span><span><span class="highlight-pink">Maps rows to structs</span> and prints data</span></div>
+        </div>
+    </div>
+
+    <!-- FILES CREATED -->
+    <div class="bg-white p-6 rounded-lg paper-shadow mb-8 transform -rotate-1">
+        <h3 class="text-2xl font-bold mb-4 text-gray-800">📁 Files Created</h3>
+        <div class="space-y-2 text-lg">
+            <div class="flex items-center gap-2"><span class="text-2xl">📄</span><code class="inline-code">cmd/server/main.go</code></div>
+            <div class="flex items-center gap-2"><span class="text-2xl">📄</span><code class="inline-code">internal/config/config.go</code></div>
+            <div class="flex items-center gap-2"><span class="text-2xl">📄</span><code class="inline-code">internal/database/postgres.go</code></div>
+            <div class="flex items-center gap-2"><span class="text-2xl">📄</span><code class="inline-code">internal/models/superhero.go</code></div>
+            <div class="flex items-center gap-2"><span class="text-2xl">📄</span><code class="inline-code">internal/repository/superhero_repository.go</code></div>
+        </div>
+    </div>
+
+    <!-- COMMANDS USED -->
+    <div class="bg-white p-6 rounded-lg paper-shadow mb-8 transform rotate-1">
+        <h3 class="text-2xl font-bold mb-4 text-gray-800">⌨️ Commands Used</h3>
+        <div class="code-block p-4 rounded-lg overflow-x-auto text-sm md:text-base">
+<pre><span style="color:#fd79a8">go mod init</span> superhero-api
+<span style="color:#fd79a8">go get</span> github.com/gin-gonic/gin
+<span style="color:#fd79a8">go get</span> github.com/jackc/pgx/v5
+<span style="color:#fd79a8">go get</span> github.com/jackc/pgx/v5/stdlib
+<span style="color:#fd79a8">go run</span> cmd/server/main.go</pre>
+        </div>
+    </div>
+
+    <!-- ARCHITECTURE RECAP -->
+    <div class="hero-dark p-8 rounded-lg paper-shadow mb-8 text-center">
+        <h3 class="text-2xl font-bold mb-6 text-yellow-300">🏛️ Architecture Recap</h3>
+        <div class="flex flex-wrap justify-center items-center gap-2 text-base md:text-lg font-mono">
+            <div class="bg-blue-600 px-3 py-2 rounded">main.go</div>
+            <span class="text-yellow-400">→</span>
+            <div class="bg-green-600 px-3 py-2 rounded">Repository</div>
+            <span class="text-yellow-400">→</span>
+            <div class="bg-purple-600 px-3 py-2 rounded">database/sql</div>
+            <span class="text-yellow-400">→</span>
+            <div class="bg-orange-600 px-3 py-2 rounded">pgx Driver</div>
+            <span class="text-yellow-400">→</span>
+            <div class="bg-red-600 px-3 py-2 rounded">PostgreSQL</div>
+        </div>
+        <div class="mt-6 text-2xl font-bold text-white">Go ↔️ PostgreSQL Connection Ready! ✅</div>
+    </div>
+
+    <!-- BACKEND FLOW RECAP -->
+    <div class="sticky-note-blue p-6 mb-8 transform rotate-1">
+        <h3 class="text-2xl font-bold mb-3 text-gray-800">🔄 Backend Flow Recap</h3>
+        <p class="text-lg">Go Code → Query() → PostgreSQL → Rows → Scan() → Superhero Struct → Output</p>
+    </div>
+
+    <!-- NEXT STEPS -->
+    <div class="bg-white p-6 rounded-lg paper-shadow mb-8 transform -rotate-1">
+        <h3 class="text-2xl font-bold mb-4 text-gray-800">📚 Next Up: Phase 4 <span class="emoji-big">🌐</span></h3>
+        <p class="mb-4 text-lg">Phase 4: <span class="font-bold">Complete CRUD API with Gin</span></p>
+        <p class="text-gray-700">We will build all <span class="highlight">five endpoints</span> and deeply learn <code class="inline-code">Exec()</code>, <code class="inline-code">QueryRow()</code>, request handling, JSON binding, and the complete request lifecycle!</p>
+    </div>
+
+    <!-- PRINT BUTTON -->
+    <div class="text-center no-print mb-8">
+        <button onclick="window.print()" class="bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 px-8 rounded-full text-xl shadow-lg transform transition hover:scale-105">
+            🖨️ Save as PDF / Print
+        </button>
+        <p class="mt-2 text-gray-600 text-sm">Use your browser's print dialog to save as PDF</p>
+    </div>
+
+    <!-- CONTINUE TO PHASE 4 BUTTON -->
+    <div class="text-center no-print mb-12">
+        <div class="inline-block sticky-note-green p-8 transform rotate-1">
+            <h3 class="text-2xl font-bold mb-4 text-gray-800 handwritten">Ready for the next adventure?</h3>
+            <p class="text-lg mb-4 text-gray-700">Phase 4: Complete CRUD API with Gin</p>
+            <button onclick="alert('🚀 Phase 4 coming up next! Let us build all five HTTP endpoints with Gin!')" class="bg-green-600 hover:bg-green-700 text-white font-bold py-4 px-10 rounded-full text-2xl shadow-lg transform transition hover:scale-110 hover:rotate-1">
+                🚀 Continue to Phase 4
+            </button>
+            <p class="mt-3 text-sm text-gray-600">Click to build the full CRUD API!</p>
+        </div>
+    </div>
+
+</body>
+</html>
